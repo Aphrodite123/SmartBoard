@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--Toolbar-->
+    <dimen name="toolbar_title_height">48dp</dimen>
+
+    <dimen name="ipen_short_line_width">30dp</dimen>
+    <dimen name="ipen_short_line_bottom_width">26dp</dimen>
+    <dimen name="ipen_short_line_left_margin">5dp</dimen>
+    <dimen name="ipen_short_line_right_margin">5dp</dimen>
+
+</resources>

@@ -1,0 +1,118 @@
+apply plugin: 'com.android.application'
+apply plugin: 'realm-android'
+
+android {
+    compileSdkVersion 28
+    buildToolsVersion '28.0.3'
+
+    defaultConfig {
+        applicationId "com.aphrodite.smartboard"
+        minSdkVersion 19
+        targetSdkVersion 28
+        versionCode 1
+        versionName "1.0.0"
+        multiDexEnabled true
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        ndk { abiFilters "armeabi-v7a", "arm64-v8a" }
+
+        externalNativeBuild {
+            cmake {
+                cppFlags ""
+            }
+        }
+    }
+
+    externalNativeBuild {
+        cmake {
+            path "CMakeLists.txt"
+        }
+    }
+
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['libs']
+            jni.srcDirs = []
+        }
+    }
+
+    signingConfigs {
+        debug {
+            storeFile file(storefile)
+            storePassword storepassword
+            keyAlias keyalias
+            keyPassword keypassword
+        }
+
+        release {
+            storeFile file(storefile)
+            storePassword storepassword
+            keyAlias keyalias
+            keyPassword keypassword
+        }
+    }
+
+    buildTypes {
+        /*正式环境*/
+        debug {
+            minifyEnabled false
+            shrinkResources false
+            matchingFallbacks = ['release', 'debug']
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.debug
+            //是否输出日志
+            buildConfigField 'boolean', 'IS_DEBUG', 'true'
+            //服务器地址
+            buildConfigField 'String', 'SERVER_URL', '"https://www.dbmeinv.com/"'
+        }
+        release {
+            minifyEnabled true
+            shrinkResources false
+            matchingFallbacks = ['release', 'debug']
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+            //是否输出日志
+            buildConfigField 'boolean', 'IS_DEBUG', 'false'
+            //服务器地址
+            buildConfigField 'String', 'SERVER_URL', '"https://www.dbmeinv.com/"'
+            debuggable false
+        }
+    }
+
+    lintOptions {
+        abortOnError false
+    }
+
+    compileOptions {
+        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_1_8
+    }
+
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'com.google.android.material:material:1.1.0'
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'com.aphrodite.framework:framework-base:1.0.4'
+    /**
+     * Log
+     */
+    implementation 'com.orhanobut:logger:2.2.0'
+    /**
+     * 注解框架
+     */
+    implementation 'com.jakewharton:butterknife:10.2.1'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:10.2.1'
+    implementation 'com.jakewharton.rxbinding:rxbinding:0.4.0'
+    /**
+     * Stetho调试 Realm
+     */
+    implementation 'com.facebook.stetho:stetho:1.5.0'
+    implementation 'com.uphyca:stetho_realm:2.2.2'
+    /**
+     * EventBus
+     */
+    implementation 'org.greenrobot:eventbus:3.1.1'
+}

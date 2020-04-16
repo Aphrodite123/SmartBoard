@@ -1,15 +1,111 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:gravity="center"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
-    <Button
-        android:id="@+id/create_video_btn"
-        android:layout_width="wrap_content"
+    <com.aphrodite.smartboard.view.widget.viewpager.ConfigureSlideViewPager
+        android:id="@+id/tab_viewpager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <LinearLayout
+        android:id="@+id/tab_bottom_ll"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="生成视频" />
+        android:layout_alignParentBottom="true"
+        android:gravity="bottom"
+        android:orientation="horizontal">
 
-</LinearLayout>
+        <LinearLayout
+            android:id="@+id/tab_home_ll"
+            style="@style/tab_bottom_style"
+            android:layout_weight="1">
+
+            <ImageView
+                android:id="@+id/tab_home_ic"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_tab_home_selector" />
+
+            <TextView
+                android:id="@+id/tab_home_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/tab_home"
+                android:textColor="@color/tab_text_color_selector"
+                android:textSize="@dimen/font10" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/tab_found_ll"
+            style="@style/tab_bottom_style"
+            android:layout_weight="1">
+
+            <ImageView
+                android:id="@+id/tab_found_ic"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_tab_found_selector" />
+
+            <TextView
+                android:id="@+id/tab_found_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/tab_found"
+                android:textColor="@color/tab_text_color_selector"
+                android:textSize="@dimen/font10" />
+
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/tab_middle_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/middle_blue" />
+
+        <LinearLayout
+            android:id="@+id/tab_message_ll"
+            style="@style/tab_bottom_style"
+            android:layout_weight="1">
+
+            <ImageView
+                android:id="@+id/tab_message_ic"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_tab_message_selector" />
+
+            <TextView
+                android:id="@+id/tab_message_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/tab_message"
+                android:textColor="@color/tab_text_color_selector"
+                android:textSize="@dimen/font10" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/tab_mine_ll"
+            style="@style/tab_bottom_style"
+            android:layout_weight="1">
+
+            <ImageView
+                android:id="@+id/tab_mine_ic"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_tab_mine_selector" />
+
+            <TextView
+                android:id="@+id/tab_mine_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/tab_mine"
+                android:textColor="@color/tab_text_color_selector"
+                android:textSize="@dimen/font10" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</RelativeLayout>

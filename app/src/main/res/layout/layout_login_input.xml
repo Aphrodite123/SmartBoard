@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/login_input_root"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/dip48"
+    android:layout_gravity="center_vertical"
+    android:layout_marginLeft="@dimen/dip20"
+    android:layout_marginRight="@dimen/dip20"
+    android:gravity="center_vertical">
+
+    <ImageView
+        android:id="@+id/password_format_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:src="@drawable/ic_password_format_selector" />
+
+    <EditText
+        android:id="@+id/input_et"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="@dimen/dip20"
+        android:background="@android:color/transparent"
+        android:hint="@string/hint_input_password"
+        android:textSize="@dimen/font16" />
+
+    <TextView
+        android:id="@+id/forgot_password"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignParentRight="true"
+        android:gravity="center_vertical"
+        android:text="@string/forgot_password"
+        android:textColor="@color/color_626262"
+        android:textSize="@dimen/font14" />
+
+    <View
+        style="@style/divide_line_of_blue"
+        android:layout_alignParentBottom="true" />
+
+</RelativeLayout>

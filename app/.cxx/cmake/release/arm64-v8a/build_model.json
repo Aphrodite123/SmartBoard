@@ -5,9 +5,9 @@
     "environmentVariables": []
   },
   "cmake": {
-    "cmakeArtifactsBaseFolder": "/home/wl/AndroidStudioProjects/SmartBoard/app/.cxx/cmake/release/arm64-v8a",
-    "cmakeServerLogFile": "/home/wl/AndroidStudioProjects/SmartBoard/app/.cxx/cmake/release/arm64-v8a/cmake_server_log.txt",
-    "cmakeWrappingBaseFolder": "/home/wl/AndroidStudioProjects/SmartBoard/app/.cxx/cxx/release/arm64-v8a",
+    "cmakeArtifactsBaseFolder": "/home/share/Application/Aphrodite/SmartBoard/app/.cxx/cmake/release/arm64-v8a",
+    "cmakeServerLogFile": "/home/share/Application/Aphrodite/SmartBoard/app/.cxx/cmake/release/arm64-v8a/cmake_server_log.txt",
+    "cmakeWrappingBaseFolder": "/home/share/Application/Aphrodite/SmartBoard/app/.cxx/cxx/release/arm64-v8a",
     "effectiveConfiguration": {
       "name": "traditional-android-studio-cmake-environment",
       "description": "Composite reified CMakeSettings configuration",
@@ -15,7 +15,7 @@
       "inheritEnvironments": [
         "ndk"
       ],
-      "buildRoot": "/home/wl/AndroidStudioProjects/SmartBoard/app/.cxx/cmake/release/arm64-v8a",
+      "buildRoot": "/home/share/Application/Aphrodite/SmartBoard/app/.cxx/cmake/release/arm64-v8a",
       "cmakeToolchain": "/home/wl/Android/Sdk/ndk/20.0.5594570/build/cmake/android.toolchain.cmake",
       "cmakeExecutable": "/home/wl/Android/Sdk/cmake/3.10.2.4988404/bin/cmake",
       "variables": [
@@ -53,7 +53,7 @@
         },
         {
           "name": "CMAKE_LIBRARY_OUTPUT_DIRECTORY",
-          "value": "/home/wl/AndroidStudioProjects/SmartBoard/app/build/intermediates/cmake/release/obj/arm64-v8a"
+          "value": "/home/share/Application/Aphrodite/SmartBoard/app/build/intermediates/cmake/release/obj/arm64-v8a"
         },
         {
           "name": "CMAKE_MAKE_PROGRAM",
@@ -70,14 +70,14 @@
       ]
     }
   },
-  "cxxBuildFolder": "/home/wl/AndroidStudioProjects/SmartBoard/app/.cxx/cmake/release/arm64-v8a",
+  "cxxBuildFolder": "/home/share/Application/Aphrodite/SmartBoard/app/.cxx/cmake/release/arm64-v8a",
   "info": {
     "abi": "ARM64_V8A",
     "bitness": 64,
     "deprecated": false,
     "default": true
   },
-  "originalCxxBuildFolder": "/home/wl/AndroidStudioProjects/SmartBoard/app/.cxx/cmake/release/arm64-v8a",
+  "originalCxxBuildFolder": "/home/share/Application/Aphrodite/SmartBoard/app/.cxx/cmake/release/arm64-v8a",
   "variant": {
     "buildSystemArgumentList": [],
     "buildTargetSet": [],
@@ -95,12 +95,12 @@
         "ninjaExe": "/home/wl/Android/Sdk/cmake/3.10.2.4988404/bin/ninja"
       },
       "cmakeToolchainFile": "/home/wl/Android/Sdk/ndk/20.0.5594570/build/cmake/android.toolchain.cmake",
-      "cxxFolder": "/home/wl/AndroidStudioProjects/SmartBoard/app/.cxx",
+      "cxxFolder": "/home/share/Application/Aphrodite/SmartBoard/app/.cxx",
       "gradleModulePathName": ":app",
-      "intermediatesFolder": "/home/wl/AndroidStudioProjects/SmartBoard/app/build/intermediates",
-      "makeFile": "/home/wl/AndroidStudioProjects/SmartBoard/app/CMakeLists.txt",
-      "moduleBuildFile": "/home/wl/AndroidStudioProjects/SmartBoard/app/build.gradle",
-      "moduleRootFolder": "/home/wl/AndroidStudioProjects/SmartBoard/app",
+      "intermediatesFolder": "/home/share/Application/Aphrodite/SmartBoard/app/build/intermediates",
+      "makeFile": "/home/share/Application/Aphrodite/SmartBoard/app/CMakeLists.txt",
+      "moduleBuildFile": "/home/share/Application/Aphrodite/SmartBoard/app/build.gradle",
+      "moduleRootFolder": "/home/share/Application/Aphrodite/SmartBoard/app",
       "ndkDefaultAbiList": [
         "ARMEABI_V7A",
         "ARM64_V8A",
@@ -163,12 +163,12 @@
       ],
       "ndkVersion": "20.0.5594570",
       "project": {
-        "compilerSettingsCacheFolder": "/home/wl/AndroidStudioProjects/SmartBoard/.cxx",
-        "cxxFolder": "/home/wl/AndroidStudioProjects/SmartBoard/.cxx",
+        "compilerSettingsCacheFolder": "/home/share/Application/Aphrodite/SmartBoard/.cxx",
+        "cxxFolder": "/home/share/Application/Aphrodite/SmartBoard/.cxx",
         "isBuildOnlyTargetAbiEnabled": true,
         "isCmakeBuildCohabitationEnabled": false,
         "isNativeCompilerSettingsCacheEnabled": false,
-        "rootBuildGradleFolder": "/home/wl/AndroidStudioProjects/SmartBoard",
+        "rootBuildGradleFolder": "/home/share/Application/Aphrodite/SmartBoard",
         "sdkFolder": "/home/wl/Android/Sdk"
       },
       "splitsAbiFilterSet": [],
@@ -184,7 +184,7 @@
         "SYSTEM": {}
       }
     },
-    "objFolder": "/home/wl/AndroidStudioProjects/SmartBoard/app/build/intermediates/cmake/release/obj",
+    "objFolder": "/home/share/Application/Aphrodite/SmartBoard/app/build/intermediates/cmake/release/obj",
     "variantName": "release",
     "validAbiList": [
       "ARMEABI_V7A",

@@ -22,4 +22,30 @@
         <item name="android:layout_height">1px</item>
     </style>
 
+    <style name="divide_line_of_blue">
+        <item name="android:background">@color/color_0392ff</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1px</item>
+    </style>
+
+    <style name="tab_bottom_style">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_centerVertical">true</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:gravity">center</item>
+        <item name="android:clickable">true</item>
+    </style>
+
+    <style name="login_button" parent="Widget.AppCompat.Button.Borderless">
+        <item name="android:minHeight">@dimen/dip40</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/dip40</item>
+        <item name="android:layout_marginLeft">@dimen/dip19</item>
+        <item name="android:layout_marginRight">@dimen/dip19</item>
+        <item name="android:textSize">@dimen/font13</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
 </resources>

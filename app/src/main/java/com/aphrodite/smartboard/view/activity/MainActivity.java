@@ -7,7 +7,6 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -23,8 +22,8 @@ import com.aphrodite.smartboard.R;
 import com.aphrodite.smartboard.application.MainApplication;
 import com.aphrodite.smartboard.config.AppConfig;
 import com.aphrodite.smartboard.model.ffmpeg.FFmpegHandler;
-import com.aphrodite.smartboard.utils.FFmpegUtil;
-import com.aphrodite.smartboard.utils.ParseUtil;
+import com.aphrodite.smartboard.utils.FFmpegUtils;
+import com.aphrodite.smartboard.utils.ParseUtils;
 import com.aphrodite.smartboard.view.activity.base.BaseActivity;
 import com.aphrodite.smartboard.view.adapter.HomeViewPagerAdapter;
 import com.aphrodite.smartboard.view.fragment.MineFragment;
@@ -169,7 +168,7 @@ public class MainActivity extends BaseActivity {
 
     //    @OnClick(R.id.create_video_btn)
     public void onCreateVideoClick() {
-        ParseUtil.getAssetsJson(this, "phone_region_code.json");
+        ParseUtils.getAssetsJson(this, "phone_region_code.json");
 
 //        if (hasPermission()) {
 //            pictureToGif();
@@ -191,7 +190,7 @@ public class MainActivity extends BaseActivity {
 
         String combineVideo = AppConfig.VIDEO_PATH + "video.mp4";
         int frameRate = 10;// 合成视频帧率建议:1-10  普通视频帧率一般为25
-        String[] commandLine = FFmpegUtil.pictureToVideo(AppConfig.VIDEO_PATH, frameRate, combineVideo);
+        String[] commandLine = FFmpegUtils.pictureToVideo(AppConfig.VIDEO_PATH, frameRate, combineVideo);
         if (mFfmpegHandler != null) {
             mFfmpegHandler.executeFFmpegCmd(commandLine);
         }
@@ -208,7 +207,7 @@ public class MainActivity extends BaseActivity {
         int gifDuration = 5;
         String resolution = "720x1280";//240x320、480x640、1080x1920
         int frameRate = 10;
-        String[] commandLine = FFmpegUtil.generateGif(srcFile, gifStart, gifDuration, resolution, frameRate, Video2Gif);
+        String[] commandLine = FFmpegUtils.generateGif(srcFile, gifStart, gifDuration, resolution, frameRate, Video2Gif);
         if (mFfmpegHandler != null) {
             mFfmpegHandler.executeFFmpegCmd(commandLine);
         }

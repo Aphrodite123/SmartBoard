@@ -34,6 +34,17 @@
         android:textColor="@color/color_626262"
         android:textSize="@dimen/font14" />
 
+    <TextView
+        android:id="@+id/auth_code"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignParentRight="true"
+        android:gravity="center_vertical"
+        android:text="@string/get_auth_code"
+        android:textColor="@color/color_27ace7"
+        android:textSize="@dimen/font14"
+        android:visibility="gone" />
+
     <View
         style="@style/divide_line_of_blue"
         android:layout_alignParentBottom="true" />

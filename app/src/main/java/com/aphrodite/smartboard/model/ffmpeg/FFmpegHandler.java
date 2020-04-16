@@ -2,7 +2,7 @@ package com.aphrodite.smartboard.model.ffmpeg;
 
 import android.os.Handler;
 
-import com.aphrodite.smartboard.utils.LogUtil;
+import com.aphrodite.smartboard.utils.LogUtils;
 
 /**
  * Handler消息处理器
@@ -44,13 +44,13 @@ public class FFmpegHandler {
         FFmpegTask.execute(commandLine, new OnHandleListener() {
             @Override
             public void onBegin() {
-                LogUtil.i(TAG, "handle onBegin...");
+                LogUtils.i(TAG, "handle onBegin...");
                 mHandler.obtainMessage(MSG_BEGIN).sendToTarget();
             }
 
             @Override
             public void onEnd(int resultCode, String resultMsg) {
-                LogUtil.i(TAG, "handle onEnd...");
+                LogUtils.i(TAG, "handle onEnd...");
                 if (isContinue) {
                     mHandler.obtainMessage(MSG_CONTINUE).sendToTarget();
                 } else {

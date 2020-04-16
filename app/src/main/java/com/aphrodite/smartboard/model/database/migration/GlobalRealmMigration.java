@@ -1,6 +1,6 @@
 package com.aphrodite.smartboard.model.database.migration;
 
-import com.aphrodite.smartboard.utils.LogUtil;
+import com.aphrodite.smartboard.utils.LogUtils;
 
 import io.realm.DynamicRealm;
 import io.realm.RealmMigration;
@@ -13,7 +13,7 @@ public class GlobalRealmMigration implements RealmMigration {
 
     @Override
     public void migrate(DynamicRealm realm, long oldVersion, long newVersion) {
-        LogUtil.i("Enter migrate method.oldVersion: " + oldVersion + ",newVersion: " + newVersion);
+        LogUtils.i("Enter migrate method.oldVersion: " + oldVersion + ",newVersion: " + newVersion);
         RealmSchema schema = realm.getSchema();
     }
 

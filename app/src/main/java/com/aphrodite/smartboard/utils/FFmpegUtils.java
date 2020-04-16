@@ -10,7 +10,7 @@ import java.util.Locale;
  * Created by frank on 2018/1/23.
  */
 
-public class FFmpegUtil {
+public class FFmpegUtils {
 
     /**
      * 使用ffmpeg命令行进行音频转码

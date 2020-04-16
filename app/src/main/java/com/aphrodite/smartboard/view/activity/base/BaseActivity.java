@@ -1,12 +1,14 @@
 package com.aphrodite.smartboard.view.activity.base;
 
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -21,6 +23,7 @@ import com.aphrodite.framework.utils.UIUtils;
 import com.aphrodite.framework.view.manager.ActivitysManager;
 import com.aphrodite.framework.view.widget.dialog.LoadingDialog;
 import com.aphrodite.smartboard.R;
+import com.aphrodite.smartboard.utils.KeyboardUtils;
 
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
@@ -165,18 +168,25 @@ public abstract class BaseActivity extends AppCompatActivity {
         }
     }
 
-    public void showKeyBoard(EditText editText) {
+    public void showKeyBoard(Context context, EditText editText) {
         if (null == editText) {
             return;
         }
-
-        editText.clearFocus();
+        editText.setFocusable(true);
+        editText.setFocusableInTouchMode(true);
         editText.requestFocus();
-        UIUtils.openSoftKeyboard(editText);
+
+        if (null == context) {
+            return;
+        }
+        KeyboardUtils.showKeyboard(context);
     }
 
-    public void hideKeyBoard() {
-        UIUtils.closeSoftKeyboard(this);
+    public void hideKeyBoard(Context context, EditText editText) {
+        if (null == context || null == editText) {
+            return;
+        }
+        KeyboardUtils.hideKeyboard(context, editText);
     }
 
     public void showLoadingDialog() {

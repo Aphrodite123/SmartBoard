@@ -7,7 +7,7 @@ import com.orhanobut.logger.Logger;
  * Created by Aphrodite on 2016/9/29.
  */
 
-public final class LogUtil {
+public final class LogUtils {
     /**
      * Send a DEBUG log message.
      *

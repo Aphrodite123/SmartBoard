@@ -11,7 +11,7 @@ import java.io.InputStreamReader;
 /**
  * Created by Aphrodite on 20-4-15
  */
-public class ParseUtil {
+public class ParseUtils {
     public interface CodeFormat {
         String UTF8 = "UTF-8";
     }
@@ -36,7 +36,7 @@ public class ParseUtil {
             }
             reader.close();
         } catch (IOException e) {
-            LogUtil.e("Enter to getAssetsJson. " + e);
+            LogUtils.e("Enter to getAssetsJson. " + e);
         }
         return builder.toString();
     }

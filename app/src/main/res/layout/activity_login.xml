@@ -32,7 +32,10 @@
             android:layout_marginLeft="@dimen/dip20"
             android:layout_weight="1"
             android:background="@android:color/transparent"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
             android:hint="@string/hint_input_mobile_phone"
+            android:inputType="number"
             android:textSize="@dimen/font16" />
 
         <View

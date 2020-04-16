@@ -1,7 +1,7 @@
-Executable : /home/wl/Android/Sdk/cmake/3.10.2.4988404/bin/ninja
+Executable : E:\Software\Android\Sdk\cmake\3.10.2.4988404\bin\ninja.exe
 arguments : 
 -C
-/home/share/Application/Aphrodite/SmartBoard/app/.cxx/cmake/debug/armeabi-v7a
+D:\Application\SmartBoard\app\.cxx\cmake\debug\armeabi-v7a
 media-handle
 jvmArgs : 
 

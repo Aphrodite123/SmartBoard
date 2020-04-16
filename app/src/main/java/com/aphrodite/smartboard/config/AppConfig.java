@@ -16,4 +16,11 @@ public class AppConfig extends BaseConfig {
         int RECORD_PERMISSION = BASE + 1;
     }
 
+    public interface RegularModel {
+        /**
+         * 11位手机号码
+         */
+        String PHONE_PATTERN = "^((13[0-9])|(15[^4,\\D])|(18[0,5-9]))\\d{8}$";
+    }
+
 }

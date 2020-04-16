@@ -11,7 +11,7 @@ import com.aphrodite.framework.model.network.interceptor.BaseCommonParamIntercep
 import com.aphrodite.framework.utils.ToastUtils;
 import com.aphrodite.smartboard.application.base.BaseApplication;
 import com.aphrodite.smartboard.model.database.migration.GlobalRealmMigration;
-import com.aphrodite.smartboard.utils.LogUtil;
+import com.aphrodite.smartboard.utils.LogUtils;
 import com.facebook.stetho.Stetho;
 import com.orhanobut.logger.AndroidLogAdapter;
 import com.orhanobut.logger.Logger;
@@ -110,7 +110,7 @@ public class MainApplication extends BaseApplication {
         try {
             realm = Realm.getInstance(mRealmConfiguration);
         } catch (RealmMigrationNeededException e) {
-            LogUtil.e("Enter getGlobalRealm method.RealmMigrationNeededException: " + e);
+            LogUtils.e("Enter getGlobalRealm method.RealmMigrationNeededException: " + e);
             Realm.migrateRealm(mRealmConfiguration, new GlobalRealmMigration());
             realm = Realm.getInstance(mRealmConfiguration);
         }

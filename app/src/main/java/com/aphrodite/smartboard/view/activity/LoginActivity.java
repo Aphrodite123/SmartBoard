@@ -12,6 +12,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.aphrodite.smartboard.R;
+import com.aphrodite.smartboard.utils.LogUtils;
 import com.aphrodite.smartboard.view.activity.base.BaseActivity;
 
 import butterknife.BindView;
@@ -121,6 +122,11 @@ public class LoginActivity extends BaseActivity {
             mPasswordInvisiable = true;
         }
         mInput.setSelection(mInput.length());
+    }
+
+    @OnClick(R.id.login_btn)
+    public void onLogin() {
+
     }
 
 }

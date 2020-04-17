@@ -22,6 +22,7 @@
         android:layout_marginLeft="@dimen/dip20"
         android:background="@android:color/transparent"
         android:hint="@string/hint_input_password"
+        android:inputType="textEmailAddress"
         android:textSize="@dimen/font16" />
 
     <TextView

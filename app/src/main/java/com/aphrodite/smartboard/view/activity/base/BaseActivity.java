@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -18,12 +17,11 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import com.aphrodite.framework.utils.KeyboardUtils;
 import com.aphrodite.framework.utils.ObjectUtils;
-import com.aphrodite.framework.utils.UIUtils;
 import com.aphrodite.framework.view.manager.ActivitysManager;
 import com.aphrodite.framework.view.widget.dialog.LoadingDialog;
 import com.aphrodite.smartboard.R;
-import com.aphrodite.smartboard.utils.KeyboardUtils;
 
 import butterknife.ButterKnife;
 import butterknife.Unbinder;

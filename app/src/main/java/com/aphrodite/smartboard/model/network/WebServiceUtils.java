@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.aphrodite.framework.utils.NetworkUtils;
 import com.aphrodite.framework.utils.ToastUtils;
+import com.aphrodite.smartboard.R;
 
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.SoapObject;
@@ -71,8 +72,7 @@ public class WebServiceUtils {
                     request.addProperty(key[i], values.get(i));
                 }
 
-                SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
-                        SoapEnvelope.VER11);
+                SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
                 envelope.dotNet = true;
                 envelope.setOutputSoapObject(request);
                 try {
@@ -91,7 +91,7 @@ public class WebServiceUtils {
                     return false;
                 }
             } else {
-                ToastUtils.showMessage("请检查网络连接");
+                ToastUtils.showMessage(context.getResources().getString(R.string.prompt_network_offline));
                 list.add(WebServiceUtils.REQ_STATUS_FALSE);
                 list.add(WebServiceUtils.REQ_RET_VALUES);
                 return false;

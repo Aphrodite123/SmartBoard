@@ -31,12 +31,22 @@
     <string name="hint_input_password">请输入密码</string>
     <string name="hint_input_auth">请输入验证码</string>
     <string name="forgot_password">忘记密码</string>
-    <string name="account_wrong_prompt">账号输入不正确，请重新输入</string>
+    <string name="prompt_account_wrong">号码输入不正确，请重新输入</string>
+    <string name="prompt_phone_not_empty">手机号码不能为空</string>
+    <string name="prompt_password_not_empty">密码不能为空</string>
 
     <!-- MainActivity -->
     <string name="tab_home">首页</string>
     <string name="tab_found">发现</string>
     <string name="tab_message">消息</string>
     <string name="tab_mine">我的</string>
+
+    <!-- RegisterActivity -->
+    <string name="register_follow_agreement">同意协议并注册</string>
+    <string name="register_quickly">快速注册</string>
+    <string name="format_auth_code_regain">%ds后重新获取</string>
+
+    <!-- NetWork -->
+    <string name="prompt_network_offline">请检查网络连接</string>
 
 </resources>

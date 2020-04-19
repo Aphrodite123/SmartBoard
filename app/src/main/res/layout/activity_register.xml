@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical">
+
+    <include layout="@layout/toolbar_general" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dip48"
+        android:layout_marginLeft="@dimen/dip20"
+        android:layout_marginTop="@dimen/dip50"
+        android:layout_marginRight="@dimen/dip20"
+        android:gravity="center_vertical"
+        android:orientation="vertical">
+
+        <EditText
+            android:id="@+id/input_phone_number"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dip0"
+            android:layout_marginLeft="@dimen/dip20"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:hint="@string/hint_input_mobile_phone"
+            android:inputType="number"
+            android:textSize="@dimen/font16" />
+
+        <View
+            style="@style/divide_line_of_blue"
+            android:layout_alignParentBottom="true" />
+
+    </LinearLayout>
+
+    <include layout="@layout/layout_login_input" />
+
+    <Button
+        android:id="@+id/register_btn"
+        style="@style/login_button"
+        android:layout_marginTop="@dimen/dip40"
+        android:background="@drawable/login_button_selector"
+        android:text="@string/register_follow_agreement"
+        android:textColor="@color/white" />
+
+</LinearLayout>

@@ -1,0 +1,7 @@
+Executable : E:\Software\Android\Sdk\cmake\3.10.2.4988404\bin\ninja.exe
+arguments : 
+-C
+D:\Application\SmartBoard\app\.cxx\cmake\debug\arm64-v8a
+media-handle
+jvmArgs : 
+

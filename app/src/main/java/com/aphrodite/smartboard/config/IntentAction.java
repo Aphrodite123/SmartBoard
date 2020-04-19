@@ -15,4 +15,8 @@ public interface IntentAction {
         String ACTION = ACTION_SUFFIX + "SEARCHREGION";
     }
 
+    interface RegisterAction {
+        String ACTION = ACTION_SUFFIX + "REGISTER";
+    }
+
 }

@@ -95,7 +95,7 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.google.android.material:material:1.1.0'
     implementation 'androidx.appcompat:appcompat:1.1.0'
-    implementation 'com.aphrodite.framework:framework-base:1.0.4'
+    implementation 'com.aphrodite.framework:framework-base:1.0.5'
     /**
      * Log
      */

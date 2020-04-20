@@ -10,6 +10,14 @@ import java.io.File;
 public class AppConfig extends BaseConfig {
     public static final String VIDEO_PATH = SDCARD_PATH + "ffmpeg" + File.separator + "video/";
 
+    public interface SharePreferenceKey {
+        //用户手机号
+        String PHONE_NUMBER = "phone_number";
+
+        //手机验证码
+        String AUTH_CODE = "auth_code";
+    }
+
     public interface PermissionType {
         int BASE = 0x1000;
 

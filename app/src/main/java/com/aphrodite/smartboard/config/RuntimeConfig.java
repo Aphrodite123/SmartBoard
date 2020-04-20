@@ -9,6 +9,11 @@ import com.aphrodite.smartboard.BuildConfig;
  */
 public class RuntimeConfig extends BaseConfig {
     /**
+     * APP包名
+     */
+    public static final String PACKAGE_NAME = "com.aphrodite.smartboard";
+
+    /**
      * APP版本号
      */
     public static final String APP_VERSION = BuildConfig.VERSION_NAME;

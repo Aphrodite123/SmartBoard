@@ -2,6 +2,7 @@ package com.aphrodite.smartboard.view.activity;
 
 import android.content.Intent;
 import android.text.InputFilter;
+import android.text.InputType;
 import android.text.TextUtils;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
@@ -13,12 +14,16 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.aphrodite.framework.utils.ObjectUtils;
+import com.aphrodite.framework.utils.SPUtils;
 import com.aphrodite.framework.utils.ToastUtils;
 import com.aphrodite.smartboard.R;
+import com.aphrodite.smartboard.config.AppConfig;
 import com.aphrodite.smartboard.config.IntentAction;
 import com.aphrodite.smartboard.model.network.WebServiceUtils;
 import com.aphrodite.smartboard.model.network.inter.IResponseListener;
 import com.aphrodite.smartboard.model.network.task.NetworkAsyncTask;
+import com.aphrodite.smartboard.model.timer.CustomCountDownTimer;
 import com.aphrodite.smartboard.utils.LogUtils;
 import com.aphrodite.smartboard.view.activity.base.BaseActivity;
 
@@ -57,6 +62,7 @@ public class LoginActivity extends BaseActivity implements IResponseListener {
     TextView mAuthCode;
 
     private boolean mPasswordInvisiable = true;
+    private CustomCountDownTimer mDownTimer;
 
     private NetworkAsyncTask mNetworkAsyncTask = null;
 
@@ -73,7 +79,12 @@ public class LoginActivity extends BaseActivity implements IResponseListener {
         setTitleColor(getResources().getColor(R.color.color_626262));
 
         mInputPhoneNumber.setFilters(new InputFilter[]{new InputFilter.LengthFilter(11)});
-        mInput.setTransformationMethod(PasswordTransformationMethod.getInstance());
+//        mInput.setTransformationMethod(PasswordTransformationMethod.getInstance());
+        mLoginAuth.setText(getString(R.string.login_by_password));
+        mInput.setHint(getString(R.string.hint_input_auth));
+        mInput.setInputType(InputType.TYPE_CLASS_NUMBER);
+        mForgotPassword.setVisibility(View.GONE);
+        mAuthCode.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -139,6 +150,7 @@ public class LoginActivity extends BaseActivity implements IResponseListener {
 
     @OnClick(R.id.login_btn)
     public void onLogin() {
+        showLoadingDialog();
         login();
     }
 
@@ -146,6 +158,24 @@ public class LoginActivity extends BaseActivity implements IResponseListener {
     public void onRegister() {
         Intent intent = new Intent(IntentAction.RegisterAction.ACTION);
         startActivity(intent);
+    }
+
+    @OnClick(R.id.auth_code)
+    public void onAuthCode() {
+        if (TextUtils.isEmpty(mInputPhoneNumber.getText().toString())) {
+            ToastUtils.showMessage(R.string.prompt_phone_not_empty);
+            return;
+        }
+
+        if (mInputPhoneNumber.getText().toString().length() != 11) {
+            ToastUtils.showMessage(R.string.prompt_account_wrong);
+            return;
+        }
+
+        mDownTimer = new CustomCountDownTimer(60 * 1000, 1000, mCountDownListener);
+        mDownTimer.start();
+
+        sendAuthCode();
     }
 
     private void login() {
@@ -169,15 +199,60 @@ public class LoginActivity extends BaseActivity implements IResponseListener {
         mNetworkAsyncTask.execute();
     }
 
+    private void sendAuthCode() {
+        if (TextUtils.isEmpty(mInputPhoneNumber.getText().toString())) {
+            ToastUtils.showMessage(R.string.prompt_phone_not_empty);
+            return;
+        }
+
+        if (mInputPhoneNumber.getText().toString().length() != 11) {
+            ToastUtils.showMessage(R.string.prompt_account_wrong);
+            return;
+        }
+
+        List<String> reqValue = new ArrayList<>();
+
+        reqValue.add(mInputPhoneNumber.getText().toString());
+        reqValue.add("");
+
+        mNetworkAsyncTask = new NetworkAsyncTask(WebServiceUtils.NET_URL_REGUSER, WebServiceUtils.NET_URL_REGUSER_KEY, reqValue, null, this, this);
+        mNetworkAsyncTask.execute();
+    }
+
     @Override
     public void result(String method, List<String> list, Object object) {
         switch (method) {
             case WebServiceUtils.NET_URL_LOGIN:
-                LogUtils.d("Enter to result. " + method + list.toString() + object);
+                if (ObjectUtils.isOutOfBounds(list, 2)) {
+                    if ("true".equals(list.get(0))) {
+                        SPUtils.put(AppConfig.SharePreferenceKey.PHONE_NUMBER, mInputPhoneNumber.getText().toString());
+                        SPUtils.put(AppConfig.SharePreferenceKey.AUTH_CODE, mInput.getText().toString());
+
+                        finish();
+                    } else {
+                        ToastUtils.showMessage(list.get(1));
+                    }
+                }
+                dismissLoadingDialog();
                 break;
             default:
                 break;
         }
     }
+
+    private CustomCountDownTimer.CountDownListener mCountDownListener = new CustomCountDownTimer.CountDownListener() {
+
+        @Override
+        public void onTick(long time) {
+            mAuthCode.setClickable(false);
+            mAuthCode.setText(String.format(getResources().getString(R.string.format_auth_code_regain), time / 1000));
+        }
+
+        @Override
+        public void onFinish() {
+            mAuthCode.setClickable(true);
+            mAuthCode.setText(getResources().getString(R.string.get_auth_code));
+        }
+    };
 
 }

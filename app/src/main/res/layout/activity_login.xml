@@ -59,7 +59,8 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/dip20"
         android:layout_marginTop="@dimen/dip10"
-        android:layout_marginRight="@dimen/dip20">
+        android:layout_marginRight="@dimen/dip20"
+        android:visibility="gone">
 
         <TextView
             android:id="@+id/login_auth"

@@ -8,8 +8,10 @@ import androidx.multidex.MultiDex;
 
 import com.aphrodite.framework.model.network.api.RetrofitInitial;
 import com.aphrodite.framework.model.network.interceptor.BaseCommonParamInterceptor;
+import com.aphrodite.framework.utils.SPUtils;
 import com.aphrodite.framework.utils.ToastUtils;
 import com.aphrodite.smartboard.application.base.BaseApplication;
+import com.aphrodite.smartboard.config.RuntimeConfig;
 import com.aphrodite.smartboard.model.database.migration.GlobalRealmMigration;
 import com.aphrodite.smartboard.utils.LogUtils;
 import com.facebook.stetho.Stetho;
@@ -55,6 +57,8 @@ public class MainApplication extends BaseApplication {
         initStetho();
 
         initToast();
+
+        SPUtils.init(this, RuntimeConfig.PACKAGE_NAME);
     }
 
     @Override

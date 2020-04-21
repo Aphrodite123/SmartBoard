@@ -24,7 +24,6 @@ import com.aphrodite.smartboard.model.network.WebServiceUtils;
 import com.aphrodite.smartboard.model.network.inter.IResponseListener;
 import com.aphrodite.smartboard.model.network.task.NetworkAsyncTask;
 import com.aphrodite.smartboard.model.timer.CustomCountDownTimer;
-import com.aphrodite.smartboard.utils.LogUtils;
 import com.aphrodite.smartboard.view.activity.base.BaseActivity;
 
 import java.util.ArrayList;
@@ -244,12 +243,18 @@ public class LoginActivity extends BaseActivity implements IResponseListener {
 
         @Override
         public void onTick(long time) {
+            if (null == mAuthCode) {
+                return;
+            }
             mAuthCode.setClickable(false);
             mAuthCode.setText(String.format(getResources().getString(R.string.format_auth_code_regain), time / 1000));
         }
 
         @Override
         public void onFinish() {
+            if (null == mAuthCode) {
+                return;
+            }
             mAuthCode.setClickable(true);
             mAuthCode.setText(getResources().getString(R.string.get_auth_code));
         }

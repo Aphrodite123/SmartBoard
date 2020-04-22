@@ -11,12 +11,15 @@ import com.aphrodite.framework.model.network.interceptor.BaseCommonParamIntercep
 import com.aphrodite.framework.utils.SPUtils;
 import com.aphrodite.framework.utils.ToastUtils;
 import com.aphrodite.smartboard.application.base.BaseApplication;
+import com.aphrodite.smartboard.config.AppConfig;
 import com.aphrodite.smartboard.config.RuntimeConfig;
 import com.aphrodite.smartboard.model.database.migration.GlobalRealmMigration;
 import com.aphrodite.smartboard.utils.LogUtils;
 import com.facebook.stetho.Stetho;
 import com.orhanobut.logger.AndroidLogAdapter;
 import com.orhanobut.logger.Logger;
+import com.tencent.mm.opensdk.openapi.IWXAPI;
+import com.tencent.mm.opensdk.openapi.WXAPIFactory;
 import com.uphyca.stetho_realm.RealmInspectorModulesProvider;
 
 import java.io.FileNotFoundException;
@@ -37,6 +40,8 @@ public class MainApplication extends BaseApplication {
     private int mActivityCount;
 
     private RealmConfiguration mRealmConfiguration;
+
+    private static IWXAPI mWXApi;
 
     @Override
     protected void attachBaseContext(Context base) {
@@ -59,15 +64,13 @@ public class MainApplication extends BaseApplication {
         initToast();
 
         SPUtils.init(this, RuntimeConfig.PACKAGE_NAME);
+
+        registerWX(AppConfig.WX_APP_ID);
     }
 
     @Override
     public void onTerminate() {
         super.onTerminate();
-    }
-
-    public static MainApplication getApplication() {
-        return mIpenApplication;
     }
 
     private void initRealm() {
@@ -141,6 +144,24 @@ public class MainApplication extends BaseApplication {
 
     private void initToast() {
         ToastUtils.init(this);
+    }
+
+    private void registerWX(String appId) {
+        mWXApi = WXAPIFactory.createWXAPI(this, appId, true);
+        mWXApi.registerApp(appId);
+    }
+
+    public static void logout() {
+        SPUtils.remove(AppConfig.SharePreferenceKey.PHONE_NUMBER);
+        SPUtils.remove(AppConfig.SharePreferenceKey.AUTH_CODE);
+    }
+
+    public static MainApplication getApplication() {
+        return mIpenApplication;
+    }
+
+    public static IWXAPI getWXApi() {
+        return mWXApi;
     }
 
     private ActivityLifecycleCallbacks lifecycleCallbacks = new ActivityLifecycleCallbacks() {

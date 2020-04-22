@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">智能手写板</string>
 
+    <!-- NetWork -->
+    <string name="prompt_network_offline">请检查网络连接</string>
+
     <!-- 刷新 -->
     <string name="pull_to_refresh_pull_label">下拉刷新</string>
     <string name="pull_to_refresh_from_bottom_pull_label">上拉加载</string>
@@ -13,7 +16,17 @@
     <string name="load_more">加载更多</string>
     <string name="no_more">没有更多啦!</string>
 
-    <string name="press_exit_again">再按一次退出</string>
+    <!-- 微信分享 -->
+    <string name="prompt_share_success">分享成功</string>
+    <string name="prompt_share_failed">分享失敗</string>
+    <string name="prompt_share_cancel">已取消分享</string>
+    <string name="share">分享</string>
+    <string name="share_to">分享至</string>
+    <string name="share_to_wechat_friends">微信好友</string>
+    <string name="share_to_circle_friends">朋友圈</string>
+    <string name="saved_to_album">已保存至相册</string>
+    <string name="install_wechat_prompt">请先安装微信应用</string>
+    <string name="update_wechat_prompt">请先更新微信应用</string>
 
     <!-- LoginActivity -->
     <string name="login_by_password">账户密码登录</string>
@@ -36,6 +49,7 @@
     <string name="prompt_password_not_empty">密码不能为空</string>
 
     <!-- MainActivity -->
+    <string name="press_exit_again">再按一次退出</string>
     <string name="tab_home">首页</string>
     <string name="tab_found">发现</string>
     <string name="tab_message">消息</string>
@@ -46,7 +60,15 @@
     <string name="register_quickly">快速注册</string>
     <string name="format_auth_code_regain">%ds后重新获取</string>
 
-    <!-- NetWork -->
-    <string name="prompt_network_offline">请检查网络连接</string>
+    <!-- MineFragment -->
+    <string name="prompt_not_login">更多好玩功能，登录后解锁哦~</string>
+
+    <!-- MineFragment -->
+    <string name="setting_for_app">APP设置</string>
+
+    <!-- SettingActivity -->
+    <string name="logout">退出登录</string>
+    <string name="cancel">取消</string>
+    <string name="dialog_logout_message">退出登录后，将无法查看更多好玩功能(您可以随时再次登录)，确定要退出吗?</string>
 
 </resources>

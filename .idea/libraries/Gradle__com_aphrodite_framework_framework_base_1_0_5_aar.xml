@@ -1,8 +1,8 @@
 <component name="libraryTable">
   <library name="Gradle: com.aphrodite.framework:framework-base:1.0.5@aar">
     <CLASSES>
-      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/71e5e3278f9ef3de9b0d8e0baed08584/jetified-framework-base-1.0.5/jars/classes.jar!/" />
-      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/71e5e3278f9ef3de9b0d8e0baed08584/jetified-framework-base-1.0.5/res" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/417fa5cf8b44f84183771db0a5773e7c/jetified-framework-base-1.0.5/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/417fa5cf8b44f84183771db0a5773e7c/jetified-framework-base-1.0.5/res" />
     </CLASSES>
     <JAVADOC>
       <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.aphrodite.framework/framework-base/1.0.5/a05190708edf314c794bf7a4540ef5320218923d/framework-base-1.0.5-javadoc.jar!/" />

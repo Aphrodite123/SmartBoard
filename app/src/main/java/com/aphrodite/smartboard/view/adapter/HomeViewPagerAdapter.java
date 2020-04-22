@@ -49,6 +49,8 @@ public class HomeViewPagerAdapter extends FragmentStatePagerAdapter {
         return PagerAdapter.POSITION_NONE;
     }
 
+
+
     @Override
     public void destroyItem(ViewGroup container, int position, Object object) {
         //如果注释这行，那么不管怎么切换，page都不会被销毁

@@ -4,10 +4,12 @@ import android.content.Intent;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
+import android.widget.TextView;
 
-import com.aphrodite.framework.utils.ObjectUtils;
 import com.aphrodite.framework.utils.SPUtils;
-import com.aphrodite.framework.utils.ToastUtils;
 import com.aphrodite.smartboard.R;
 import com.aphrodite.smartboard.config.AppConfig;
 import com.aphrodite.smartboard.config.IntentAction;
@@ -27,8 +29,21 @@ import butterknife.OnClick;
  * Created by Aphrodite on 20-4-15
  */
 public class MineFragment extends BaseFragment implements IResponseListener {
+    //未登录状态
+    @BindView(R.id.not_login_ll)
+    LinearLayout mNotLoginLL;
     @BindView(R.id.login_btn)
     Button mLoginBtn;
+
+    //已登录
+    @BindView(R.id.logined_sv)
+    ScrollView mLoginedSV;
+    @BindView(R.id.my_head)
+    ImageView mHeadIV;
+    @BindView(R.id.my_name)
+    TextView myName;
+    @BindView(R.id.my_user_id)
+    TextView mUserId;
 
     private String mPhoneNumber;
     private String mAuthCode;
@@ -51,15 +66,35 @@ public class MineFragment extends BaseFragment implements IResponseListener {
 
     @Override
     protected void initData() {
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        loadLocalData();
+        loadRemoteData();
+    }
+
+    private void loadLocalData() {
         mPhoneNumber = (String) SPUtils.get(AppConfig.SharePreferenceKey.PHONE_NUMBER, "");
         mAuthCode = (String) SPUtils.get(AppConfig.SharePreferenceKey.AUTH_CODE, "");
         if (TextUtils.isEmpty((mPhoneNumber)) || TextUtils.isEmpty(mAuthCode)) {
-            mLoginBtn.setVisibility(View.VISIBLE);
+            mNotLoginLL.setVisibility(View.VISIBLE);
+            mLoginedSV.setVisibility(View.GONE);
         } else {
-            mLoginBtn.setVisibility(View.GONE);
-
-            getUserSet();
+            mNotLoginLL.setVisibility(View.GONE);
+            mLoginedSV.setVisibility(View.VISIBLE);
         }
+
+        myName.setText(mPhoneNumber);
+
+    }
+
+    private void loadRemoteData() {
+        if (TextUtils.isEmpty((mPhoneNumber)) || TextUtils.isEmpty(mAuthCode)) {
+            return;
+        }
+        getUserSet();
     }
 
     private void getUserSet() {
@@ -93,6 +128,12 @@ public class MineFragment extends BaseFragment implements IResponseListener {
     public void onLoginClick() {
         Intent intent = new Intent(IntentAction.LoginAction.ACTION);
         getContext().startActivity(intent);
+    }
+
+    @OnClick(R.id.mine_setting)
+    public void onSetting() {
+        Intent intent = new Intent(IntentAction.SettingAction.ACTION);
+        startActivity(intent);
     }
 
 }

@@ -40,7 +40,8 @@
         <LinearLayout
             android:id="@+id/tab_found_ll"
             style="@style/tab_bottom_style"
-            android:layout_weight="1">
+            android:layout_weight="1"
+            android:visibility="gone">
 
             <ImageView
                 android:id="@+id/tab_found_ic"
@@ -67,7 +68,8 @@
         <LinearLayout
             android:id="@+id/tab_message_ll"
             style="@style/tab_bottom_style"
-            android:layout_weight="1">
+            android:layout_weight="1"
+            android:visibility="gone">
 
             <ImageView
                 android:id="@+id/tab_message_ic"

@@ -119,4 +119,8 @@ dependencies {
      * 网络请求
      */
     implementation files('libs/ksoap2-android-assembly-3.0.0-jar-with-dependencies.jar')
+    /**
+     * WeChat
+     */
+    implementation 'com.tencent.mm.opensdk:wechat-sdk-android-without-mta:+'
 }

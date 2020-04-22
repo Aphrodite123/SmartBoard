@@ -7,6 +7,10 @@ public interface IntentAction {
 
     String ACTION_SUFFIX = "com.aphrodite.smartboard.view.";
 
+    interface MainAction {
+        String ACTION = ACTION_SUFFIX + "MAIN";
+    }
+
     interface LoginAction {
         String ACTION = ACTION_SUFFIX + "LOGIN";
     }
@@ -17,6 +21,14 @@ public interface IntentAction {
 
     interface RegisterAction {
         String ACTION = ACTION_SUFFIX + "REGISTER";
+    }
+
+    interface CanvasAction {
+        String ACTION = ACTION_SUFFIX + "CANVAS";
+    }
+
+    interface SettingAction {
+        String ACTION = ACTION_SUFFIX + "SETTING";
     }
 
 }

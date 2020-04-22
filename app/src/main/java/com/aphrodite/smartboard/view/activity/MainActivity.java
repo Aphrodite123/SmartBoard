@@ -3,6 +3,7 @@ package com.aphrodite.smartboard.view.activity;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Handler;
@@ -21,11 +22,13 @@ import com.aphrodite.framework.utils.ToastUtils;
 import com.aphrodite.smartboard.R;
 import com.aphrodite.smartboard.application.MainApplication;
 import com.aphrodite.smartboard.config.AppConfig;
+import com.aphrodite.smartboard.config.IntentAction;
 import com.aphrodite.smartboard.model.ffmpeg.FFmpegHandler;
 import com.aphrodite.smartboard.utils.FFmpegUtils;
 import com.aphrodite.smartboard.utils.ParseUtils;
 import com.aphrodite.smartboard.view.activity.base.BaseActivity;
 import com.aphrodite.smartboard.view.adapter.HomeViewPagerAdapter;
+import com.aphrodite.smartboard.view.fragment.MainFragment;
 import com.aphrodite.smartboard.view.fragment.MineFragment;
 import com.aphrodite.smartboard.view.fragment.base.BaseFragment;
 import com.aphrodite.smartboard.view.widget.viewpager.ConfigureSlideViewPager;
@@ -66,12 +69,12 @@ public class MainActivity extends BaseActivity {
         //默认进入首页
         switchTab(0);
 
-        MineFragment fragment1 = new MineFragment();
+        MainFragment mainFragment = new MainFragment();
         MineFragment fragment2 = new MineFragment();
         MineFragment fragment3 = new MineFragment();
         MineFragment mineFragment = new MineFragment();
         mFragments = new ArrayList<>();
-        mFragments.add(fragment1);
+        mFragments.add(mainFragment);
         mFragments.add(fragment2);
         mFragments.add(fragment3);
         mFragments.add(mineFragment);
@@ -79,7 +82,6 @@ public class MainActivity extends BaseActivity {
         mPagerAdapter = new HomeViewPagerAdapter(getSupportFragmentManager());
         mViewPager.setAdapter(mPagerAdapter);
         mPagerAdapter.setFragments(mFragments);
-
     }
 
     @Override
@@ -162,9 +164,9 @@ public class MainActivity extends BaseActivity {
 
     @OnClick(R.id.tab_middle_btn)
     public void onMiddleClick() {
-
+        Intent intent = new Intent(IntentAction.CanvasAction.ACTION);
+        startActivity(intent);
     }
-
 
     //    @OnClick(R.id.create_video_btn)
     public void onCreateVideoClick() {

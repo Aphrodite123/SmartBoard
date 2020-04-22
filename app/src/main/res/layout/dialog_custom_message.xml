@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_bottom_spinner"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingLeft="@dimen/dip40"
+        android:paddingTop="@dimen/dip30"
+        android:paddingRight="@dimen/dip40"
+        android:paddingBottom="@dimen/dip30">
+
+        <TextView
+            android:id="@+id/tv_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/dip18"
+            android:textColor="@color/black"
+            android:textSize="@dimen/font14"
+            android:textStyle="bold"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/tv_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:alpha="0.5"
+            android:gravity="center_horizontal"
+            android:textColor="@color/black"
+            android:textSize="@dimen/font13" />
+    </LinearLayout>
+
+    <View style="@style/divide_line" />
+
+    <LinearLayout
+        android:id="@+id/ll_btns"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dip52"
+        android:background="@drawable/bg_dialog_button"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btn_negative"
+            android:layout_width="@dimen/dip0"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:alpha="0.7"
+            android:background="?android:attr/selectableItemBackground"
+            android:textColor="@color/black"
+            android:textSize="@dimen/font14" />
+
+        <View
+            android:id="@+id/divide_line"
+            android:layout_width="1px"
+            android:layout_height="match_parent"
+            android:background="@color/color_cacbcc" />
+
+        <Button
+            android:id="@+id/btn_positive"
+            android:layout_width="@dimen/dip0"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?android:attr/selectableItemBackground"
+            android:textColor="@color/color_0392ff"
+            android:textSize="@dimen/font14" />
+    </LinearLayout>
+</LinearLayout>

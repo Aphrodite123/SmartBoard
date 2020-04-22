@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical">
+
+    <include layout="@layout/toolbar_general" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="@dimen/dip65"
+                android:layout_height="@dimen/dip65"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="@dimen/dip15"
+                android:scaleType="fitXY"
+                android:src="@mipmap/ic_launcher" />
+
+            <TextView
+                android:id="@+id/app_version_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="@dimen/dip22"
+                android:textColor="@color/black_90_transparent"
+                android:textSize="@dimen/font14" />
+
+            <View style="@style/divide_line" />
+
+            <LinearLayout
+                android:id="@+id/logout_ll"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <include layout="@layout/layout_divide_view" />
+
+                <TextView
+                    android:id="@+id/logout"
+                    style="@style/select_item_view"
+                    android:gravity="center"
+                    android:text="@string/logout"
+                    android:textColor="@color/color_0392ff"
+                    android:textSize="@dimen/font14"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <View style="@style/divide_line" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</LinearLayout>

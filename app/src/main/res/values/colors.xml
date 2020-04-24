@@ -95,19 +95,26 @@
     <color name="color_ccffffff">#CCFFFFFF</color>
     <color name="color_e6ffffff">#E6FFFFFF</color>
 
+    <color name="color_000000">#000000</color>
     <color name="color_001425">#001425</color>
     <color name="color_00b491">#00B491</color>
     <color name="color_0392ff">#0392FF</color>
     <color name="color_202020">#202020</color>
     <color name="color_212121">#212121</color>
     <color name="color_27ace7">#27ACE7</color>
+    <color name="color_2e48ff">#2E48FF</color>
+    <color name="color_32397e">#32397E</color>
     <color name="color_404040">#404040</color>
+    <color name="color_492c4f">#492C4F</color>
     <color name="color_5dd2ff">#5DD2FF</color>
     <color name="color_5fdabe">#5FDABE</color>
     <color name="color_626262">#626262</color>
-    <color name="color_84d5e3">#84d5e3</color>
-    <color name="color_a0e5ff">#a0e5ff</color>
-    <color name="color_ae975d">#ae975d</color>
+    <color name="color_7bff16">#7BFF16</color>
+    <color name="color_84d5e3">#84D5E3</color>
+    <color name="color_a0e5ff">#A0E5FF</color>
+    <color name="color_ae975d">#AE975D</color>
+    <color name="color_b71919">#B71919</color>
+    <color name="color_bac290">#BAC290</color>
     <color name="color_cacbcc">#CACBCC</color>
     <color name="color_cccccc">#CCCCCC</color>
     <color name="color_d9d9d9">#D9D9D9</color>
@@ -118,12 +125,17 @@
     <color name="color_f3f4f6">#F3F4F6</color>
     <color name="color_f75f5d">#F75F5D</color>
     <color name="color_f7f7f7">#F7F7F7</color>
+    <color name="color_f836ff">#F836FF</color>
     <color name="color_fac264">#FAC264</color>
+    <color name="color_ff0000">#FF0000</color>
     <color name="color_ff699a">#FF699A</color>
     <color name="color_ff7592">#FF7592</color>
     <!--卡片内容画廊颜色&#45;&#45;字母卡-->
     <color name="color_ffa1b5">#FFA1B5</color>
+    <color name="color_ffaaaa">#FFAAAA</color>
+    <color name="color_ffbe79">#FFBE79</color>
     <color name="color_ffde38">#FFDE38</color>
+    <color name="color_ffe82a">#FFE82A</color>
     <!--字母卡背景色-->
     <color name="color_ffedf1">#FFEDF1</color>
 

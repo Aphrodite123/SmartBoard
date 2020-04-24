@@ -82,4 +82,9 @@
         <item name="android:windowNoTitle">true</item>
     </style>
 
+    <style name="anim_popupwindow_zoom">
+        <item name="android:windowEnterAnimation">@anim/zoom_in_from_bottom</item>
+        <item name="android:windowExitAnimation">@anim/zoom_out_to_bottom</item>
+    </style>
+
 </resources>

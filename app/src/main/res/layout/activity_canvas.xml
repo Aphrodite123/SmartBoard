@@ -7,4 +7,73 @@
 
     <include layout="@layout/toolbar_general" />
 
+    <!-- 自绘区 -->
+    <LinearLayout
+        android:id="@+id/auto_draw_ll"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+    </LinearLayout>
+
+    <!-- 非自绘区 -->
+    <LinearLayout
+        android:id="@+id/not_auto_draw_ll"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <com.aphrodite.smartboard.view.widget.view.SimpleDoodleView
+            android:id="@+id/custom_canvas"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dip0"
+            android:layout_weight="1"
+            android:background="@android:color/white" />
+
+        <include layout="@layout/layout_divide_view" />
+
+        <LinearLayout
+            android:id="@+id/canvas_bottom_tab"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="@string/canvas"
+                android:textColor="@color/color_626262" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="@string/eraser"
+                android:textColor="@color/color_626262" />
+
+            <TextView
+                android:id="@+id/switch_color"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="@string/palete"
+                android:textColor="@color/color_626262" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="@string/clear"
+                android:textColor="@color/color_626262" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
 </LinearLayout>

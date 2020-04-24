@@ -71,4 +71,10 @@
     <string name="cancel">取消</string>
     <string name="dialog_logout_message">退出登录后，将无法查看更多好玩功能(您可以随时再次登录)，确定要退出吗?</string>
 
+    <!-- CanvasActivity -->
+    <string name="canvas">画笔</string>
+    <string name="eraser">橡皮</string>
+    <string name="palete">色板</string>
+    <string name="clear">清空</string>
+
 </resources>

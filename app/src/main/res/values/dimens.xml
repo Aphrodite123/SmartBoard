@@ -8,4 +8,6 @@
     <dimen name="ipen_short_line_left_margin">5dp</dimen>
     <dimen name="ipen_short_line_right_margin">5dp</dimen>
 
+    <dimen name="androids_api27_config_minScalingSpan">32mm</dimen>
+
 </resources>

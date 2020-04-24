@@ -1,9 +1,6 @@
 package com.aphrodite.smartboard.view.fragment;
 
-import android.content.Intent;
-
 import com.aphrodite.smartboard.R;
-import com.aphrodite.smartboard.config.IntentAction;
 import com.aphrodite.smartboard.view.fragment.base.BaseFragment;
 import com.aphrodite.smartboard.view.widget.dialog.ShareDialog;
 

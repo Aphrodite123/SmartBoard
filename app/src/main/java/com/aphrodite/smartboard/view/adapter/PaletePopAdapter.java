@@ -38,13 +38,11 @@ public class PaletePopAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+        View view = LayoutInflater.from(mContext).inflate(R.layout.popup_window_palete_item, null);
         ImageView imageView;
-        if (null == convertView) {
-            convertView = LayoutInflater.from(mContext).inflate(R.layout.popup_window_palete_item, null);
-        }
-        imageView = convertView.findViewById(R.id.palete_item_iv);
-        imageView.setBackgroundColor(mColorIds.get(position));
-        return convertView;
+        imageView = view.findViewById(R.id.palete_item_iv);
+        imageView.setBackgroundColor(mContext.getResources().getColor(R.color.black));
+        return view;
     }
 
 }

@@ -2,11 +2,14 @@ package com.aphrodite.smartboard.view.widget.popupwindow;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.GridLayout;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.GridView;
 import android.widget.PopupWindow;
 
@@ -47,6 +50,19 @@ public class PaletePopupWindow extends PopupWindow {
 
     private void initData() {
 
+    }
+
+    @Override
+    public void showAsDropDown(View anchor) {
+        //解决Android7.0中PopupWindow会覆盖Toolbar 20180420
+        if (Build.VERSION.SDK_INT >= 24) {
+            Rect visibleFrame = new Rect();
+            anchor.getGlobalVisibleRect(visibleFrame);
+            int height = anchor.getResources().getDisplayMetrics().heightPixels - visibleFrame.bottom;
+            setHeight(height);
+        }
+
+        super.showAsDropDown(anchor);
     }
 
 }

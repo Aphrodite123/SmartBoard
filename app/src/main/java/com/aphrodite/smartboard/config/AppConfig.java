@@ -8,7 +8,9 @@ import java.io.File;
  * Created by Aphrodite on 2019/5/28.
  */
 public class AppConfig extends BaseConfig {
-    public static final String VIDEO_PATH = SDCARD_PATH + "ffmpeg" + File.separator + "video/";
+    public static final String VIDEO_PATH = SDCARD_PATH + File.separator + "video/";
+
+    public static final String TEMP_PATH = SDCARD_PATH + File.separator + "temp/";
 
     /**
      * 微信APP ID

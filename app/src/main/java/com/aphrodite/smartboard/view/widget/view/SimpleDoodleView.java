@@ -1,16 +1,22 @@
 package com.aphrodite.smartboard.view.widget.view;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Point;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
+import com.aphrodite.smartboard.R;
 import com.aphrodite.smartboard.model.bean.CWLine;
 import com.aphrodite.smartboard.model.ffmpeg.TouchGestureDetector;
 import com.aphrodite.smartboard.utils.CWFileUtils;
@@ -34,8 +40,15 @@ public class SimpleDoodleView extends View {
     private boolean canDraw;
     private List<Point> points;
     private int strokeWidth = 10;
-    private int drawColor = Color.RED;
+    private int drawColor;
     private static int LINE_PARTS = 5;
+
+    private int mWidth;
+    private int mHeight;
+    private Bitmap mBitmapBg;
+    private Matrix matrix;
+
+    private boolean mIsEraser;
 
     public void setCanDraw(boolean canDraw) {
         this.canDraw = canDraw;
@@ -47,6 +60,9 @@ public class SimpleDoodleView extends View {
 
     public SimpleDoodleView(Context context, AttributeSet attrs) {
         super(context, attrs);
+
+        mBitmapBg = BitmapFactory.decodeResource(getResources(), R.drawable.flash);
+        setLayerType(LAYER_TYPE_HARDWARE, null);
 
         // 由手势识别器处理手势
         mTouchGestureDetector = new TouchGestureDetector(getContext(), new TouchGestureDetector.OnTouchGestureListener() {
@@ -64,8 +80,8 @@ public class SimpleDoodleView extends View {
                 points = new ArrayList<>();
                 points.add(new Point((int) mLastX, (int) mLastY));
                 DrawPath drawPath = new DrawPath();
-                drawPath.setmPaint(mPaint);
-                drawPath.setmPathList(mPathList);
+                drawPath.setPaint(mPaint);
+                drawPath.setPathList(mPathList);
                 drawPaths.add(drawPath);
                 invalidate(); // 刷新
             }
@@ -118,10 +134,23 @@ public class SimpleDoodleView extends View {
     }
 
     @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+
+        mWidth = getDefaultSize(getSuggestedMinimumWidth(), widthMeasureSpec);
+        mHeight = getDefaultSize(getSuggestedMinimumHeight(), heightMeasureSpec);
+
+        matrix = new Matrix();
+        matrix.postScale(mWidth / mBitmapBg.getWidth(), mHeight / mBitmapBg.getHeight());
+    }
+
+    @Override
     protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+//        canvas.drawBitmap(mBitmapBg, matrix, null);
         for (DrawPath drawPath : drawPaths) {
-            for (int i = 0; i < drawPath.getmPathList().size(); i++) {
-                canvas.drawPath(drawPath.getmPathList().get(i), drawPath.getmPaint());
+            for (int i = 0; i < drawPath.getPathList().size(); i++) {
+                canvas.drawPath(drawPath.getPathList().get(i), drawPath.getPaint());
             }
         }
     }
@@ -163,8 +192,8 @@ public class SimpleDoodleView extends View {
             mLastY = xyPoints.get(1);
         }
         DrawPath drawPath = new DrawPath();
-        drawPath.setmPaint(mPaint);
-        drawPath.setmPathList(mPathList);
+        drawPath.setPaint(mPaint);
+        drawPath.setPathList(mPathList);
         drawPaths.add(drawPath);
         invalidate();
     }
@@ -231,8 +260,8 @@ public class SimpleDoodleView extends View {
             mLastY = xyPoints.get(1);
         }
         DrawPath drawPath = new DrawPath();
-        drawPath.setmPaint(mPaint);
-        drawPath.setmPathList(mPathList);
+        drawPath.setPaint(mPaint);
+        drawPath.setPathList(mPathList);
         drawPaths.add(drawPath);
         invalidate();
     }
@@ -245,6 +274,10 @@ public class SimpleDoodleView extends View {
         drawColor = color;
     }
 
+    public void setIsEraser(boolean isEraser) {
+        this.mIsEraser = isEraser;
+    }
+
     public void initPaint() {
         mPaint = new Paint();
         mPaint.setColor(drawColor);
@@ -252,25 +285,30 @@ public class SimpleDoodleView extends View {
         mPaint.setStrokeWidth(strokeWidth);
         mPaint.setAntiAlias(true);
         mPaint.setStrokeCap(Paint.Cap.ROUND);
+        if (mIsEraser) {
+            mPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+        } else {
+            mPaint.setXfermode(null);
+        }
     }
 
     class DrawPath {
         private Paint mPaint;
         private List<Path> mPathList;
 
-        public Paint getmPaint() {
+        public Paint getPaint() {
             return mPaint;
         }
 
-        public void setmPaint(Paint mPaint) {
+        public void setPaint(Paint mPaint) {
             this.mPaint = mPaint;
         }
 
-        public List<Path> getmPathList() {
+        public List<Path> getPathList() {
             return mPathList;
         }
 
-        public void setmPathList(List<Path> mPathList) {
+        public void setPathList(List<Path> mPathList) {
             this.mPathList = mPathList;
         }
     }

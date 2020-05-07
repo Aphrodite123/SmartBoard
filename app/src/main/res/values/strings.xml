@@ -77,4 +77,8 @@
     <string name="palete">色板</string>
     <string name="clear">清空</string>
 
+    <!-- 权限管理 -->
+    <string name="permission_granted">权限已接收</string>
+    <string name="permission_denied">权限被拒绝，您可以在权限管理中打开该权限</string>
+
 </resources>

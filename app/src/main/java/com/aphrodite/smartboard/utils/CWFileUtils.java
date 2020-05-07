@@ -37,7 +37,7 @@ public class CWFileUtils {
             path.mkdirs();
         }
 
-        File file = new File(filePath + File.separator + "data.cw");
+        File file = new File(filePath + "data.cw");
 
         try {
             Writer wr = new FileWriter(file, true);

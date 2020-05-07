@@ -2,5 +2,4 @@
 <ImageView xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/palete_item_iv"
     android:layout_width="@dimen/dip20"
-    android:layout_height="@dimen/dip20"
-    android:background="@drawable/palete_item_shape" />
+    android:layout_height="@dimen/dip20" />

@@ -8,9 +8,11 @@ import java.io.File;
  * Created by Aphrodite on 2019/5/28.
  */
 public class AppConfig extends BaseConfig {
-    public static final String VIDEO_PATH = SDCARD_PATH + File.separator + "video/";
+    public static final String ROOT_PATH = SDCARD_PATH + "com.aphrodite.smartboard/";
 
-    public static final String TEMP_PATH = SDCARD_PATH + File.separator + "temp/";
+    public static final String VIDEO_PATH = ROOT_PATH + "video/";
+
+    public static final String TEMP_PATH = ROOT_PATH + "temp/";
 
     /**
      * 微信APP ID

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/palette_online_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
+
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/toolbar_general" />
+
+    <ImageView
+        android:id="@+id/palette_online_bg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/toolbar" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/toolbar"
+        android:orientation="vertical">
+
+        <com.aphrodite.smartboard.view.widget.view.SimpleDoodleView
+            android:id="@+id/palette_online_canvas"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dip0"
+            android:layout_weight="1"
+            android:background="@android:color/transparent" />
+
+        <include layout="@layout/layout_divide_view" />
+
+        <LinearLayout
+            android:id="@+id/canvas_bottom_tab"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dip45"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/switch_player"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="@string/player"
+                android:textColor="@color/color_626262" />
+
+            <TextView
+                android:id="@+id/switch_detail"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="@string/detail"
+                android:textColor="@color/color_626262" />
+
+            <TextView
+                android:id="@+id/switch_editor"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="@string/editor"
+                android:textColor="@color/color_626262" />
+
+            <TextView
+                android:id="@+id/switch_delete"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="@string/delete"
+                android:textColor="@color/color_626262" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</RelativeLayout>

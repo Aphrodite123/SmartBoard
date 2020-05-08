@@ -1,11 +1,8 @@
 package com.aphrodite.smartboard.view.widget.view;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Point;
@@ -16,7 +13,6 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
-import com.aphrodite.smartboard.R;
 import com.aphrodite.smartboard.model.bean.CWLine;
 import com.aphrodite.smartboard.model.ffmpeg.TouchGestureDetector;
 import com.aphrodite.smartboard.utils.CWFileUtils;
@@ -40,13 +36,10 @@ public class SimpleDoodleView extends View {
     private boolean canDraw;
     private List<Point> points;
     private int strokeWidth = 10;
+    private int mEraserStrokeWidth = 20;
     private int drawColor;
+    private int mEraserColor = Color.WHITE;
     private static int LINE_PARTS = 5;
-
-    private int mWidth;
-    private int mHeight;
-    private Bitmap mBitmapBg;
-    private Matrix matrix;
 
     private boolean mIsEraser;
 
@@ -61,7 +54,6 @@ public class SimpleDoodleView extends View {
     public SimpleDoodleView(Context context, AttributeSet attrs) {
         super(context, attrs);
 
-        mBitmapBg = BitmapFactory.decodeResource(getResources(), R.drawable.flash);
         setLayerType(LAYER_TYPE_HARDWARE, null);
 
         // 由手势识别器处理手势
@@ -134,20 +126,8 @@ public class SimpleDoodleView extends View {
     }
 
     @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-
-        mWidth = getDefaultSize(getSuggestedMinimumWidth(), widthMeasureSpec);
-        mHeight = getDefaultSize(getSuggestedMinimumHeight(), heightMeasureSpec);
-
-        matrix = new Matrix();
-        matrix.postScale(mWidth / mBitmapBg.getWidth(), mHeight / mBitmapBg.getHeight());
-    }
-
-    @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-//        canvas.drawBitmap(mBitmapBg, matrix, null);
         for (DrawPath drawPath : drawPaths) {
             for (int i = 0; i < drawPath.getPathList().size(); i++) {
                 canvas.drawPath(drawPath.getPathList().get(i), drawPath.getPaint());
@@ -280,15 +260,18 @@ public class SimpleDoodleView extends View {
 
     public void initPaint() {
         mPaint = new Paint();
-        mPaint.setColor(drawColor);
+
         mPaint.setStyle(Paint.Style.STROKE);
-        mPaint.setStrokeWidth(strokeWidth);
         mPaint.setAntiAlias(true);
         mPaint.setStrokeCap(Paint.Cap.ROUND);
         if (mIsEraser) {
             mPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+            mPaint.setStrokeWidth(mEraserStrokeWidth);
+            mPaint.setColor(mEraserColor);
         } else {
             mPaint.setXfermode(null);
+            mPaint.setStrokeWidth(strokeWidth);
+            mPaint.setColor(drawColor);
         }
     }
 

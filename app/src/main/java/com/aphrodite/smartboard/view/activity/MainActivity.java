@@ -113,7 +113,8 @@ public class MainActivity extends BaseActivity {
     @TargetApi(23)
     private boolean hasPermission() {
         return Build.VERSION.SDK_INT < 23
-                || ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+                || ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
+                && ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
                 && ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
     }
 
@@ -122,7 +123,9 @@ public class MainActivity extends BaseActivity {
         if (Build.VERSION.SDK_INT < 23) {
             return;
         }
+
         String[] permissions = new String[]{
+                Manifest.permission.RECORD_AUDIO,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE,
                 Manifest.permission.READ_EXTERNAL_STORAGE
         };
@@ -134,9 +137,10 @@ public class MainActivity extends BaseActivity {
         switch (requestCode) {
             case AppConfig.PermissionType.RECORD_PERMISSION:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    handlePhoto();
+                    Intent intent = new Intent(IntentAction.CanvasAction.ACTION);
+                    startActivity(intent);
                 } else {
-                    Toast.makeText(this, "没有权限", Toast.LENGTH_LONG).show();
+                    ToastUtils.showMessage(R.string.permission_denied);
                 }
                 break;
         }
@@ -164,8 +168,12 @@ public class MainActivity extends BaseActivity {
 
     @OnClick(R.id.tab_middle_btn)
     public void onMiddleClick() {
-        Intent intent = new Intent(IntentAction.CanvasAction.ACTION);
-        startActivity(intent);
+        if (hasPermission()) {
+            Intent intent = new Intent(IntentAction.CanvasAction.ACTION);
+            startActivity(intent);
+        } else {
+            requestPermission();
+        }
     }
 
     //    @OnClick(R.id.create_video_btn)

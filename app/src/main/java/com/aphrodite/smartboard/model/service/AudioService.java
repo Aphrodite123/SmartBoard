@@ -93,7 +93,7 @@ public class AudioService extends Service implements Handler.Callback {
             return;
         }
         if (recordDictory == null) {
-            recordDictory = new File(AppConfig.VIDEO_PATH);
+            recordDictory = new File(AppConfig.TEMP_PATH);
         }
         if (!recordDictory.exists()) {
             recordDictory.mkdirs();

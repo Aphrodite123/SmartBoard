@@ -96,13 +96,6 @@ public abstract class BaseFragment extends Fragment {
             if (null != mActivity) {
                 mActivity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
             }
-
-            if (null == mToolbar) {
-                return;
-            }
-            LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) mToolbar.getLayoutParams();
-            params.topMargin = UIUtils.getStatusBarHeight(getContext());
-            mToolbar.setLayoutParams(params);
         }
     }
 

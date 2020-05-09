@@ -79,6 +79,15 @@ public class BoardEditorFragment extends BaseFragment {
 
     @Override
     protected void initListener() {
+        mLeftBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (null != mStatusListener) {
+                    mStatusListener.onPreview();
+                }
+            }
+        });
+
         AudioUtils.addRecordListener(mRecordListener);
 
         if (null != mPaletePopupWindow) {
@@ -89,6 +98,7 @@ public class BoardEditorFragment extends BaseFragment {
                 }
             });
         }
+
     }
 
     @Override

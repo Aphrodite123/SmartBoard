@@ -5,6 +5,8 @@ package com.aphrodite.smartboard.view.inter;
  * 用于监听手写板显示态or编辑态
  */
 public interface BoardStatusListener {
+    void onPreview();
+
     void onPlay();
 
     void onEditor();

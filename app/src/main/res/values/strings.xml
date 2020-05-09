@@ -80,6 +80,7 @@
     <string name="eraser">橡皮</string>
     <string name="palete">色板</string>
     <string name="clear">清空</string>
+    <string name="work_playback">创作回放</string>
 
     <!-- 权限管理 -->
     <string name="permission_granted">权限已接收</string>

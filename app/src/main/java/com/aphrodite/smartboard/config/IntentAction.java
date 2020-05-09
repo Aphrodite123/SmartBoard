@@ -25,6 +25,8 @@ public interface IntentAction {
 
     interface CanvasAction {
         String ACTION = ACTION_SUFFIX + "CANVAS";
+
+        String PATH_TRACK_FILE = "path_track_file";
     }
 
     interface SettingAction {

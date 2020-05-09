@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical">
+
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/toolbar_general" />
+
+    <com.aphrodite.smartboard.view.widget.view.SimpleDoodleView
+        android:id="@+id/board_play_canvas"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dip0"
+        android:layout_weight="1" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/color_f7f7f7"
+        android:orientation="vertical"
+        android:paddingLeft="@dimen/dip40"
+        android:paddingRight="@dimen/dip40"
+        android:paddingBottom="@dimen/dip10">
+
+        <SeekBar
+            android:id="@+id/board_play_seekbar"
+            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dip12"
+            android:max="100"
+            android:maxWidth="@dimen/dip4"
+            android:maxHeight="@dimen/dip4"
+            android:paddingTop="@dimen/dip4"
+            android:paddingBottom="@dimen/dip4"
+            android:progress="0"
+            android:progressDrawable="@drawable/seekbar_progress_layer_list"
+            android:splitTrack="false"
+            android:thumb="@drawable/icon_seekbar_guide" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent">
+
+            <ImageView
+                android:id="@+id/board_play_fast_back"
+                android:layout_width="@dimen/dip30"
+                android:layout_height="@dimen/dip30"
+                android:layout_alignParentLeft="true"
+                android:layout_weight="1"
+                android:padding="@dimen/dip2"
+                android:src="@drawable/icon_fast_back" />
+
+            <ImageView
+                android:id="@+id/board_play_status"
+                android:layout_width="@dimen/dip30"
+                android:layout_height="@dimen/dip30"
+                android:layout_centerInParent="true"
+                android:layout_weight="1"
+                android:padding="@dimen/dip2"
+                android:src="@drawable/play_button_status_selector" />
+
+            <ImageView
+                android:id="@+id/board_play_fast_forward"
+                android:layout_width="@dimen/dip30"
+                android:layout_height="@dimen/dip30"
+                android:layout_alignParentRight="true"
+                android:layout_weight="1"
+                android:padding="@dimen/dip2"
+                android:src="@drawable/icon_fast_forward" />
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

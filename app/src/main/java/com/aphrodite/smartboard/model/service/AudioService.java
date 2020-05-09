@@ -125,7 +125,13 @@ public class AudioService extends Service implements Handler.Callback {
     public void stopAudio(String newPath) {
         isRunning = false;
         if (mMediaRecorder != null) {
-            mMediaRecorder.stop();
+            try {
+                mMediaRecorder.stop();
+            } catch (IllegalStateException e) {
+                //如果当前java状态和jni里面的状态不一致
+                mMediaRecorder = null;
+                mMediaRecorder = new MediaRecorder();
+            }
             mMediaRecorder.reset();
             mMediaRecorder.release();
             mMediaRecorder = null;

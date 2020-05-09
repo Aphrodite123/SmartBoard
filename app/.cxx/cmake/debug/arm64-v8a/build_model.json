@@ -165,6 +165,7 @@
       "project": {
         "compilerSettingsCacheFolder": "/home/share/Application/Aphrodite/SmartBoard/.cxx",
         "cxxFolder": "/home/share/Application/Aphrodite/SmartBoard/.cxx",
+        "ideBuildTargetAbi": "arm64-v8a,armeabi-v7a,armeabi",
         "isBuildOnlyTargetAbiEnabled": true,
         "isCmakeBuildCohabitationEnabled": false,
         "isNativeCompilerSettingsCacheEnabled": false,
@@ -187,8 +188,8 @@
     "objFolder": "/home/share/Application/Aphrodite/SmartBoard/app/build/intermediates/cmake/debug/obj",
     "variantName": "debug",
     "validAbiList": [
-      "ARMEABI_V7A",
-      "ARM64_V8A"
+      "ARM64_V8A",
+      "ARMEABI_V7A"
     ]
   }
 }

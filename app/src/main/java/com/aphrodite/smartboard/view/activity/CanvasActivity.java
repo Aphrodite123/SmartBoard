@@ -8,6 +8,7 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.aphrodite.framework.utils.ObjectUtils;
 import com.aphrodite.smartboard.R;
+import com.aphrodite.smartboard.config.AppConfig;
 import com.aphrodite.smartboard.config.IntentAction;
 import com.aphrodite.smartboard.utils.LogUtils;
 import com.aphrodite.smartboard.view.activity.base.BaseActivity;
@@ -29,7 +30,8 @@ public class CanvasActivity extends BaseActivity {
 
     //设备是否在线
     private boolean mDeviceOnline = true;
-    private String mCurrentFilePath;
+    private String mCurrentPath = AppConfig.TEMP_PATH + "data.cw";
+    private String mCurrentAudioPath = AppConfig.TEMP_PATH + "audio.mp3";
 
     @Override
     protected int getViewId() {
@@ -53,7 +55,8 @@ public class CanvasActivity extends BaseActivity {
         BoardEditorFragment editorFragment = new BoardEditorFragment(mStatusListener);
 
         Bundle bundle = new Bundle();
-        bundle.putString(IntentAction.CanvasAction.PATH_TRACK_FILE, mCurrentFilePath);
+        bundle.putString(IntentAction.CanvasAction.PATH_TRACK_FILE, mCurrentPath);
+        bundle.putString(IntentAction.CanvasAction.PATH_AUDIO_FILE, mCurrentAudioPath);
         onlineFragment.setArguments(bundle);
         playFragment.setArguments(bundle);
         editorFragment.setArguments(bundle);

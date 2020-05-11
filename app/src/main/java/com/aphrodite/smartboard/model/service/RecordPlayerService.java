@@ -21,6 +21,8 @@ public class RecordPlayerService extends Service implements MediaPlayer.OnPrepar
     private Handler mHandler;
     private int seconds;
     private final int TIMESECONDS = 100;
+    //播放速度，默认为1s
+    private float mPlaySpeed = 1.0f;
 
     public void setMediaPlayerListener(MediaPlayerListener mediaPlayerListener) {
         this.mediaPlayerListener = mediaPlayerListener;
@@ -53,16 +55,16 @@ public class RecordPlayerService extends Service implements MediaPlayer.OnPrepar
 
     public void onResume() {
         mediaPlayer.start();
-        mHandler.sendEmptyMessageDelayed(TIMESECONDS, 1000);
+        mHandler.sendEmptyMessageDelayed(TIMESECONDS, (long) (1000 / mPlaySpeed));
     }
 
     public void seek(int seconds) {
         this.seconds = seconds;
         if (!mediaPlayer.isPlaying()) {
             mediaPlayer.start();
-            mHandler.sendEmptyMessageDelayed(TIMESECONDS, 1000);
+            mHandler.sendEmptyMessageDelayed(TIMESECONDS, (long) (1000 / mPlaySpeed));
         }
-        mediaPlayer.seekTo(seconds * 1000);
+        mediaPlayer.seekTo((int) (seconds * 1000 / mPlaySpeed));
     }
 
     public void stop() {
@@ -96,7 +98,7 @@ public class RecordPlayerService extends Service implements MediaPlayer.OnPrepar
     @Override
     public void onPrepared(MediaPlayer mp) {
         mp.start();
-        mHandler.sendEmptyMessageDelayed(TIMESECONDS, 1000);
+        mHandler.sendEmptyMessageDelayed(TIMESECONDS, (long) (1000 / mPlaySpeed));
     }
 
     @Override
@@ -107,7 +109,7 @@ public class RecordPlayerService extends Service implements MediaPlayer.OnPrepar
                 if (mediaPlayerListener != null) {
                     mediaPlayerListener.playing(seconds);
                 }
-                mHandler.sendEmptyMessageDelayed(TIMESECONDS, 1000);
+                mHandler.sendEmptyMessageDelayed(TIMESECONDS, (long) (1000 / mPlaySpeed));
                 break;
         }
         return false;
@@ -119,6 +121,10 @@ public class RecordPlayerService extends Service implements MediaPlayer.OnPrepar
         if (mediaPlayerListener != null) {
             mediaPlayerListener.completion();
         }
+    }
+
+    public void setPlaySpeed(float playSpeed) {
+        this.mPlaySpeed = playSpeed;
     }
 
     public class RecordPlayerBinder extends Binder {

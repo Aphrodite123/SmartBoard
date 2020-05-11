@@ -24,20 +24,35 @@
         android:paddingRight="@dimen/dip40"
         android:paddingBottom="@dimen/dip10">
 
-        <SeekBar
-            android:id="@+id/board_play_seekbar"
-            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="@dimen/dip12"
-            android:max="100"
-            android:maxWidth="@dimen/dip4"
-            android:maxHeight="@dimen/dip4"
-            android:paddingTop="@dimen/dip4"
-            android:paddingBottom="@dimen/dip4"
-            android:progress="0"
-            android:progressDrawable="@drawable/seekbar_progress_layer_list"
-            android:splitTrack="false"
-            android:thumb="@drawable/icon_seekbar_guide" />
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <SeekBar
+                android:id="@+id/board_play_seekbar"
+                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                android:layout_width="@dimen/dip1"
+                android:layout_height="@dimen/dip12"
+                android:layout_weight="1"
+                android:max="100"
+                android:maxWidth="@dimen/dip4"
+                android:maxHeight="@dimen/dip4"
+                android:paddingTop="@dimen/dip4"
+                android:paddingBottom="@dimen/dip4"
+                android:progress="0"
+                android:progressDrawable="@drawable/seekbar_progress_layer_list"
+                android:splitTrack="false"
+                android:thumb="@drawable/icon_seekbar_guide" />
+
+            <TextView
+                android:id="@+id/play_speed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="1.0x" />
+
+        </LinearLayout>
 
         <RelativeLayout
             android:layout_width="match_parent"

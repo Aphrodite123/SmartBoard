@@ -12,9 +12,9 @@
         android:id="@+id/main_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:loadMoreEnabled="true"
+        app:loadMoreEnabled="false"
         app:loadMoreFooterLayout="@layout/layout_rv_footer_container"
-        app:refreshEnabled="true"
+        app:refreshEnabled="false"
         app:refreshHeaderLayout="@layout/layout_rv_header_container" />
 
 </LinearLayout>

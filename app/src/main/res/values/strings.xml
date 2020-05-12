@@ -60,14 +60,16 @@
     <string name="register_quickly">快速注册</string>
     <string name="format_auth_code_regain">%ds后重新获取</string>
 
-    <!-- MineFragment -->
-    <string name="prompt_not_login">更多好玩功能，登录后解锁哦~</string>
+    <!-- MainFragment -->
+    <string name="main_page">首页</string>
 
     <!-- MineFragment -->
+    <string name="prompt_not_login">更多好玩功能，登录后解锁哦~</string>
     <string name="setting_for_app">APP设置</string>
 
     <!-- SettingActivity -->
     <string name="logout">退出登录</string>
+    <string name="confirm">确定</string>
     <string name="cancel">取消</string>
     <string name="dialog_logout_message">退出登录后，将无法查看更多好玩功能(您可以随时再次登录)，确定要退出吗?</string>
 
@@ -86,5 +88,9 @@
     <!-- 权限管理 -->
     <string name="permission_granted">权限已接收</string>
     <string name="permission_denied">权限被拒绝，您可以在权限管理中打开该权限</string>
+
+    <!-- DeleteDialog -->
+    <string name="delete_dialog_title">删除当前页面</string>
+    <string name="delete_dialog_message">删除后无法恢复</string>
 
 </resources>

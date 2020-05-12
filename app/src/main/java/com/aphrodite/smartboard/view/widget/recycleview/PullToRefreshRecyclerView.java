@@ -63,6 +63,11 @@ public class PullToRefreshRecyclerView extends RecyclerView {
 
     private RefreshHeaderLayout mRefreshHeaderContainer;
 
+    @Override
+    public void setAdapter(@Nullable Adapter adapter) {
+        super.setAdapter(adapter);
+    }
+
     private FrameLayout mLoadMoreFooterContainer;
 
     private LinearLayout mHeaderViewContainer;

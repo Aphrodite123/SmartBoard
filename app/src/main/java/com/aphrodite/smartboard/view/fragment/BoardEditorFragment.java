@@ -89,16 +89,6 @@ public class BoardEditorFragment extends BaseFragment {
         });
 
         AudioUtils.addRecordListener(mRecordListener);
-
-        if (null != mPaletePopupWindow) {
-            mPaletePopupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
-                @Override
-                public void onDismiss() {
-                    setWindowBackground(1f);
-                }
-            });
-        }
-
     }
 
     @Override
@@ -183,6 +173,12 @@ public class BoardEditorFragment extends BaseFragment {
                 if (null == mPaletePopupWindow) {
                     mPaletePopupWindow = new PaletePopupWindow(getContext(), mColorIds);
                 }
+                mPaletePopupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
+                    @Override
+                    public void onDismiss() {
+                        setWindowBackground(1f);
+                    }
+                });
                 if (!mPaletePopupWindow.isShowing()) {
                     mPaletePopupWindow.showAtLocation(mRoot, Gravity.BOTTOM, 0, 0);
                     setWindowBackground(0.8f);

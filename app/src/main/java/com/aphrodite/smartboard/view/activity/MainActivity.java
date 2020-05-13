@@ -5,6 +5,12 @@ import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Path;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
@@ -19,11 +25,17 @@ import androidx.core.content.ContextCompat;
 import com.aphrodite.framework.utils.FileUtils;
 import com.aphrodite.framework.utils.ObjectUtils;
 import com.aphrodite.framework.utils.ToastUtils;
+import com.aphrodite.framework.utils.UIUtils;
 import com.aphrodite.smartboard.R;
 import com.aphrodite.smartboard.application.MainApplication;
 import com.aphrodite.smartboard.config.AppConfig;
 import com.aphrodite.smartboard.config.IntentAction;
+import com.aphrodite.smartboard.model.bean.CW;
+import com.aphrodite.smartboard.model.bean.CWACT;
+import com.aphrodite.smartboard.model.bean.CWLine;
 import com.aphrodite.smartboard.model.ffmpeg.FFmpegHandler;
+import com.aphrodite.smartboard.utils.BitmapUtils;
+import com.aphrodite.smartboard.utils.CWFileUtils;
 import com.aphrodite.smartboard.utils.FFmpegUtils;
 import com.aphrodite.smartboard.utils.ParseUtils;
 import com.aphrodite.smartboard.view.activity.base.BaseActivity;
@@ -33,6 +45,8 @@ import com.aphrodite.smartboard.view.fragment.MineFragment;
 import com.aphrodite.smartboard.view.fragment.base.BaseFragment;
 import com.aphrodite.smartboard.view.widget.viewpager.ConfigureSlideViewPager;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,6 +72,13 @@ public class MainActivity extends BaseActivity {
     private List<BaseFragment> mFragments;
     private HomeViewPagerAdapter mPagerAdapter;
 
+    private LoadSDcardTask mLoadSDcardTask;
+    private String[] mWorkFolders;
+    private List<Path> mPaths;
+    private Paint mPaint;
+    private float mLastX;
+    private float mLastY;
+
     @Override
     protected int getViewId() {
         return R.layout.activity_main;
@@ -66,8 +87,21 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void initView() {
         setStatusBarColor(this);
-        //默认进入首页
-        switchTab(0);
+    }
+
+    @Override
+    protected void initListener() {
+    }
+
+    @Override
+    protected void initData() {
+        mPaths = new ArrayList<>();
+        mLoadSDcardTask = new LoadSDcardTask();
+        if (hasStoragePermission()) {
+            mLoadSDcardTask.execute();
+        } else {
+            requestStoragePermission();
+        }
 
         MainFragment mainFragment = new MainFragment();
         MineFragment fragment2 = new MineFragment();
@@ -82,15 +116,11 @@ public class MainActivity extends BaseActivity {
         mPagerAdapter = new HomeViewPagerAdapter(getSupportFragmentManager());
         mViewPager.setAdapter(mPagerAdapter);
         mPagerAdapter.setFragments(mFragments);
-    }
 
-    @Override
-    protected void initListener() {
-    }
-
-    @Override
-    protected void initData() {
         mFfmpegHandler = new FFmpegHandler(mHandler);
+
+        //默认进入首页
+        switchTab(0);
     }
 
     @Override
@@ -108,6 +138,26 @@ public class MainActivity extends BaseActivity {
             // 退出
             MainApplication.getApplication().exit();
         }
+    }
+
+    @TargetApi(23)
+    private boolean hasStoragePermission() {
+        return Build.VERSION.SDK_INT < 23
+                || ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+                && ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    @TargetApi(23)
+    private void requestStoragePermission() {
+        if (Build.VERSION.SDK_INT < 23) {
+            return;
+        }
+
+        String[] permissions = new String[]{
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.READ_EXTERNAL_STORAGE
+        };
+        ActivityCompat.requestPermissions(this, permissions, AppConfig.PermissionType.STORAGE_PERMISSION);
     }
 
     @TargetApi(23)
@@ -135,6 +185,16 @@ public class MainActivity extends BaseActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {
+            case AppConfig.PermissionType.STORAGE_PERMISSION:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    if (null != mLoadSDcardTask) {
+                        mLoadSDcardTask.execute();
+                    }
+                } else {
+                    ToastUtils.showMessage(R.string.permission_denied);
+                    finish();
+                }
+                break;
             case AppConfig.PermissionType.RECORD_PERMISSION:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Intent intent = new Intent(IntentAction.CanvasAction.ACTION);
@@ -253,6 +313,114 @@ public class MainActivity extends BaseActivity {
         }
     }
 
+    private void loadSDcardData() {
+        File file = new File(AppConfig.TEMP_PATH);
+        if (!file.exists()) {
+            return;
+        }
+
+        mWorkFolders = file.list();
+        if (ObjectUtils.isEmpty(mWorkFolders)) {
+            return;
+        }
+
+        for (String fold : mWorkFolders) {
+            mPaths.clear();
+            parsePath(AppConfig.TEMP_PATH + fold, "data.cw");
+        }
+    }
+
+    private void parsePath(String fileDir, String name) {
+        String path = fileDir + File.separator + name;
+        if (!com.aphrodite.smartboard.utils.FileUtils.isExist(path)) {
+            return;
+        }
+
+        CW cw = CWFileUtils.read(path);
+        if (null == cw) {
+            return;
+        }
+
+        List<CWACT> cwacts = cw.getACT();
+        if (null == cwacts || cwacts.size() <= 0) {
+            return;
+        }
+
+        for (CWACT cwact : cwacts) {
+            if (null == cwact) {
+                continue;
+            }
+            createPaths(cwact.getLine());
+        }
+        drawPathToBitmap(UIUtils.getDisplayHeightPixels(this), UIUtils.getDisplayWidthPixels(this), fileDir, Bitmap.CompressFormat.JPEG, 100);
+    }
+
+    private void createPaths(CWLine line) {
+        if (null == line) {
+            return;
+        }
+
+        List<List<Integer>> points = line.getPoints();
+        if (ObjectUtils.isEmpty(points)) {
+            return;
+        }
+        String[] split = line.getColor().split("\\,");
+        int color = Color.rgb(Integer.valueOf(split[0]), Integer.valueOf(split[1]), Integer.valueOf(split[2]));
+        int width = line.getWidth();
+        initPaint(color, width);
+
+        Path path = new Path();
+        List<Integer> xyPoints;
+        for (int i = 0; i < points.size(); i++) {
+            xyPoints = points.get(i);
+            if (ObjectUtils.isOutOfBounds(xyPoints, 1)) {
+                continue;
+            }
+            if (0 == i) {
+                path.moveTo(xyPoints.get(0), xyPoints.get(1));
+            } else {
+                path.quadTo(mLastX, mLastY, xyPoints.get(0), xyPoints.get(1));
+            }
+            mLastX = xyPoints.get(0);
+            mLastY = xyPoints.get(1);
+        }
+        mPaths.add(path);
+    }
+
+    private void drawPathToBitmap(int width, int height, String fileDir, Bitmap.CompressFormat format, int quality) {
+        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        bitmap.setHasAlpha(true);
+        Canvas canvas = new Canvas(bitmap);
+        canvas.drawColor(Color.WHITE);
+        if (ObjectUtils.isEmpty(mPaths)) {
+            return;
+        }
+        for (int i = 0; i < mPaths.size(); i++) {
+            canvas.drawPath(mPaths.get(i), mPaint);
+        }
+
+        StringBuilder name = new StringBuilder();
+        name.append(AppConfig.COVER_IMAGE_NAME).append(AppConfig.IMAGE_SUFFIX);
+
+        try {
+            BitmapUtils.saveBitmap(bitmap, fileDir, name.toString(), format, quality);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void initPaint(int color, float size) {
+        if (null == mPaint) {
+            mPaint = new Paint();
+        }
+
+        mPaint.setColor(color);
+        mPaint.setStyle(Paint.Style.STROKE);
+        mPaint.setStrokeWidth(size);
+        mPaint.setAntiAlias(true);
+        mPaint.setStrokeCap(Paint.Cap.ROUND);
+    }
+
     @SuppressLint("HandlerLeak")
     private Handler mHandler = new Handler() {
         @Override
@@ -270,5 +438,24 @@ public class MainActivity extends BaseActivity {
         }
     };
 
+    private class LoadSDcardTask extends AsyncTask<Object, Object, Object> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            showLoadingDialog();
+        }
+
+        @Override
+        protected Object doInBackground(Object... objects) {
+            loadSDcardData();
+            return true;
+        }
+
+        @Override
+        protected void onPostExecute(Object o) {
+            super.onPostExecute(o);
+            dismissLoadingDialog();
+        }
+    }
 
 }

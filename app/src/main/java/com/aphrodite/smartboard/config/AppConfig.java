@@ -15,6 +15,11 @@ public class AppConfig extends BaseConfig {
     public static final String TEMP_PATH = ROOT_PATH + "temp/";
 
     /**
+     * 封面图片名称
+     */
+    public static final String COVER_IMAGE_NAME = "cover_image";
+
+    /**
      * 微信APP ID
      */
     public static final String WX_APP_ID = "wx87889e866c6936fe";
@@ -30,7 +35,9 @@ public class AppConfig extends BaseConfig {
     public interface PermissionType {
         int BASE = 0x1000;
 
-        int RECORD_PERMISSION = BASE + 1;
+        int STORAGE_PERMISSION = BASE + 1;
+
+        int RECORD_PERMISSION = BASE + 2;
     }
 
     public interface RegularModel {

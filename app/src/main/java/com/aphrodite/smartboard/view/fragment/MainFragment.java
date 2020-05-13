@@ -1,5 +1,13 @@
 package com.aphrodite.smartboard.view.fragment;
 
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Path;
+import android.os.AsyncTask;
+import android.widget.LinearLayout;
+
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.aphrodite.smartboard.R;
@@ -13,6 +21,8 @@ import butterknife.BindView;
  * Created by Aphrodite on 20-4-22
  */
 public class MainFragment extends BaseFragment {
+    @BindView(R.id.root)
+    LinearLayout mRoot;
     @BindView(R.id.main_list)
     PullToRefreshRecyclerView mRefreshRecyclerView;
 

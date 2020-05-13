@@ -2,6 +2,8 @@ package com.aphrodite.smartboard.utils;
 
 import android.graphics.Point;
 
+import com.aphrodite.framework.utils.SPUtils;
+import com.aphrodite.smartboard.config.AppConfig;
 import com.aphrodite.smartboard.model.bean.CW;
 import com.aphrodite.smartboard.model.bean.CWACT;
 import com.aphrodite.smartboard.model.bean.CWBackground;
@@ -64,6 +66,10 @@ public class CWFileUtils {
             }
             Gson gson = new Gson();
             wr.write("#PAGES:" + gson.toJson(PAGES));
+            wr.write("\n");
+            wr.write("#AUTHOR:" + SPUtils.get(AppConfig.SharePreferenceKey.PHONE_NUMBER, ""));
+            wr.write("\n");
+            wr.write("#TIME:" + System.currentTimeMillis());
             wr.write("\n\n");
             wr.write(actStringBuilder.toString());
             wr.write("\n");
@@ -159,6 +165,12 @@ public class CWFileUtils {
                     CWPage[] cwPage = gson.fromJson(result.substring(7), CWPage[].class);
                     cwPages = Arrays.asList(cwPage);
                     cw.setPAGES(cwPages);
+                } else if (result.contains("AUTHOR")) {
+                    splitResult = result.split("\\:");
+                    cw.setAUDIO(splitResult[1]);
+                } else if (result.contains("TIME")) {
+                    splitResult = result.split("\\:");
+                    cw.setAUDIO(splitResult[1]);
                 } else if (result.contains("ACT")) {
                     splitResult = result.split("\\,");
                     CWACT cwact = new CWACT();

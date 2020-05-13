@@ -1,5 +1,5 @@
 {
-  "ndkFolder": "/home/wl/Android/Sdk/ndk/20.0.5594570",
+  "ndkFolder": "E:\\Software\\Android\\Sdk\\ndk\\21.0.6113669",
   "messages": [
     {
       "level": "INFO",
@@ -7,7 +7,7 @@
     },
     {
       "level": "INFO",
-      "message": "ndk.dir in local.properties is not set"
+      "message": "ndk.dir in local.properties is E:\\Software\\Android\\Sdk\\ndk\\21.0.6113669"
     },
     {
       "level": "INFO",
@@ -15,27 +15,23 @@
     },
     {
       "level": "INFO",
-      "message": "sdkFolder is /home/wl/Android/Sdk"
+      "message": "sdkFolder is E:\\Software\\Android\\Sdk"
     },
     {
       "level": "INFO",
-      "message": "Because no explicit NDK was requested, the default version \u002720.0.5594570\u0027 for this Android Gradle Plugin will be used"
+      "message": "Considering E:\\Software\\Android\\Sdk\\ndk\\21.0.6113669 by ndk.dir"
     },
     {
       "level": "INFO",
-      "message": "Considering /home/wl/Android/Sdk/ndk-bundle in SDK ndk-bundle folder"
+      "message": "Considering E:\\Software\\Android\\Sdk\\ndk-bundle in SDK ndk-bundle folder"
     },
     {
       "level": "INFO",
-      "message": "Considering /home/wl/Android/Sdk/ndk/20.0.5594570 in SDK ndk folder"
+      "message": "Considering E:\\Software\\Android\\Sdk\\ndk\\21.0.6113669 in SDK ndk folder"
     },
     {
       "level": "INFO",
-      "message": "Rejected /home/wl/Android/Sdk/ndk-bundle in SDK ndk-bundle folder because that location has no source.properties"
-    },
-    {
-      "level": "INFO",
-      "message": "Found requested NDK version 20.0.5594570 at /home/wl/Android/Sdk/ndk/20.0.5594570"
+      "message": "Found requested ndk.dir (E:\\Software\\Android\\Sdk\\ndk\\21.0.6113669) which has version 21.0.6113669"
     }
   ]
 }

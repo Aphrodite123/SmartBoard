@@ -13,6 +13,8 @@ public class CW {
     private String AUDIO;
     private List<CWPage> PAGES;
     private List<CWACT> ACT;
+    private String author;
+    private long time;
 
     public String getVERSION() {
         return VERSION;
@@ -52,5 +54,21 @@ public class CW {
 
     public void setACT(List<CWACT> ACT) {
         this.ACT = ACT;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+
+    public long getTime() {
+        return time;
+    }
+
+    public void setTime(long time) {
+        this.time = time;
     }
 }

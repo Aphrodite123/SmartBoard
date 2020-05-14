@@ -20,10 +20,12 @@ import butterknife.ButterKnife;
 public class WorkListAdapter<T> extends BaseRecyclerAdapter<T, WorkListAdapter.ViewHolder> {
     private Context mContext;
     private WorkListGridViewAdapter mGridViewAdapter;
+    private WorkListGridViewAdapter.OnClickListener mClickListener;
 
-    public WorkListAdapter(Context context) {
+    public WorkListAdapter(Context context, WorkListGridViewAdapter.OnClickListener listener) {
         super(context);
         this.mContext = context;
+        this.mClickListener = listener;
     }
 
     @NonNull
@@ -40,7 +42,7 @@ public class WorkListAdapter<T> extends BaseRecyclerAdapter<T, WorkListAdapter.V
             return;
         }
         holder.mDate.setText(bean.getDate());
-        mGridViewAdapter = new WorkListGridViewAdapter(mContext, bean.getData());
+        mGridViewAdapter = new WorkListGridViewAdapter(mContext, bean.getData(), mClickListener);
         holder.mGridView.setAdapter(mGridViewAdapter);
     }
 
@@ -56,7 +58,7 @@ public class WorkListAdapter<T> extends BaseRecyclerAdapter<T, WorkListAdapter.V
             super(itemView);
             ButterKnife.bind(this, itemView);
 
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             params.leftMargin = (int) mContext.getResources().getDimension(R.dimen.dip25);
             params.rightMargin = (int) mContext.getResources().getDimension(R.dimen.dip25);
             mRoot.setLayoutParams(params);

@@ -1,6 +1,10 @@
 <resources>
     <string name="app_name">智能手写板</string>
 
+    <!-- 日期 -->
+    <string name="today">今天</string>
+    <string name="yesterday">昨天</string>
+
     <!-- NetWork -->
     <string name="prompt_network_offline">请检查网络连接</string>
 

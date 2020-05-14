@@ -1,5 +1,6 @@
 package com.aphrodite.smartboard.view.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
@@ -10,7 +11,6 @@ import com.aphrodite.framework.utils.ObjectUtils;
 import com.aphrodite.smartboard.R;
 import com.aphrodite.smartboard.config.AppConfig;
 import com.aphrodite.smartboard.config.IntentAction;
-import com.aphrodite.smartboard.utils.LogUtils;
 import com.aphrodite.smartboard.view.activity.base.BaseActivity;
 import com.aphrodite.smartboard.view.fragment.BoardEditorFragment;
 import com.aphrodite.smartboard.view.fragment.BoardOnlineFragment;
@@ -30,8 +30,8 @@ public class CanvasActivity extends BaseActivity {
 
     //设备是否在线
     private boolean mDeviceOnline = true;
-    private String mCurrentPath = AppConfig.TEMP_PATH + "data.cw";
-    private String mCurrentAudioPath = AppConfig.TEMP_PATH + "audio.mp3";
+    private String mCurrentDataPath;
+    private String mCurrentAudioPath;
 
     @Override
     protected int getViewId() {
@@ -49,13 +49,19 @@ public class CanvasActivity extends BaseActivity {
 
     @Override
     protected void initData() {
+        Intent intent = getIntent();
+        if (null != intent) {
+            mCurrentDataPath = intent.getStringExtra(IntentAction.CanvasAction.PATH_TRACK_FILE);
+            mCurrentAudioPath = intent.getStringExtra(IntentAction.CanvasAction.PATH_AUDIO_FILE);
+        }
+
         mFragments = new ArrayList<>();
         BoardOnlineFragment onlineFragment = new BoardOnlineFragment(mStatusListener);
         BoardPlayFragment playFragment = new BoardPlayFragment(mStatusListener);
         BoardEditorFragment editorFragment = new BoardEditorFragment(mStatusListener);
 
         Bundle bundle = new Bundle();
-        bundle.putString(IntentAction.CanvasAction.PATH_TRACK_FILE, mCurrentPath);
+        bundle.putString(IntentAction.CanvasAction.PATH_TRACK_FILE, mCurrentDataPath);
         bundle.putString(IntentAction.CanvasAction.PATH_AUDIO_FILE, mCurrentAudioPath);
         onlineFragment.setArguments(bundle);
         playFragment.setArguments(bundle);

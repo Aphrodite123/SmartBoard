@@ -167,10 +167,10 @@ public class CWFileUtils {
                     cw.setPAGES(cwPages);
                 } else if (result.contains("AUTHOR")) {
                     splitResult = result.split("\\:");
-                    cw.setAUDIO(splitResult[1]);
+                    cw.setAuthor(splitResult[1]);
                 } else if (result.contains("TIME")) {
                     splitResult = result.split("\\:");
-                    cw.setAUDIO(splitResult[1]);
+                    cw.setTime(Long.parseLong(splitResult[1]));
                 } else if (result.contains("ACT")) {
                     splitResult = result.split("\\,");
                     CWACT cwact = new CWACT();

@@ -20,7 +20,9 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/dip10"
         android:background="@android:color/white"
+        android:horizontalSpacing="@dimen/dip10"
         android:numColumns="2"
-        android:scrollbars="none" />
+        android:scrollbars="none"
+        android:verticalSpacing="@dimen/dip20" />
 
 </LinearLayout>

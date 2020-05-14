@@ -18,10 +18,15 @@ import java.util.TimeZone;
  */
 public class TimeUtils {
     /**
-     * 年月日格式
+     * 年月日格式*中文间隔
      */
-    public static final String FORMAT_CHINESE_ONE = "yyyy年MM月dd日";
-    public static final String FORMAT_CHINESE_TWO = "MM月dd日";
+    public static final String FORMAT_CHINESE_ONE = "yyyy年MM月dd日 HH:mm";
+    public static final String FORMAT_CHINESE_TWO = "yyyy年MM月dd日";
+    public static final String FORMAT_CHINESE_THREE = "MM月dd日";
+    /**
+     * 年月日格式*特殊符号间隔
+     */
+    public static final String FORMAT_SPECIAL_SYMBOL_ONE = "yyyy.MM.dd";
     /**
      * 时钟格式
      */

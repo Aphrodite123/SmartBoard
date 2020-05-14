@@ -26,7 +26,7 @@ public class WorkListGridViewAdapter extends BaseAdapter {
     private OnClickListener mClickListener;
 
     public interface OnClickListener {
-        void onClick(String dataPath, String audioPath);
+        void onClick(String dataPath, String audioPath, String imagePath);
     }
 
     public WorkListGridViewAdapter(Context mContext, List<WorkInfoBean> data, OnClickListener listener) {
@@ -72,7 +72,7 @@ public class WorkListGridViewAdapter extends BaseAdapter {
             @Override
             public void onClick(View v) {
                 if (null != mClickListener) {
-                    mClickListener.onClick(bean.getDataPath(), bean.getAudioPath());
+                    mClickListener.onClick(bean.getDataPath(), bean.getAudioPath(), bean.getPicture());
                 }
             }
         });

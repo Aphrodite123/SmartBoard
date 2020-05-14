@@ -67,7 +67,18 @@ public class MainFragment extends BaseFragment {
     @Override
     protected void initData() {
         mWorksBeans = new ArrayList<>();
+        mCws = new ArrayList<>();
+    }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (null != mWorksBeans) {
+            mWorksBeans.clear();
+        }
+        if (null != mCws) {
+            mCws.clear();
+        }
         loadSDcardData();
         parseData();
         mListAdapter.setItems(mWorksBeans);
@@ -89,7 +100,6 @@ public class MainFragment extends BaseFragment {
             return;
         }
 
-        mCws = new ArrayList<>();
         CW cw = null;
         for (String fold : mWorkFolders) {
             if (TextUtils.isEmpty(fold)) {
@@ -147,7 +157,7 @@ public class MainFragment extends BaseFragment {
     }
 
     private void createWorkBeans(WorksBean bean, List<WorkInfoBean> workInfoBeans, Long time) {
-        bean.setDate(TimeUtils.msToDateFormat(1000 * time, TimeUtils.FORMAT_CHINESE_ONE, TimeUtils.FORMAT_CHINESE_TWO));
+        bean.setDate(TimeUtils.msToDateFormat(1000 * time, TimeUtils.FORMAT_CHINESE_TWO, TimeUtils.FORMAT_CHINESE_THREE));
         if (ObjectUtils.isEmpty(mCws)) {
             return;
         }
@@ -179,10 +189,11 @@ public class MainFragment extends BaseFragment {
 
     private WorkListGridViewAdapter.OnClickListener mClickListener = new WorkListGridViewAdapter.OnClickListener() {
         @Override
-        public void onClick(String dataPath, String audioPath) {
+        public void onClick(String dataPath, String audioPath, String imagePath) {
             Intent intent = new Intent(IntentAction.CanvasAction.ACTION);
             intent.putExtra(IntentAction.CanvasAction.PATH_TRACK_FILE, dataPath);
             intent.putExtra(IntentAction.CanvasAction.PATH_AUDIO_FILE, audioPath);
+            intent.putExtra(IntentAction.CanvasAction.PATH_COVER_IMAGE, imagePath);
             getActivity().startActivity(intent);
         }
     };

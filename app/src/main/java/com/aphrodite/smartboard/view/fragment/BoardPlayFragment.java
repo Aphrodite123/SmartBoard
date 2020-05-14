@@ -49,8 +49,9 @@ public class BoardPlayFragment extends BaseFragment {
 
     private BoardStatusListener mStatusListener;
 
-    private String mCurrentPath;
+    private String mCurrentDataPath;
     private String mCurrentAudioPath;
+    private String mCurrentImagePath;
     private RecordPlayerService mRecordPlayerService;
     private ServiceConnection mServiceConnection;
 
@@ -93,8 +94,9 @@ public class BoardPlayFragment extends BaseFragment {
     protected void initData() {
         Bundle bundle = getArguments();
         if (null != bundle) {
-            mCurrentPath = bundle.getString(IntentAction.CanvasAction.PATH_TRACK_FILE);
+            mCurrentDataPath = bundle.getString(IntentAction.CanvasAction.PATH_TRACK_FILE);
             mCurrentAudioPath = bundle.getString(IntentAction.CanvasAction.PATH_AUDIO_FILE);
+            mCurrentImagePath = bundle.getString(IntentAction.CanvasAction.PATH_COVER_IMAGE);
         }
         getPaths();
         startAudioService();
@@ -135,11 +137,11 @@ public class BoardPlayFragment extends BaseFragment {
     }
 
     private void getPaths() {
-        if (TextUtils.isEmpty(mCurrentPath)) {
+        if (TextUtils.isEmpty(mCurrentDataPath)) {
             return;
         }
 
-        mCw = CWFileUtils.read(mCurrentPath);
+        mCw = CWFileUtils.read(mCurrentDataPath);
         if (null == mCw) {
             return;
         }
@@ -235,14 +237,15 @@ public class BoardPlayFragment extends BaseFragment {
 
         @Override
         public void playing(int seconds) {
-            LogUtils.d("playing: " + seconds);
             mSeekBar.setProgress((int) (1.0 * mPlaySpeedOffset * seconds / mDuration * 100));
             drawPath(mCw, seconds, false);
         }
 
         @Override
         public void completion() {
-
+            if (null != mStatusListener) {
+                mStatusListener.onPreview();
+            }
         }
     };
 

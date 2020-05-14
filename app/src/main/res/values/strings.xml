@@ -32,6 +32,10 @@
     <string name="install_wechat_prompt">请先安装微信应用</string>
     <string name="update_wechat_prompt">请先更新微信应用</string>
 
+    <!-- 权限管理 -->
+    <string name="permission_granted">权限已接收</string>
+    <string name="permission_denied">权限被拒绝，您可以在权限管理中打开该权限</string>
+
     <!-- LoginActivity -->
     <string name="login_by_password">账户密码登录</string>
     <string name="login_by_auth">短信验证码登录</string>
@@ -89,9 +93,11 @@
     <string name="work_playback">创作回放</string>
     <string name="play_rate">%sx</string>
 
-    <!-- 权限管理 -->
-    <string name="permission_granted">权限已接收</string>
-    <string name="permission_denied">权限被拒绝，您可以在权限管理中打开该权限</string>
+    <!-- BoardOnlineFragment -->
+    <string name="work_info">作品信息</string>
+    <string name="author">作者</string>
+    <string name="create_time">创建时间</string>
+    <string name="edit_time">修改时间</string>
 
     <!-- DeleteDialog -->
     <string name="delete_dialog_title">删除当前页面</string>

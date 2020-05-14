@@ -9,21 +9,22 @@ import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 
-import com.aphrodite.framework.utils.ObjectUtils;
 import com.aphrodite.smartboard.R;
+import com.aphrodite.smartboard.config.AppConfig;
 import com.aphrodite.smartboard.config.IntentAction;
 import com.aphrodite.smartboard.model.bean.CW;
-import com.aphrodite.smartboard.model.bean.CWPage;
 import com.aphrodite.smartboard.model.bean.ScreenRecordEntity;
 import com.aphrodite.smartboard.model.bean.WorkBriefBean;
 import com.aphrodite.smartboard.utils.CWFileUtils;
 import com.aphrodite.smartboard.utils.FileUtils;
+import com.aphrodite.smartboard.utils.TimeUtils;
 import com.aphrodite.smartboard.view.fragment.base.BaseFragment;
 import com.aphrodite.smartboard.view.inter.BoardStatusListener;
 import com.aphrodite.smartboard.view.widget.dialog.DeleteDialog;
 import com.aphrodite.smartboard.view.widget.dialog.ShareDialog;
 import com.aphrodite.smartboard.view.widget.popupwindow.ListPopupWindow;
 import com.aphrodite.smartboard.view.widget.view.SimpleDoodleView;
+import com.bumptech.glide.Glide;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -43,7 +44,10 @@ public class BoardOnlineFragment extends BaseFragment {
     @BindView(R.id.palette_online_canvas)
     SimpleDoodleView mPaletteOnlineCanvas;
 
-    private String mCurrentFilePath;
+    private String mCurrentDataPath;
+    private String mCurrentAudioPath;
+    private String mCurrentImagePath;
+
     private List<ScreenRecordEntity> mEntities;
     private CW mCw;
 
@@ -68,7 +72,6 @@ public class BoardOnlineFragment extends BaseFragment {
         setToolbarFlag(TITLE_FLAG_SHOW_LEFT_BACK | TITLE_FLAG_SHOW_RIGHT_BTN);
         setLeftBtnRes(R.drawable.back);
         setRightBtnRes(R.drawable.share_toolbar_icon);
-        setTitleText("2020.5.8");
         setTitleColor(getResources().getColor(R.color.color_626262));
     }
 
@@ -86,20 +89,24 @@ public class BoardOnlineFragment extends BaseFragment {
     protected void initData() {
         Bundle bundle = getArguments();
         if (null != bundle) {
-            mCurrentFilePath = bundle.getString(IntentAction.CanvasAction.PATH_TRACK_FILE);
+            mCurrentDataPath = bundle.getString(IntentAction.CanvasAction.PATH_TRACK_FILE);
+            mCurrentAudioPath = bundle.getString(IntentAction.CanvasAction.PATH_AUDIO_FILE);
+            mCurrentImagePath = bundle.getString(IntentAction.CanvasAction.PATH_COVER_IMAGE);
         }
 
-        getPaths();
+        if (TextUtils.isEmpty(mCurrentDataPath)) {
+            return;
+        }
 
-        mBeans = new ArrayList<>();
-        WorkBriefBean bean0 = new WorkBriefBean("创建时间", "2020.5.12 12：30");
-        WorkBriefBean bean1 = new WorkBriefBean("修改时间", "2020.5.12 12：30");
-        WorkBriefBean bean2 = new WorkBriefBean("创建时间", "2020.5.12 12：30");
-        WorkBriefBean bean3 = new WorkBriefBean("创建时间", "2020.5.12 12：30");
-        mBeans.add(bean0);
-        mBeans.add(bean1);
-        mBeans.add(bean2);
-        mBeans.add(bean3);
+        File file = new File(mCurrentImagePath);
+        Glide.with(getContext()).load(file).into(mPaletteOnlineBg);
+
+        mCw = CWFileUtils.read(mCurrentDataPath);
+        if (null != mCw) {
+            String createTime = TimeUtils.msToDateFormat(1000 * mCw.getTime(), TimeUtils.FORMAT_SPECIAL_SYMBOL_ONE);
+            setTitleText(createTime);
+        }
+
     }
 
     @Override
@@ -107,33 +114,6 @@ public class BoardOnlineFragment extends BaseFragment {
         super.onDestroyView();
         if (null != mShareDialog) {
             mShareDialog.dismiss();
-        }
-    }
-
-    private void getPaths() {
-        if (TextUtils.isEmpty(mCurrentFilePath)) {
-            return;
-        }
-
-        mCw = CWFileUtils.read(mCurrentFilePath);
-        if (null == mCw) {
-            return;
-        }
-
-        List<CWPage> cwPages = mCw.getPAGES();
-        if (ObjectUtils.isEmpty(cwPages)) {
-            return;
-        }
-
-        mEntities = new ArrayList<>();
-        for (CWPage cwPage : cwPages) {
-            if (null == cwPage) {
-                continue;
-            }
-            ScreenRecordEntity recordEntity = new ScreenRecordEntity();
-            recordEntity.setCanDraw(false);
-            recordEntity.setType("0");
-            mEntities.add(recordEntity);
         }
     }
 
@@ -152,6 +132,20 @@ public class BoardOnlineFragment extends BaseFragment {
 
     @OnClick(R.id.switch_detail)
     public void onSwitchDetail() {
+        if (null == mCw) {
+            return;
+        }
+
+        mBeans = new ArrayList<>();
+        if (null != mCw) {
+            WorkBriefBean bean0 = new WorkBriefBean(getString(R.string.author), mCw.getAuthor());
+            WorkBriefBean bean1 = new WorkBriefBean(getString(R.string.create_time), TimeUtils.msToDateFormat(1000 * mCw.getTime(), TimeUtils.FORMAT_CHINESE_ONE));
+            WorkBriefBean bean2 = new WorkBriefBean(getString(R.string.edit_time), TimeUtils.msToDateFormat(1000 * mCw.getEditTime(), TimeUtils.FORMAT_CHINESE_ONE));
+            mBeans.add(bean0);
+            mBeans.add(bean1);
+            mBeans.add(bean2);
+        }
+
         if (null == mListPopupWindow) {
             mListPopupWindow = new ListPopupWindow(getContext());
         }
@@ -161,7 +155,7 @@ public class BoardOnlineFragment extends BaseFragment {
                 setWindowBackground(1f);
             }
         });
-        mListPopupWindow.setTitle("作品信息");
+        mListPopupWindow.setTitle(getString(R.string.work_info));
         mListPopupWindow.setList(mBeans);
         if (!mListPopupWindow.isShowing()) {
             mListPopupWindow.showAtLocation(mPaletteOnlineRoot, Gravity.BOTTOM, 0, 0);
@@ -200,7 +194,9 @@ public class BoardOnlineFragment extends BaseFragment {
     private DeleteDialog.OnClickListener mClickListener = new DeleteDialog.OnClickListener() {
         @Override
         public void onPositive() {
-            FileUtils.deleteFile(new File(mCurrentFilePath), false);
+            String dir = mCurrentDataPath.substring(0, mCurrentDataPath.lastIndexOf(AppConfig.SLASH));
+            FileUtils.deleteDir(new File(dir), true);
+            getActivity().finish();
         }
     };
 

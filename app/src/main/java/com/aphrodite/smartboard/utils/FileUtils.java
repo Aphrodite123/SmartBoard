@@ -258,12 +258,25 @@ public class FileUtils {
     }
 
     /**
+     * 删除文件夹
+     *
+     * @param file
+     * @return
+     */
+    public static boolean deleteFolder(File file) {
+        if (!file.exists()) {
+            return true;
+        }
+        return file.delete();
+    }
+
+    /**
      * 删除文件夹下所有文件
      *
      * @param file
      * @return
      */
-    public static boolean deleteDir(File file) {
+    public static boolean deleteDir(File file, boolean deleteParent) {
         if (null == file) {
             return true;
         }
@@ -279,6 +292,10 @@ public class FileUtils {
                 files[fileNum - 1].delete();
                 fileNum--;
             }
+        }
+
+        if (deleteParent) {
+            file.delete();
         }
 
         return true;

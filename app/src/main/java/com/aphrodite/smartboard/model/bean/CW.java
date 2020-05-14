@@ -15,6 +15,7 @@ public class CW {
     private List<CWACT> ACT;
     private String author;
     private long time;
+    private long editTime;
 
     public String getVERSION() {
         return VERSION;
@@ -70,5 +71,13 @@ public class CW {
 
     public void setTime(long time) {
         this.time = time;
+    }
+
+    public long getEditTime() {
+        return editTime;
+    }
+
+    public void setEditTime(long editTime) {
+        this.editTime = editTime;
     }
 }

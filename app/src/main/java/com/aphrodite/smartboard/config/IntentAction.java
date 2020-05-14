@@ -29,6 +29,8 @@ public interface IntentAction {
         String PATH_TRACK_FILE = "path_track_file";
 
         String PATH_AUDIO_FILE = "path_audio_file";
+
+        String PATH_COVER_IMAGE = "path_cover_image";
     }
 
     interface SettingAction {

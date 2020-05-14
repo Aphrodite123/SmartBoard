@@ -32,6 +32,7 @@ public class CanvasActivity extends BaseActivity {
     private boolean mDeviceOnline = true;
     private String mCurrentDataPath;
     private String mCurrentAudioPath;
+    private String mCurrentImagePath;
 
     @Override
     protected int getViewId() {
@@ -53,6 +54,7 @@ public class CanvasActivity extends BaseActivity {
         if (null != intent) {
             mCurrentDataPath = intent.getStringExtra(IntentAction.CanvasAction.PATH_TRACK_FILE);
             mCurrentAudioPath = intent.getStringExtra(IntentAction.CanvasAction.PATH_AUDIO_FILE);
+            mCurrentImagePath = intent.getStringExtra(IntentAction.CanvasAction.PATH_COVER_IMAGE);
         }
 
         mFragments = new ArrayList<>();
@@ -63,6 +65,7 @@ public class CanvasActivity extends BaseActivity {
         Bundle bundle = new Bundle();
         bundle.putString(IntentAction.CanvasAction.PATH_TRACK_FILE, mCurrentDataPath);
         bundle.putString(IntentAction.CanvasAction.PATH_AUDIO_FILE, mCurrentAudioPath);
+        bundle.putString(IntentAction.CanvasAction.PATH_COVER_IMAGE, mCurrentImagePath);
         onlineFragment.setArguments(bundle);
         playFragment.setArguments(bundle);
         editorFragment.setArguments(bundle);

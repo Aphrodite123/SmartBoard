@@ -26,7 +26,7 @@ import java.util.List;
  * @Description
  */
 public class SimpleDoodleView extends View {
-    private final static String TAG = "SimpleDoodleView";
+    private final static String TAG = SimpleDoodleView.class.getSimpleName();
     private List<DrawPath> drawPaths = new ArrayList<>();
     private Paint mPaint;
     private List<Path> mPathList; // 保存涂鸦轨迹的集合

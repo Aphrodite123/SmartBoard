@@ -1,9 +1,7 @@
 package com.aphrodite.smartboard.view.fragment;
 
-import android.content.ComponentName;
-import android.content.Intent;
-import android.content.ServiceConnection;
-import android.os.IBinder;
+import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
@@ -16,15 +14,14 @@ import android.widget.TextView;
 import com.aphrodite.framework.utils.UIUtils;
 import com.aphrodite.smartboard.R;
 import com.aphrodite.smartboard.config.AppConfig;
+import com.aphrodite.smartboard.config.IntentAction;
 import com.aphrodite.smartboard.model.bean.ScreenRecordEntity;
-import com.aphrodite.smartboard.model.service.AudioService;
-import com.aphrodite.smartboard.utils.AudioUtils;
 import com.aphrodite.smartboard.utils.CWFileUtils;
-import com.aphrodite.smartboard.utils.FileUtils;
 import com.aphrodite.smartboard.view.fragment.base.BaseFragment;
 import com.aphrodite.smartboard.view.inter.BoardStatusListener;
 import com.aphrodite.smartboard.view.widget.popupwindow.PaletePopupWindow;
 import com.aphrodite.smartboard.view.widget.view.SimpleDoodleView;
+import com.bumptech.glide.Glide;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -32,8 +29,6 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.OnClick;
-
-import static android.content.Context.BIND_AUTO_CREATE;
 
 /**
  * Created by Aphrodite on 20-5-8
@@ -50,10 +45,12 @@ public class BoardEditorFragment extends BaseFragment {
     @BindView(R.id.switch_color)
     TextView mSwitchColorBtn;
 
+    private String mCurrentDataPath;
+    private String mCurrentAudioPath;
+    private String mCurrentImagePath;
+
     private BoardStatusListener mStatusListener;
 
-    private AudioService mAudioService;
-    private ServiceConnection mServiceConnection;
     private List<ScreenRecordEntity> mRecordEntities = new ArrayList<>();
 
     private PaletePopupWindow mPaletePopupWindow;
@@ -88,11 +85,30 @@ public class BoardEditorFragment extends BaseFragment {
             }
         });
 
-        AudioUtils.addRecordListener(mRecordListener);
+        mRightBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                CWFileUtils.write(mRecordEntities, AppConfig.TEMP_PATH, UIUtils.getDisplayWidthPixels(getContext()), UIUtils.getDisplayHeightPixels(getContext()));
+            }
+        });
     }
 
     @Override
     protected void initData() {
+        Bundle bundle = getArguments();
+        if (null != bundle) {
+            mCurrentDataPath = bundle.getString(IntentAction.CanvasAction.PATH_TRACK_FILE);
+            mCurrentAudioPath = bundle.getString(IntentAction.CanvasAction.PATH_AUDIO_FILE);
+            mCurrentImagePath = bundle.getString(IntentAction.CanvasAction.PATH_COVER_IMAGE);
+        }
+
+        if (TextUtils.isEmpty(mCurrentDataPath)) {
+            return;
+        }
+
+        File file = new File(mCurrentImagePath);
+        Glide.with(getContext()).load(file).into(mBoardPathBg);
+
         mColorIds = new ArrayList<>();
         mColorIds.add(getResources().getColor(R.color.color_b71919));
         mColorIds.add(getResources().getColor(R.color.color_ffe82a));
@@ -112,16 +128,10 @@ public class BoardEditorFragment extends BaseFragment {
         ScreenRecordEntity recordEntity = new ScreenRecordEntity();
         recordEntity.setType("0");
         mRecordEntities.add(recordEntity);
-        startAudioService();
     }
 
     @Override
     public void onDestroy() {
-        getActivity().unbindService(mServiceConnection);
-        AudioUtils.clearAllListener();
-        if (null != mAudioService) {
-            mAudioService.stopAudio(null);
-        }
         super.onDestroy();
     }
 
@@ -138,34 +148,9 @@ public class BoardEditorFragment extends BaseFragment {
                 if (null != mCanvas) {
                     mCanvas.setCanDraw(true);
                 }
-
-                if (null != mAudioService) {
-                    if (mAudioService.isFinish()) {
-                        FileUtils.deleteFile(new File(AppConfig.TEMP_PATH), false);
-                        mAudioService.startAudio();
-                    } else {
-                        if (mAudioService.isRunning()) {
-                            mAudioService.pauseAuido();
-                        } else {
-                            mAudioService.resumeAudio();
-                        }
-                    }
-                }
                 break;
             //橡皮
             case 1:
-                if (null != mAudioService) {
-                    if (mAudioService.isFinish()) {
-                        FileUtils.deleteFile(new File(AppConfig.TEMP_PATH), false);
-                        mAudioService.startAudio();
-                    } else {
-                        if (mAudioService.isRunning()) {
-                            mAudioService.pauseAuido();
-                        } else {
-                            mAudioService.resumeAudio();
-                        }
-                    }
-                }
                 mCanvas.setIsEraser(true);
                 break;
             //色板
@@ -191,38 +176,6 @@ public class BoardEditorFragment extends BaseFragment {
         }
     }
 
-    private void startAudioService() {
-        if (null == mServiceConnection) {
-            mServiceConnection = new ServiceConnection() {
-                @Override
-                public void onServiceConnected(ComponentName name, IBinder service) {
-                    AudioService.AudioBinder audioBinder = (AudioService.AudioBinder) service;
-                    mAudioService = audioBinder.getAudioService();
-                }
-
-                @Override
-                public void onServiceDisconnected(ComponentName name) {
-
-                }
-            };
-        }
-
-        Intent intent = new Intent(getActivity(), AudioService.class);
-        getActivity().bindService(intent, mServiceConnection, BIND_AUTO_CREATE);
-    }
-
-    @Override
-    public void clickRightBtn(View view) {
-        if (null != mAudioService) {
-            mAudioService.stopAudio(null);
-        }
-
-        if (null != mCanvas) {
-            mCanvas.setCanDraw(false);
-            mCanvas.clear();
-        }
-    }
-
     @OnClick(R.id.switch_paint)
     public void onPainting() {
         onBottomTab(0);
@@ -242,32 +195,5 @@ public class BoardEditorFragment extends BaseFragment {
     public void onClear() {
         onBottomTab(3);
     }
-
-    private AudioUtils.RecordListener mRecordListener = new AudioUtils.RecordListener() {
-        @Override
-        public void onStartRecord() {
-
-        }
-
-        @Override
-        public void onPauseRecord() {
-
-        }
-
-        @Override
-        public void onResumeRecord() {
-
-        }
-
-        @Override
-        public void onStopRecord(String stopTip) {
-            CWFileUtils.write(mRecordEntities, AppConfig.TEMP_PATH, UIUtils.getDisplayWidthPixels(getContext()), UIUtils.getDisplayHeightPixels(getContext()));
-        }
-
-        @Override
-        public void onRecording(int time) {
-            CWFileUtils.setSeconds(time);
-        }
-    };
 
 }

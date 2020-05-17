@@ -14,8 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/toolbar"
-        android:scaleType="fitXY"
-        android:src="@drawable/flash" />
+        android:layout_marginBottom="@dimen/dip55" />
 
     <!-- 非自绘区 -->
     <LinearLayout

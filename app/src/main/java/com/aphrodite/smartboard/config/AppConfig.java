@@ -2,8 +2,6 @@ package com.aphrodite.smartboard.config;
 
 import com.aphrodite.framework.config.base.BaseConfig;
 
-import java.io.File;
-
 /**
  * Created by Aphrodite on 2019/5/28.
  */

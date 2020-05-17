@@ -34,10 +34,6 @@ public class AudioService extends Service implements Handler.Callback {
     private int fileIndex;
     private boolean isFinish = true;
 
-    public String getmRecordFilePath() {
-        return mRecordFilePath;
-    }
-
     public boolean isRunning() {
         return isRunning;
     }
@@ -140,7 +136,6 @@ public class AudioService extends Service implements Handler.Callback {
         mHandler.removeMessages(MSG_TYPE_COUNT_DOWN);
         if (recordDictory != null) {
             composeAudio(recordDictory.getAbsolutePath() + File.separator + "audio.mp3");
-//            FileUtil.renameFile(recordDictory.getAbsolutePath(), AppConfig.filePath + File.separator + newPath);
         }
         mRecordSeconds = 0;
         recordDictory = null;
@@ -198,6 +193,5 @@ public class AudioService extends Service implements Handler.Callback {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        FileUtils.deleteFile(new File(AppConfig.TEMP_PATH), true);
     }
 }

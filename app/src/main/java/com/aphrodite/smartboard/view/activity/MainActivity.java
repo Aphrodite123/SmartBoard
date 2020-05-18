@@ -254,25 +254,25 @@ public class MainActivity extends BaseActivity {
         // 图片所在路径，图片命名格式img+number.jpg
         // 这里指定目录为根目录下img文件夹
 
-        if (!FileUtils.isFolderExist(AppConfig.VIDEO_PATH)) {
+        if (!FileUtils.isFolderExist(AppConfig.FFMPEG_PATH)) {
             return;
         }
 
-        String combineVideo = AppConfig.VIDEO_PATH + "video.mp4";
+        String combineVideo = AppConfig.FFMPEG_PATH + "video.mp4";
         int frameRate = 10;// 合成视频帧率建议:1-10  普通视频帧率一般为25
-        String[] commandLine = FFmpegUtils.pictureToVideo(AppConfig.VIDEO_PATH, frameRate, combineVideo);
+        String[] commandLine = FFmpegUtils.pictureToVideo(AppConfig.FFMPEG_PATH, frameRate, combineVideo);
         if (mFfmpegHandler != null) {
             mFfmpegHandler.executeFFmpegCmd(commandLine);
         }
     }
 
     private void pictureToGif() {
-        if (!FileUtils.isFolderExist(AppConfig.VIDEO_PATH)) {
+        if (!FileUtils.isFolderExist(AppConfig.FFMPEG_PATH)) {
             return;
         }
 
-        String srcFile = AppConfig.VIDEO_PATH + "video.mp4";
-        String Video2Gif = AppConfig.VIDEO_PATH + "pituretogif.gif";
+        String srcFile = AppConfig.FFMPEG_PATH + "video.mp4";
+        String Video2Gif = AppConfig.FFMPEG_PATH + "pituretogif.gif";
         int gifStart = 0;
         int gifDuration = 5;
         String resolution = "720x1280";//240x320、480x640、1080x1920
@@ -314,7 +314,7 @@ public class MainActivity extends BaseActivity {
     }
 
     private void loadSDcardData() {
-        File file = new File(AppConfig.TEMP_PATH);
+        File file = new File(AppConfig.DATA_PATH);
         if (!file.exists()) {
             return;
         }
@@ -326,7 +326,7 @@ public class MainActivity extends BaseActivity {
 
         for (String fold : mWorkFolders) {
             mPaths.clear();
-            parsePath(AppConfig.TEMP_PATH + fold, "data.cw");
+            parsePath(AppConfig.DATA_PATH + fold, "data.cw");
         }
     }
 
@@ -430,7 +430,7 @@ public class MainActivity extends BaseActivity {
                 case MSG_BEGIN:
                     break;
                 case MSG_FINISH:
-                    Toast.makeText(MainActivity.this, "保存成功，路径为：" + AppConfig.VIDEO_PATH, Toast.LENGTH_LONG).show();
+                    Toast.makeText(MainActivity.this, "保存成功，路径为：" + AppConfig.FFMPEG_PATH, Toast.LENGTH_LONG).show();
                     break;
                 default:
                     break;

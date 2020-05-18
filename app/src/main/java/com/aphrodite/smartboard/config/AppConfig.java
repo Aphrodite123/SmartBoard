@@ -1,6 +1,7 @@
 package com.aphrodite.smartboard.config;
 
 import com.aphrodite.framework.config.base.BaseConfig;
+import com.aphrodite.smartboard.application.MainApplication;
 
 /**
  * Created by Aphrodite on 2019/5/28.
@@ -8,9 +9,15 @@ import com.aphrodite.framework.config.base.BaseConfig;
 public class AppConfig extends BaseConfig {
     public static final String ROOT_PATH = SDCARD_PATH + "com.aphrodite.smartboard/";
 
-    public static final String VIDEO_PATH = ROOT_PATH + "video/";
+    /**
+     * 智能手写板数据文件存储路径，默认指定到data
+     */
+    public static final String DATA_PATH = MainApplication.getApplication().getExternalFilesDir("data").getAbsolutePath();
 
-    public static final String TEMP_PATH = ROOT_PATH + "temp/";
+    /**
+     * 智能手写板ffmpeg文件存储路径，默认指定到ffmpeg
+     */
+    public static final String FFMPEG_PATH = MainApplication.getApplication().getExternalFilesDir("ffmpeg").getAbsolutePath();
 
     /**
      * 封面图片名称

@@ -14,7 +14,6 @@ import com.aphrodite.smartboard.model.bean.CW;
 import com.aphrodite.smartboard.model.bean.WorkInfoBean;
 import com.aphrodite.smartboard.model.bean.WorksBean;
 import com.aphrodite.smartboard.utils.CWFileUtils;
-import com.aphrodite.smartboard.utils.LogUtils;
 import com.aphrodite.smartboard.utils.TimeUtils;
 import com.aphrodite.smartboard.view.adapter.WorkListAdapter;
 import com.aphrodite.smartboard.view.adapter.WorkListGridViewAdapter;
@@ -90,7 +89,7 @@ public class MainFragment extends BaseFragment {
     }
 
     private void loadSDcardData() {
-        File file = new File(AppConfig.TEMP_PATH);
+        File file = new File(AppConfig.DATA_PATH);
         if (!file.exists()) {
             return;
         }
@@ -106,7 +105,7 @@ public class MainFragment extends BaseFragment {
                 continue;
             }
 
-            cw = CWFileUtils.read(AppConfig.TEMP_PATH + fold + File.separator + "data.cw");
+            cw = CWFileUtils.read(AppConfig.DATA_PATH + fold + File.separator + "data.cw");
             mCws.add(cw);
         }
     }
@@ -173,9 +172,9 @@ public class MainFragment extends BaseFragment {
                 WorkInfoBean infoBean = new WorkInfoBean();
                 infoBean.setAuthor(cw.getAuthor());
                 infoBean.setTime(TimeUtils.msToDateFormat(1000 * cw.getTime(), TimeUtils.FORMAT_CLOCK_ONE));
-                infoBean.setPicture(AppConfig.TEMP_PATH + cw.getTime() + File.separator + "cover_image.jpg");
-                infoBean.setDataPath(AppConfig.TEMP_PATH + cw.getTime() + File.separator + "data.cw");
-                infoBean.setAudioPath(AppConfig.TEMP_PATH + cw.getTime() + File.separator + "audio.mp3");
+                infoBean.setPicture(AppConfig.DATA_PATH + cw.getTime() + File.separator + "cover_image.jpg");
+                infoBean.setDataPath(AppConfig.DATA_PATH + cw.getTime() + File.separator + "data.cw");
+                infoBean.setAudioPath(AppConfig.DATA_PATH + cw.getTime() + File.separator + "audio.mp3");
 
                 workInfoBeans.add(infoBean);
             }

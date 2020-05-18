@@ -5,9 +5,9 @@
     "environmentVariables": []
   },
   "cmake": {
-    "cmakeArtifactsBaseFolder": "/home/share/Application/Aphrodite/SmartBoard/app/.cxx/cmake/debug/arm64-v8a",
-    "cmakeServerLogFile": "/home/share/Application/Aphrodite/SmartBoard/app/.cxx/cmake/debug/arm64-v8a/cmake_server_log.txt",
-    "cmakeWrappingBaseFolder": "/home/share/Application/Aphrodite/SmartBoard/app/.cxx/cxx/debug/arm64-v8a",
+    "cmakeArtifactsBaseFolder": "D:\\Application\\SmartBoard\\app\\.cxx\\cmake\\debug\\arm64-v8a",
+    "cmakeServerLogFile": "D:\\Application\\SmartBoard\\app\\.cxx\\cmake\\debug\\arm64-v8a\\cmake_server_log.txt",
+    "cmakeWrappingBaseFolder": "D:\\Application\\SmartBoard\\app\\.cxx\\cxx\\debug\\arm64-v8a",
     "effectiveConfiguration": {
       "name": "traditional-android-studio-cmake-environment",
       "description": "Composite reified CMakeSettings configuration",
@@ -15,9 +15,9 @@
       "inheritEnvironments": [
         "ndk"
       ],
-      "buildRoot": "/home/share/Application/Aphrodite/SmartBoard/app/.cxx/cmake/debug/arm64-v8a",
-      "cmakeToolchain": "/home/wl/Android/Sdk/ndk/20.0.5594570/build/cmake/android.toolchain.cmake",
-      "cmakeExecutable": "/home/wl/Android/Sdk/cmake/3.10.2.4988404/bin/cmake",
+      "buildRoot": "D:\\Application\\SmartBoard\\app\\.cxx\\cmake\\debug\\arm64-v8a",
+      "cmakeToolchain": "E:\\Software\\Android\\Sdk\\ndk\\21.0.6113669\\build\\cmake\\android.toolchain.cmake",
+      "cmakeExecutable": "E:\\Software\\Android\\Sdk\\cmake\\3.10.2.4988404\\bin\\cmake.exe",
       "variables": [
         {
           "name": "CMAKE_BUILD_TYPE",
@@ -25,7 +25,7 @@
         },
         {
           "name": "CMAKE_TOOLCHAIN_FILE",
-          "value": "/home/wl/Android/Sdk/ndk/20.0.5594570/build/cmake/android.toolchain.cmake"
+          "value": "E:\\Software\\Android\\Sdk\\ndk\\21.0.6113669\\build\\cmake\\android.toolchain.cmake"
         },
         {
           "name": "ANDROID_ABI",
@@ -33,7 +33,7 @@
         },
         {
           "name": "ANDROID_NDK",
-          "value": "/home/wl/Android/Sdk/ndk/20.0.5594570"
+          "value": "E:\\Software\\Android\\Sdk\\ndk\\21.0.6113669"
         },
         {
           "name": "ANDROID_PLATFORM",
@@ -45,7 +45,7 @@
         },
         {
           "name": "CMAKE_ANDROID_NDK",
-          "value": "/home/wl/Android/Sdk/ndk/20.0.5594570"
+          "value": "E:\\Software\\Android\\Sdk\\ndk\\21.0.6113669"
         },
         {
           "name": "CMAKE_EXPORT_COMPILE_COMMANDS",
@@ -53,11 +53,11 @@
         },
         {
           "name": "CMAKE_LIBRARY_OUTPUT_DIRECTORY",
-          "value": "/home/share/Application/Aphrodite/SmartBoard/app/build/intermediates/cmake/debug/obj/arm64-v8a"
+          "value": "D:\\Application\\SmartBoard\\app\\build\\intermediates\\cmake\\debug\\obj\\arm64-v8a"
         },
         {
           "name": "CMAKE_MAKE_PROGRAM",
-          "value": "/home/wl/Android/Sdk/cmake/3.10.2.4988404/bin/ninja"
+          "value": "E:\\Software\\Android\\Sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe"
         },
         {
           "name": "CMAKE_SYSTEM_NAME",
@@ -70,14 +70,14 @@
       ]
     }
   },
-  "cxxBuildFolder": "/home/share/Application/Aphrodite/SmartBoard/app/.cxx/cmake/debug/arm64-v8a",
+  "cxxBuildFolder": "D:\\Application\\SmartBoard\\app\\.cxx\\cmake\\debug\\arm64-v8a",
   "info": {
     "abi": "ARM64_V8A",
     "bitness": 64,
     "deprecated": false,
     "default": true
   },
-  "originalCxxBuildFolder": "/home/share/Application/Aphrodite/SmartBoard/app/.cxx/cmake/debug/arm64-v8a",
+  "originalCxxBuildFolder": "D:\\Application\\SmartBoard\\app\\.cxx\\cmake\\debug\\arm64-v8a",
   "variant": {
     "buildSystemArgumentList": [],
     "buildTargetSet": [],
@@ -90,24 +90,24 @@
     "module": {
       "buildSystem": "CMAKE",
       "cmake": {
-        "cmakeExe": "/home/wl/Android/Sdk/cmake/3.10.2.4988404/bin/cmake",
+        "cmakeExe": "E:\\Software\\Android\\Sdk\\cmake\\3.10.2.4988404\\bin\\cmake.exe",
         "minimumCmakeVersion": "3.10.2",
-        "ninjaExe": "/home/wl/Android/Sdk/cmake/3.10.2.4988404/bin/ninja"
+        "ninjaExe": "E:\\Software\\Android\\Sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe"
       },
-      "cmakeToolchainFile": "/home/wl/Android/Sdk/ndk/20.0.5594570/build/cmake/android.toolchain.cmake",
-      "cxxFolder": "/home/share/Application/Aphrodite/SmartBoard/app/.cxx",
+      "cmakeToolchainFile": "E:\\Software\\Android\\Sdk\\ndk\\21.0.6113669\\build\\cmake\\android.toolchain.cmake",
+      "cxxFolder": "D:\\Application\\SmartBoard\\app\\.cxx",
       "gradleModulePathName": ":app",
-      "intermediatesFolder": "/home/share/Application/Aphrodite/SmartBoard/app/build/intermediates",
-      "makeFile": "/home/share/Application/Aphrodite/SmartBoard/app/CMakeLists.txt",
-      "moduleBuildFile": "/home/share/Application/Aphrodite/SmartBoard/app/build.gradle",
-      "moduleRootFolder": "/home/share/Application/Aphrodite/SmartBoard/app",
+      "intermediatesFolder": "D:\\Application\\SmartBoard\\app\\build\\intermediates",
+      "makeFile": "D:\\Application\\SmartBoard\\app\\CMakeLists.txt",
+      "moduleBuildFile": "D:\\Application\\SmartBoard\\app\\build.gradle",
+      "moduleRootFolder": "D:\\Application\\SmartBoard\\app",
       "ndkDefaultAbiList": [
         "ARMEABI_V7A",
         "ARM64_V8A",
         "X86",
         "X86_64"
       ],
-      "ndkFolder": "/home/wl/Android/Sdk/ndk/20.0.5594570",
+      "ndkFolder": "E:\\Software\\Android\\Sdk\\ndk\\21.0.6113669",
       "ndkMetaAbiList": [
         {
           "abi": "ARMEABI_V7A",
@@ -161,31 +161,31 @@
         "X86",
         "X86_64"
       ],
-      "ndkVersion": "20.0.5594570",
+      "ndkVersion": "21.0.6113669",
       "project": {
-        "compilerSettingsCacheFolder": "/home/share/Application/Aphrodite/SmartBoard/.cxx",
-        "cxxFolder": "/home/share/Application/Aphrodite/SmartBoard/.cxx",
+        "compilerSettingsCacheFolder": "D:\\Application\\SmartBoard\\.cxx",
+        "cxxFolder": "D:\\Application\\SmartBoard\\.cxx",
         "ideBuildTargetAbi": "arm64-v8a,armeabi-v7a,armeabi",
         "isBuildOnlyTargetAbiEnabled": true,
         "isCmakeBuildCohabitationEnabled": false,
         "isNativeCompilerSettingsCacheEnabled": false,
-        "rootBuildGradleFolder": "/home/share/Application/Aphrodite/SmartBoard",
-        "sdkFolder": "/home/wl/Android/Sdk"
+        "rootBuildGradleFolder": "D:\\Application\\SmartBoard",
+        "sdkFolder": "E:\\Software\\Android\\Sdk"
       },
       "splitsAbiFilterSet": [],
       "stlSharedObjectMap": {
         "LIBCXX_SHARED": {
-          "ARMEABI_V7A": "/home/wl/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/arm-linux-androideabi/libc++_shared.so",
-          "ARM64_V8A": "/home/wl/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/aarch64-linux-android/libc++_shared.so",
-          "X86": "/home/wl/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/i686-linux-android/libc++_shared.so",
-          "X86_64": "/home/wl/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/x86_64-linux-android/libc++_shared.so"
+          "ARMEABI_V7A": "E:\\Software\\Android\\Sdk\\ndk\\21.0.6113669\\toolchains\\llvm\\prebuilt\\windows-x86_64\\sysroot\\usr\\lib\\arm-linux-androideabi\\libc++_shared.so",
+          "ARM64_V8A": "E:\\Software\\Android\\Sdk\\ndk\\21.0.6113669\\toolchains\\llvm\\prebuilt\\windows-x86_64\\sysroot\\usr\\lib\\aarch64-linux-android\\libc++_shared.so",
+          "X86": "E:\\Software\\Android\\Sdk\\ndk\\21.0.6113669\\toolchains\\llvm\\prebuilt\\windows-x86_64\\sysroot\\usr\\lib\\i686-linux-android\\libc++_shared.so",
+          "X86_64": "E:\\Software\\Android\\Sdk\\ndk\\21.0.6113669\\toolchains\\llvm\\prebuilt\\windows-x86_64\\sysroot\\usr\\lib\\x86_64-linux-android\\libc++_shared.so"
         },
         "LIBCXX_STATIC": {},
         "NONE": {},
         "SYSTEM": {}
       }
     },
-    "objFolder": "/home/share/Application/Aphrodite/SmartBoard/app/build/intermediates/cmake/debug/obj",
+    "objFolder": "D:\\Application\\SmartBoard\\app\\build\\intermediates\\cmake\\debug\\obj",
     "variantName": "debug",
     "validAbiList": [
       "ARM64_V8A",

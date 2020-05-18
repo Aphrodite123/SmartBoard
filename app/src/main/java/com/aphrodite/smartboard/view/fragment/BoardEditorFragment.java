@@ -1,29 +1,44 @@
 package com.aphrodite.smartboard.view.fragment;
 
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.aphrodite.framework.utils.UIUtils;
+import com.aphrodite.framework.utils.ObjectUtils;
+import com.aphrodite.framework.utils.ToastUtils;
 import com.aphrodite.smartboard.R;
 import com.aphrodite.smartboard.config.AppConfig;
 import com.aphrodite.smartboard.config.IntentAction;
+import com.aphrodite.smartboard.model.bean.CW;
+import com.aphrodite.smartboard.model.bean.CWACT;
 import com.aphrodite.smartboard.model.bean.ScreenRecordEntity;
+import com.aphrodite.smartboard.model.event.ActionEvent;
+import com.aphrodite.smartboard.utils.BitmapUtils;
 import com.aphrodite.smartboard.utils.CWFileUtils;
+import com.aphrodite.smartboard.utils.FileUtils;
 import com.aphrodite.smartboard.view.fragment.base.BaseFragment;
 import com.aphrodite.smartboard.view.inter.BoardStatusListener;
+import com.aphrodite.smartboard.view.widget.dialog.DeleteDialog;
+import com.aphrodite.smartboard.view.widget.dialog.ShareDialog;
 import com.aphrodite.smartboard.view.widget.popupwindow.PaletePopupWindow;
 import com.aphrodite.smartboard.view.widget.view.SimpleDoodleView;
-import com.bumptech.glide.Glide;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,8 +51,6 @@ import butterknife.OnClick;
 public class BoardEditorFragment extends BaseFragment {
     @BindView(R.id.board_editor_root)
     RelativeLayout mRoot;
-    @BindView(R.id.board_path_bg)
-    ImageView mBoardPathBg;
     @BindView(R.id.custom_canvas)
     SimpleDoodleView mCanvas;
     @BindView(R.id.canvas_bottom_tab)
@@ -49,12 +62,20 @@ public class BoardEditorFragment extends BaseFragment {
     private String mCurrentAudioPath;
     private String mCurrentImagePath;
 
+    private List<ScreenRecordEntity> mEntities;
+    private CW mCw;
+
     private BoardStatusListener mStatusListener;
 
     private List<ScreenRecordEntity> mRecordEntities = new ArrayList<>();
 
     private PaletePopupWindow mPaletePopupWindow;
     private List<Integer> mColorIds;
+
+    //是否正在对作品编辑，默认进入则为正在编辑
+    private boolean mIsEditing = true;
+    private ShareDialog mShareDialog;
+    private DeleteDialog mPromptDialog;
 
     public BoardEditorFragment(BoardStatusListener statusListener) {
         this.mStatusListener = statusListener;
@@ -76,6 +97,7 @@ public class BoardEditorFragment extends BaseFragment {
 
     @Override
     protected void initListener() {
+        EventBus.getDefault().register(mEventListener);
         mLeftBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -88,7 +110,13 @@ public class BoardEditorFragment extends BaseFragment {
         mRightBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                CWFileUtils.write(mRecordEntities, AppConfig.TEMP_PATH, UIUtils.getDisplayWidthPixels(getContext()), UIUtils.getDisplayHeightPixels(getContext()));
+                if (mIsEditing) {
+                    savePicture();
+                    mIsEditing = false;
+                    setRightBtnRes(R.drawable.share_toolbar_icon);
+                } else {
+                    shareDialog();
+                }
             }
         });
     }
@@ -102,12 +130,10 @@ public class BoardEditorFragment extends BaseFragment {
             mCurrentImagePath = bundle.getString(IntentAction.CanvasAction.PATH_COVER_IMAGE);
         }
 
-        if (TextUtils.isEmpty(mCurrentDataPath)) {
-            return;
-        }
+        onBottomTab(0);
 
-        File file = new File(mCurrentImagePath);
-        Glide.with(getContext()).load(file).into(mBoardPathBg);
+        getPaths();
+        drawPath(mCw);
 
         mColorIds = new ArrayList<>();
         mColorIds.add(getResources().getColor(R.color.color_b71919));
@@ -131,6 +157,12 @@ public class BoardEditorFragment extends BaseFragment {
     }
 
     @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        EventBus.getDefault().unregister(mEventListener);
+    }
+
+    @Override
     public void onDestroy() {
         super.onDestroy();
     }
@@ -139,6 +171,65 @@ public class BoardEditorFragment extends BaseFragment {
         WindowManager.LayoutParams layoutParams = getActivity().getWindow().getAttributes();
         layoutParams.alpha = alpha;
         getActivity().getWindow().setAttributes(layoutParams);
+    }
+
+    private void getPaths() {
+        if (TextUtils.isEmpty(mCurrentDataPath)) {
+            return;
+        }
+
+        mCw = CWFileUtils.read(mCurrentDataPath);
+    }
+
+    private void drawPath(CW cw) {
+        if (null == cw) {
+            return;
+        }
+
+        List<CWACT> cwacts = cw.getACT();
+        if (ObjectUtils.isEmpty(cwacts)) {
+            return;
+        }
+
+        for (CWACT cwact : cwacts) {
+            if (null == cwact) {
+                continue;
+            }
+            if (null != mCanvas) {
+                mCanvas.splitLine(cwact.getLine());
+            }
+        }
+    }
+
+    private void savePicture() {
+        String dir = null;
+        if (!TextUtils.isEmpty(mCurrentDataPath)) {
+            dir = mCurrentDataPath.substring(0, mCurrentDataPath.lastIndexOf(AppConfig.SLASH));
+        }
+        String imageName = "shot.jpg";
+
+        try {
+            BitmapUtils.saveBitmap(BitmapUtils.shotToView(mCanvas), dir, imageName, Bitmap.CompressFormat.JPEG, 100);
+            File file = new File(dir + File.separator + imageName);
+            MediaStore.Images.Media.insertImage(getContext().getContentResolver(), file.getAbsolutePath(), imageName, null);
+
+            Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(file));
+            getContext().sendBroadcast(intent);
+
+            ToastUtils.showMessage(R.string.toast_save_to_gallery_successed);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void shareDialog() {
+        if (null == mShareDialog) {
+            mShareDialog = new ShareDialog(getContext(), mShareListener);
+        }
+
+        if (!mShareDialog.isShowing()) {
+            mShareDialog.show();
+        }
     }
 
     private void onBottomTab(int index) {
@@ -195,5 +286,49 @@ public class BoardEditorFragment extends BaseFragment {
     public void onClear() {
         onBottomTab(3);
     }
+
+    private DeleteDialog.OnClickListener mClickListener = new DeleteDialog.OnClickListener() {
+        @Override
+        public void onNegative() {
+            if (null != mStatusListener) {
+                mStatusListener.onPreview();
+            }
+        }
+
+        @Override
+        public void onPositive() {
+            savePicture();
+            if (null != mStatusListener) {
+                mStatusListener.onPreview();
+            }
+        }
+    };
+
+    private ShareDialog.OnListener mShareListener = new ShareDialog.OnListener() {
+        @Override
+        public void onConfirm(int type, int id) {
+        }
+    };
+
+    private Object mEventListener = new Object() {
+        @Subscribe(threadMode = ThreadMode.MAIN)
+        public void onEventMainThread(ActionEvent event) {
+            if (mIsEditing) {
+                if (null == mPromptDialog) {
+                    mPromptDialog = new DeleteDialog(getContext(), mClickListener);
+                }
+                mPromptDialog.setTitle(R.string.prompt);
+                mPromptDialog.setMessage(R.string.message_edit_exit);
+
+                if (!mPromptDialog.isShowing()) {
+                    mPromptDialog.show();
+                }
+            } else {
+                if (null != mStatusListener) {
+                    mStatusListener.onPreview();
+                }
+            }
+        }
+    };
 
 }

@@ -15,6 +15,7 @@ import com.aphrodite.smartboard.config.IntentAction;
 import com.aphrodite.smartboard.model.bean.CW;
 import com.aphrodite.smartboard.model.bean.ScreenRecordEntity;
 import com.aphrodite.smartboard.model.bean.WorkBriefBean;
+import com.aphrodite.smartboard.model.event.ActionEvent;
 import com.aphrodite.smartboard.utils.CWFileUtils;
 import com.aphrodite.smartboard.utils.FileUtils;
 import com.aphrodite.smartboard.utils.TimeUtils;
@@ -25,6 +26,10 @@ import com.aphrodite.smartboard.view.widget.dialog.ShareDialog;
 import com.aphrodite.smartboard.view.widget.popupwindow.ListPopupWindow;
 import com.aphrodite.smartboard.view.widget.view.SimpleDoodleView;
 import com.bumptech.glide.Glide;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -52,7 +57,7 @@ public class BoardOnlineFragment extends BaseFragment {
     private CW mCw;
 
     private BoardStatusListener mStatusListener;
-    private ShareDialog mShareDialog = null;
+    private ShareDialog mShareDialog;
     private ListPopupWindow mListPopupWindow;
     private List<WorkBriefBean> mBeans;
 
@@ -77,6 +82,7 @@ public class BoardOnlineFragment extends BaseFragment {
 
     @Override
     protected void initListener() {
+        EventBus.getDefault().register(mEventListener);
         mLeftBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -112,6 +118,7 @@ public class BoardOnlineFragment extends BaseFragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        EventBus.getDefault().unregister(mEventListener);
         if (null != mShareDialog) {
             mShareDialog.dismiss();
         }
@@ -193,6 +200,11 @@ public class BoardOnlineFragment extends BaseFragment {
 
     private DeleteDialog.OnClickListener mClickListener = new DeleteDialog.OnClickListener() {
         @Override
+        public void onNegative() {
+
+        }
+
+        @Override
         public void onPositive() {
             String dir = mCurrentDataPath.substring(0, mCurrentDataPath.lastIndexOf(AppConfig.SLASH));
             FileUtils.deleteDir(new File(dir), true);
@@ -203,6 +215,13 @@ public class BoardOnlineFragment extends BaseFragment {
     private ShareDialog.OnListener mShareListener = new ShareDialog.OnListener() {
         @Override
         public void onConfirm(int type, int id) {
+        }
+    };
+
+    private Object mEventListener = new Object() {
+        @Subscribe(threadMode = ThreadMode.MAIN)
+        public void onEventMainThread(ActionEvent event) {
+            getActivity().finish();
         }
     };
 

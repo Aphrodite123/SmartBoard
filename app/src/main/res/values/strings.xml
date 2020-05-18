@@ -99,8 +99,13 @@
     <string name="create_time">创建时间</string>
     <string name="edit_time">修改时间</string>
 
+    <!-- BoardEditorFragment -->
+    <string name="toast_save_to_gallery_successed">已保存至相册</string>
+
     <!-- DeleteDialog -->
     <string name="delete_dialog_title">删除当前页面</string>
     <string name="delete_dialog_message">删除后无法恢复</string>
+    <string name="prompt">提示</string>
+    <string name="message_edit_exit">有未保存修改，是否保存？</string>
 
 </resources>

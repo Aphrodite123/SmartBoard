@@ -9,14 +9,17 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.aphrodite.framework.utils.ObjectUtils;
 import com.aphrodite.smartboard.R;
-import com.aphrodite.smartboard.config.AppConfig;
 import com.aphrodite.smartboard.config.IntentAction;
+import com.aphrodite.smartboard.model.event.ActionEvent;
+import com.aphrodite.smartboard.utils.LogUtils;
 import com.aphrodite.smartboard.view.activity.base.BaseActivity;
 import com.aphrodite.smartboard.view.fragment.BoardEditorFragment;
 import com.aphrodite.smartboard.view.fragment.BoardOnlineFragment;
 import com.aphrodite.smartboard.view.fragment.BoardPlayFragment;
 import com.aphrodite.smartboard.view.fragment.base.BaseFragment;
 import com.aphrodite.smartboard.view.inter.BoardStatusListener;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -83,12 +86,17 @@ public class CanvasActivity extends BaseActivity {
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    public void clickBack(View view) {
     }
 
     @Override
-    public void clickBack(View view) {
+    public void onBackPressed() {
+        EventBus.getDefault().post(ActionEvent.BACK_PRESSED_BOARD);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 
     private void switchFragment(int index) {

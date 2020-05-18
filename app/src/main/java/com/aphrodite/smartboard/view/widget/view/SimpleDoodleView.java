@@ -265,7 +265,7 @@ public class SimpleDoodleView extends View {
         mPaint.setAntiAlias(true);
         mPaint.setStrokeCap(Paint.Cap.ROUND);
         if (mIsEraser) {
-            mPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+//            mPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
             mPaint.setStrokeWidth(mEraserStrokeWidth);
             mPaint.setColor(mEraserColor);
         } else {

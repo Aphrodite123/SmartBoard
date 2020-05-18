@@ -25,6 +25,8 @@ public class DeleteDialog extends Dialog implements View.OnClickListener {
     private OnClickListener mOnClickListener;
 
     public interface OnClickListener {
+        void onNegative();
+
         void onPositive();
     }
 
@@ -72,33 +74,56 @@ public class DeleteDialog extends Dialog implements View.OnClickListener {
         }
     }
 
-    public void setMessage(int message) {
-        if (null != mTitle) {
-            mTitle.setText(message);
+    public void setMessage(int msg) {
+        if (null != message) {
+            message.setText(msg);
         }
     }
 
-    public void setMessage(String message) {
-        if (null != mTitle) {
-            mTitle.setText(message);
+    public void setMessage(String msg) {
+        if (null != message) {
+            message.setText(msg);
         }
     }
 
-    public void setMessage(TextView message) {
-        this.message = message;
+    public void setLeftBtn(int msg) {
+        if (null != mCancelBtn) {
+            mCancelBtn.setText(msg);
+        }
+    }
+
+    public void setLeftBtn(String msg) {
+        if (null != mCancelBtn) {
+            mCancelBtn.setText(msg);
+        }
+    }
+
+    public void setRightBtn(int msg) {
+        if (null != mConfirmBtn) {
+            mConfirmBtn.setText(msg);
+        }
+    }
+
+    public void setRightBtn(String msg) {
+        if (null != mConfirmBtn) {
+            mConfirmBtn.setText(msg);
+        }
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.cancel_btn:
+                if (null != mOnClickListener) {
+                    mOnClickListener.onNegative();
+                }
                 dismiss();
                 break;
             case R.id.confirm_btn:
                 if (null != mOnClickListener) {
                     mOnClickListener.onPositive();
-                    dismiss();
                 }
+                dismiss();
                 break;
         }
 

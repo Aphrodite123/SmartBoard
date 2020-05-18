@@ -9,13 +9,6 @@
         android:id="@id/toolbar"
         layout="@layout/toolbar_general" />
 
-    <ImageView
-        android:id="@+id/board_path_bg"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/toolbar"
-        android:layout_marginBottom="@dimen/dip55" />
-
     <!-- 非自绘区 -->
     <LinearLayout
         android:id="@+id/not_auto_draw_ll"
@@ -29,7 +22,7 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/dip0"
             android:layout_weight="1"
-            android:background="@android:color/transparent" />
+            android:background="@android:color/white" />
 
         <include layout="@layout/layout_divide_view" />
 

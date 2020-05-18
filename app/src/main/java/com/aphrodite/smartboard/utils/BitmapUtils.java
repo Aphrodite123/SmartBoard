@@ -122,4 +122,18 @@ public class BitmapUtils {
         outputStream.close();
     }
 
+    /**
+     * 给指定到View截图
+     *
+     * @param view
+     * @return
+     */
+    public static Bitmap shotToView(View view) {
+        if (null == view) {
+            return null;
+        }
+        view.buildDrawingCache();
+        return view.getDrawingCache();
+    }
+
 }

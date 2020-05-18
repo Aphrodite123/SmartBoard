@@ -67,7 +67,7 @@ public class CWFileUtils {
             Gson gson = new Gson();
             wr.write("#PAGES:" + gson.toJson(PAGES));
             wr.write("\n");
-            wr.write("#AUTHOR:" + SPUtils.get(AppConfig.SharePreferenceKey.PHONE_NUMBER, ""));
+            wr.write("#AUTHOR:" + SPUtils.get(AppConfig.SharePreferenceKey.PHONE_NUMBER, "无名"));
             wr.write("\n");
             wr.write("#TIME:" + System.currentTimeMillis());
             wr.write("\n\n");

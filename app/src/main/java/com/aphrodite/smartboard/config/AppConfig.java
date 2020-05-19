@@ -3,6 +3,8 @@ package com.aphrodite.smartboard.config;
 import com.aphrodite.framework.config.base.BaseConfig;
 import com.aphrodite.smartboard.application.MainApplication;
 
+import java.io.File;
+
 /**
  * Created by Aphrodite on 2019/5/28.
  */
@@ -12,17 +14,21 @@ public class AppConfig extends BaseConfig {
     /**
      * 智能手写板数据文件存储路径，默认指定到data
      */
-    public static final String DATA_PATH = MainApplication.getApplication().getExternalFilesDir("data").getAbsolutePath();
+    public static final String DATA_PATH = MainApplication.getApplication().getExternalFilesDir("data").getAbsolutePath() + File.separator;
 
     /**
      * 智能手写板ffmpeg文件存储路径，默认指定到ffmpeg
      */
-    public static final String FFMPEG_PATH = MainApplication.getApplication().getExternalFilesDir("ffmpeg").getAbsolutePath();
+    public static final String FFMPEG_PATH = MainApplication.getApplication().getExternalFilesDir("ffmpeg").getAbsolutePath() + File.separator;
+
+    public static final String DATA_FILE_NAME = "data.cw";
+
+    public static final String AUDIO_FILE_NAME = "audio.mp3";
 
     /**
      * 封面图片名称
      */
-    public static final String COVER_IMAGE_NAME = "cover_image";
+    public static final String COVER_IMAGE_NAME = "cover_image.jpg";
 
     /**
      * 微信APP ID
@@ -57,6 +63,11 @@ public class AppConfig extends BaseConfig {
         int WECHAT_FRIEND = BASE + 1;
 
         int WECHAT_MOMENTS = BASE + 2;
+    }
+
+    public interface FileType {
+        String MP3 = ".mp3";
+        String CW = ".cw";
     }
 
 }

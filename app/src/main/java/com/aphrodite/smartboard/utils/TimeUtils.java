@@ -115,7 +115,7 @@ public class TimeUtils {
         } else {
             second = mRecordSeconds;
         }
-        String timeTip = "0" + minute + ":" + (second < 10 ? "0" + second : second + "");
+        String timeTip = "data/0" + minute + ":" + (second < 10 ? "data/0" + second : second + "");
         return timeTip;
     }
 

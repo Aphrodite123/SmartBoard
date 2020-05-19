@@ -25,7 +25,6 @@ import com.aphrodite.smartboard.model.bean.ScreenRecordEntity;
 import com.aphrodite.smartboard.model.event.ActionEvent;
 import com.aphrodite.smartboard.utils.BitmapUtils;
 import com.aphrodite.smartboard.utils.CWFileUtils;
-import com.aphrodite.smartboard.utils.FileUtils;
 import com.aphrodite.smartboard.view.fragment.base.BaseFragment;
 import com.aphrodite.smartboard.view.inter.BoardStatusListener;
 import com.aphrodite.smartboard.view.widget.dialog.DeleteDialog;
@@ -152,7 +151,7 @@ public class BoardEditorFragment extends BaseFragment {
         //默认为红色
         mCanvas.setDrawColor(getResources().getColor(R.color.color_7bff16));
         ScreenRecordEntity recordEntity = new ScreenRecordEntity();
-        recordEntity.setType("0");
+        recordEntity.setType("data/0");
         mRecordEntities.add(recordEntity);
     }
 

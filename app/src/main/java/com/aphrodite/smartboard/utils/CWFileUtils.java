@@ -39,7 +39,7 @@ public class CWFileUtils {
             path.mkdirs();
         }
 
-        File file = new File(filePath + "data.cw");
+        File file = new File(filePath + AppConfig.DATA_FILE_NAME);
 
         try {
             Writer wr = new FileWriter(file, true);
@@ -53,7 +53,7 @@ public class CWFileUtils {
             for (ScreenRecordEntity screenRecordEntity : data) {
                 CWPage cwPage = new CWPage();
                 CWBackground background;
-                if ("0".equals(screenRecordEntity.getType())) {
+                if ("data/0".equals(screenRecordEntity.getType())) {
                     background = new CWBackground();
                     background.setRgba("255,255,255,1");
                 } else {
@@ -98,7 +98,7 @@ public class CWFileUtils {
         } else {
             second = mRecordSeconds;
         }
-        String timeTip = minute + ":" + (second < 10 ? "0" + second : second + "") + ".000";
+        String timeTip = minute + ":" + (second < 10 ? "data/0" + second : second + "") + ".000";
         actStringBuilder.append("#ACT:" + timeTip + ",line");
         actStringBuilder.append("\n");
         actStringBuilder.append("{\"width\":" + width + ",\"color\":\"" + color + "\",\"points\":[");
@@ -117,7 +117,7 @@ public class CWFileUtils {
         } else {
             second = mRecordSeconds;
         }
-        String timeTip = minute + ":" + (second < 10 ? "0" + second : second + "") + ".000";
+        String timeTip = minute + ":" + (second < 10 ? "data/0" + second : second + "") + ".000";
         actStringBuilder.append("#ACT:" + timeTip + ",switch");
         actStringBuilder.append("\n");
         actStringBuilder.append("{\"index\":" + index + "}");
@@ -132,7 +132,7 @@ public class CWFileUtils {
         } else {
             second = mRecordSeconds;
         }
-        String timeTip = minute + ":" + (second < 10 ? "0" + second : second + "") + ".000";
+        String timeTip = minute + ":" + (second < 10 ? "data/0" + second : second + "") + ".000";
         actStringBuilder.append("#ACT:" + timeTip + ",clear");
         actStringBuilder.append("\n");
     }

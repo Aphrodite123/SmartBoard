@@ -13,12 +13,17 @@ import com.aphrodite.smartboard.config.IntentAction;
 import com.aphrodite.smartboard.model.bean.CW;
 import com.aphrodite.smartboard.model.bean.WorkInfoBean;
 import com.aphrodite.smartboard.model.bean.WorksBean;
+import com.aphrodite.smartboard.model.event.SyncEvent;
 import com.aphrodite.smartboard.utils.CWFileUtils;
 import com.aphrodite.smartboard.utils.TimeUtils;
 import com.aphrodite.smartboard.view.adapter.WorkListAdapter;
 import com.aphrodite.smartboard.view.adapter.WorkListGridViewAdapter;
 import com.aphrodite.smartboard.view.fragment.base.BaseFragment;
 import com.aphrodite.smartboard.view.widget.recycleview.PullToRefreshRecyclerView;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -61,6 +66,7 @@ public class MainFragment extends BaseFragment {
 
     @Override
     protected void initListener() {
+        EventBus.getDefault().register(mEventListener);
     }
 
     @Override
@@ -86,6 +92,7 @@ public class MainFragment extends BaseFragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        EventBus.getDefault().unregister(mEventListener);
     }
 
     private void loadSDcardData() {
@@ -105,7 +112,7 @@ public class MainFragment extends BaseFragment {
                 continue;
             }
 
-            cw = CWFileUtils.read(AppConfig.DATA_PATH + fold + File.separator + "data.cw");
+            cw = CWFileUtils.read(AppConfig.DATA_PATH + fold + File.separator + AppConfig.DATA_FILE_NAME);
             mCws.add(cw);
         }
     }
@@ -173,8 +180,8 @@ public class MainFragment extends BaseFragment {
                 infoBean.setAuthor(cw.getAuthor());
                 infoBean.setTime(TimeUtils.msToDateFormat(1000 * cw.getTime(), TimeUtils.FORMAT_CLOCK_ONE));
                 infoBean.setPicture(AppConfig.DATA_PATH + cw.getTime() + File.separator + "cover_image.jpg");
-                infoBean.setDataPath(AppConfig.DATA_PATH + cw.getTime() + File.separator + "data.cw");
-                infoBean.setAudioPath(AppConfig.DATA_PATH + cw.getTime() + File.separator + "audio.mp3");
+                infoBean.setDataPath(AppConfig.DATA_PATH + cw.getTime() + File.separator + AppConfig.DATA_FILE_NAME);
+                infoBean.setAudioPath(AppConfig.DATA_PATH + cw.getTime() + File.separator + AppConfig.AUDIO_FILE_NAME);
 
                 workInfoBeans.add(infoBean);
             }
@@ -194,6 +201,19 @@ public class MainFragment extends BaseFragment {
             intent.putExtra(IntentAction.CanvasAction.PATH_AUDIO_FILE, audioPath);
             intent.putExtra(IntentAction.CanvasAction.PATH_COVER_IMAGE, imagePath);
             getActivity().startActivity(intent);
+        }
+    };
+
+    private Object mEventListener = new Object() {
+        @Subscribe(threadMode = ThreadMode.MAIN)
+        public void onEventMainThread(SyncEvent event) {
+            if (SyncEvent.REFRESH_WORK_LIST == event) {
+                loadSDcardData();
+                parseData();
+                if (null != mListAdapter) {
+                    mListAdapter.setItems(mWorksBeans);
+                }
+            }
         }
     };
 

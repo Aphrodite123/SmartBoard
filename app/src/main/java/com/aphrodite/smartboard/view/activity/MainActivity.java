@@ -22,7 +22,6 @@ import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-import com.aphrodite.framework.utils.FileUtils;
 import com.aphrodite.framework.utils.ObjectUtils;
 import com.aphrodite.framework.utils.ToastUtils;
 import com.aphrodite.framework.utils.UIUtils;
@@ -33,10 +32,12 @@ import com.aphrodite.smartboard.config.IntentAction;
 import com.aphrodite.smartboard.model.bean.CW;
 import com.aphrodite.smartboard.model.bean.CWACT;
 import com.aphrodite.smartboard.model.bean.CWLine;
+import com.aphrodite.smartboard.model.event.SyncEvent;
 import com.aphrodite.smartboard.model.ffmpeg.FFmpegHandler;
 import com.aphrodite.smartboard.utils.BitmapUtils;
 import com.aphrodite.smartboard.utils.CWFileUtils;
 import com.aphrodite.smartboard.utils.FFmpegUtils;
+import com.aphrodite.smartboard.utils.FileUtils;
 import com.aphrodite.smartboard.utils.ParseUtils;
 import com.aphrodite.smartboard.view.activity.base.BaseActivity;
 import com.aphrodite.smartboard.view.adapter.HomeViewPagerAdapter;
@@ -44,6 +45,8 @@ import com.aphrodite.smartboard.view.fragment.MainFragment;
 import com.aphrodite.smartboard.view.fragment.MineFragment;
 import com.aphrodite.smartboard.view.fragment.base.BaseFragment;
 import com.aphrodite.smartboard.view.widget.viewpager.ConfigureSlideViewPager;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.io.File;
 import java.io.IOException;
@@ -72,6 +75,9 @@ public class MainActivity extends BaseActivity {
     private List<BaseFragment> mFragments;
     private HomeViewPagerAdapter mPagerAdapter;
 
+    private static final String ASSETS_FILE_PATH = "data";
+
+    private CopyAssetsToSDcardTask mCopyAssetsToSDcardTask;
     private LoadSDcardTask mLoadSDcardTask;
     private String[] mWorkFolders;
     private List<Path> mPaths;
@@ -87,6 +93,7 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void initView() {
         setStatusBarColor(this);
+        showLoadingDialog();
     }
 
     @Override
@@ -95,14 +102,22 @@ public class MainActivity extends BaseActivity {
 
     @Override
     protected void initData() {
+        mCopyAssetsToSDcardTask = new CopyAssetsToSDcardTask();
         mPaths = new ArrayList<>();
         mLoadSDcardTask = new LoadSDcardTask();
         if (hasStoragePermission()) {
-            mLoadSDcardTask.execute();
+            mCopyAssetsToSDcardTask.execute();
         } else {
             requestStoragePermission();
         }
 
+        initMainPage();
+
+        //默认进入首页
+        switchTab(0);
+    }
+
+    private void initMainPage() {
         MainFragment mainFragment = new MainFragment();
         MineFragment fragment2 = new MineFragment();
         MineFragment fragment3 = new MineFragment();
@@ -118,9 +133,6 @@ public class MainActivity extends BaseActivity {
         mPagerAdapter.setFragments(mFragments);
 
         mFfmpegHandler = new FFmpegHandler(mHandler);
-
-        //默认进入首页
-        switchTab(0);
     }
 
     @Override
@@ -187,8 +199,8 @@ public class MainActivity extends BaseActivity {
         switch (requestCode) {
             case AppConfig.PermissionType.STORAGE_PERMISSION:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    if (null != mLoadSDcardTask) {
-                        mLoadSDcardTask.execute();
+                    if (null != mCopyAssetsToSDcardTask) {
+                        mCopyAssetsToSDcardTask.execute();
                     }
                 } else {
                     ToastUtils.showMessage(R.string.permission_denied);
@@ -254,7 +266,7 @@ public class MainActivity extends BaseActivity {
         // 图片所在路径，图片命名格式img+number.jpg
         // 这里指定目录为根目录下img文件夹
 
-        if (!FileUtils.isFolderExist(AppConfig.FFMPEG_PATH)) {
+        if (!FileUtils.isExist(AppConfig.FFMPEG_PATH)) {
             return;
         }
 
@@ -267,7 +279,7 @@ public class MainActivity extends BaseActivity {
     }
 
     private void pictureToGif() {
-        if (!FileUtils.isFolderExist(AppConfig.FFMPEG_PATH)) {
+        if (!FileUtils.isExist(AppConfig.FFMPEG_PATH)) {
             return;
         }
 
@@ -326,7 +338,7 @@ public class MainActivity extends BaseActivity {
 
         for (String fold : mWorkFolders) {
             mPaths.clear();
-            parsePath(AppConfig.DATA_PATH + fold, "data.cw");
+            parsePath(AppConfig.DATA_PATH + fold, AppConfig.DATA_FILE_NAME);
         }
     }
 
@@ -399,11 +411,8 @@ public class MainActivity extends BaseActivity {
             canvas.drawPath(mPaths.get(i), mPaint);
         }
 
-        StringBuilder name = new StringBuilder();
-        name.append(AppConfig.COVER_IMAGE_NAME).append(AppConfig.IMAGE_SUFFIX);
-
         try {
-            BitmapUtils.saveBitmap(bitmap, fileDir, name.toString(), format, quality);
+            BitmapUtils.saveBitmap(bitmap, fileDir, AppConfig.COVER_IMAGE_NAME, format, quality);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -438,11 +447,36 @@ public class MainActivity extends BaseActivity {
         }
     };
 
+    /**
+     * 拷贝Assets文件到SDcard路径
+     */
+    private class CopyAssetsToSDcardTask extends AsyncTask<Object, Object, Object> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Object doInBackground(Object... objects) {
+            return FileUtils.copyAssetsToSDcard(MainActivity.this, ASSETS_FILE_PATH, AppConfig.DATA_PATH);
+        }
+
+        @Override
+        protected void onPostExecute(Object o) {
+            super.onPostExecute(o);
+            boolean result = (boolean) o;
+            if (result && null != mLoadSDcardTask) {
+                mLoadSDcardTask.execute();
+            } else {
+                dismissLoadingDialog();
+            }
+        }
+    }
+
     private class LoadSDcardTask extends AsyncTask<Object, Object, Object> {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            showLoadingDialog();
         }
 
         @Override
@@ -455,6 +489,7 @@ public class MainActivity extends BaseActivity {
         protected void onPostExecute(Object o) {
             super.onPostExecute(o);
             dismissLoadingDialog();
+            EventBus.getDefault().post(SyncEvent.REFRESH_WORK_LIST);
         }
     }
 

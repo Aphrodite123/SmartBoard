@@ -135,7 +135,7 @@ public class AudioService extends Service implements Handler.Callback {
         AudioUtils.stopAudio("");
         mHandler.removeMessages(MSG_TYPE_COUNT_DOWN);
         if (recordDictory != null) {
-            composeAudio(recordDictory.getAbsolutePath() + File.separator + "audio.mp3");
+            composeAudio(recordDictory.getAbsolutePath() + File.separator + AppConfig.AUDIO_FILE_NAME);
         }
         mRecordSeconds = 0;
         recordDictory = null;

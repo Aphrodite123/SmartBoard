@@ -20,7 +20,6 @@ import com.aphrodite.smartboard.model.bean.CWPage;
 import com.aphrodite.smartboard.model.bean.ScreenRecordEntity;
 import com.aphrodite.smartboard.model.service.RecordPlayerService;
 import com.aphrodite.smartboard.utils.CWFileUtils;
-import com.aphrodite.smartboard.utils.LogUtils;
 import com.aphrodite.smartboard.view.fragment.base.BaseFragment;
 import com.aphrodite.smartboard.view.inter.BoardStatusListener;
 import com.aphrodite.smartboard.view.widget.view.SimpleDoodleView;
@@ -158,7 +157,7 @@ public class BoardPlayFragment extends BaseFragment {
             }
             ScreenRecordEntity recordEntity = new ScreenRecordEntity();
             recordEntity.setCanDraw(false);
-            recordEntity.setType("0");
+            recordEntity.setType("data/0");
             mEntities.add(recordEntity);
         }
     }

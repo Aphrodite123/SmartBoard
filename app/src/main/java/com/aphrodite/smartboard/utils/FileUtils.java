@@ -11,10 +11,13 @@ import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.aphrodite.smartboard.config.AppConfig;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.util.List;
 
@@ -472,6 +475,55 @@ public class FileUtils {
             return true;
         }
         return false;
+    }
+
+    /**
+     * 从assets中拷贝文件到SDcard路径下
+     *
+     * @param context
+     * @param srcPath  源文件路径
+     * @param destPath 目标文件路径
+     * @return
+     */
+    public static boolean copyAssetsToSDcard(Context context, String srcPath, String destPath) {
+        if (null == context) {
+            return false;
+        }
+
+        try {
+            String fileNames[] = context.getAssets().list(srcPath);
+            if (null == fileNames || fileNames.length <= 0) {
+                return false;
+            }
+
+            for (String name : fileNames) {
+                if (TextUtils.isEmpty(name)) {
+                    continue;
+                }
+
+                if (name.endsWith(AppConfig.FileType.MP3) || name.endsWith(AppConfig.FileType.CW)) {
+                    InputStream inputStream = context.getAssets().open(srcPath + File.separator + name);
+                    FileOutputStream fileOutputStream = new FileOutputStream(new File(destPath + name));
+                    byte[] buffer = new byte[1024];
+                    int byteCount;
+                    while (-1 != (byteCount = inputStream.read(buffer))) {
+                        fileOutputStream.write(buffer, 0, byteCount);
+                    }
+                    fileOutputStream.flush();
+                    inputStream.close();
+                    fileOutputStream.close();
+                } else {
+                    File file = new File(destPath + File.separator + name);
+                    if (!file.exists()) {
+                        file.mkdirs();
+                    }
+                    copyAssetsToSDcard(context, srcPath + File.separator + name, destPath + name + File.separator);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return true;
     }
 
 }

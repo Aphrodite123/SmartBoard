@@ -41,6 +41,9 @@ public class AppConfig extends BaseConfig {
 
         //手机验证码
         String AUTH_CODE = "auth_code";
+
+        //首次进入应用将Assets中数据文件拷贝到指定SDcard路径下
+        String COPY_ASSETS_DATA_TO_SDCARD = "copy_assets_data_to_sdcard";
     }
 
     public interface PermissionType {

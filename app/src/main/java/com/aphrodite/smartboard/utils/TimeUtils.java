@@ -60,7 +60,7 @@ public class TimeUtils {
      * @return
      */
     public static String msToDateFormat(long ms, String yearFormat, String monthFormat) {
-        if (ms <= 0 || TextUtils.isEmpty(yearFormat) || TextUtils.isEmpty(monthFormat)) {
+        if (ms < 0 || TextUtils.isEmpty(yearFormat) || TextUtils.isEmpty(monthFormat)) {
             return "";
         }
 

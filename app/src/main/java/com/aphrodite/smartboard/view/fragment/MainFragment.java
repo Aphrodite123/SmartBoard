@@ -208,6 +208,12 @@ public class MainFragment extends BaseFragment {
         @Subscribe(threadMode = ThreadMode.MAIN)
         public void onEventMainThread(SyncEvent event) {
             if (SyncEvent.REFRESH_WORK_LIST == event) {
+                if (null != mWorksBeans) {
+                    mWorksBeans.clear();
+                }
+                if (null != mCws) {
+                    mCws.clear();
+                }
                 loadSDcardData();
                 parseData();
                 if (null != mListAdapter) {

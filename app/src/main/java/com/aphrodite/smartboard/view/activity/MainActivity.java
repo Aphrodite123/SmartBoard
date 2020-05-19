@@ -23,6 +23,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.aphrodite.framework.utils.ObjectUtils;
+import com.aphrodite.framework.utils.SPUtils;
 import com.aphrodite.framework.utils.ToastUtils;
 import com.aphrodite.framework.utils.UIUtils;
 import com.aphrodite.smartboard.R;
@@ -76,6 +77,7 @@ public class MainActivity extends BaseActivity {
     private HomeViewPagerAdapter mPagerAdapter;
 
     private static final String ASSETS_FILE_PATH = "data";
+    private boolean mIsCopied;
 
     private CopyAssetsToSDcardTask mCopyAssetsToSDcardTask;
     private LoadSDcardTask mLoadSDcardTask;
@@ -105,8 +107,14 @@ public class MainActivity extends BaseActivity {
         mCopyAssetsToSDcardTask = new CopyAssetsToSDcardTask();
         mPaths = new ArrayList<>();
         mLoadSDcardTask = new LoadSDcardTask();
+        mIsCopied = (boolean) SPUtils.get(AppConfig.SharePreferenceKey.COPY_ASSETS_DATA_TO_SDCARD, false);
         if (hasStoragePermission()) {
-            mCopyAssetsToSDcardTask.execute();
+            if (mIsCopied) {
+                mLoadSDcardTask.execute();
+            } else {
+                mCopyAssetsToSDcardTask.execute();
+                SPUtils.put(AppConfig.SharePreferenceKey.COPY_ASSETS_DATA_TO_SDCARD, true);
+            }
         } else {
             requestStoragePermission();
         }
@@ -199,9 +207,18 @@ public class MainActivity extends BaseActivity {
         switch (requestCode) {
             case AppConfig.PermissionType.STORAGE_PERMISSION:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    if (null != mCopyAssetsToSDcardTask) {
-                        mCopyAssetsToSDcardTask.execute();
+                    if (mIsCopied) {
+                        if (null != mLoadSDcardTask) {
+                            mLoadSDcardTask.execute();
+                        }
+                    } else {
+                        if (null != mCopyAssetsToSDcardTask) {
+                            mCopyAssetsToSDcardTask.execute();
+                        }
+                        SPUtils.put(AppConfig.SharePreferenceKey.COPY_ASSETS_DATA_TO_SDCARD, true);
                     }
+
+
                 } else {
                     ToastUtils.showMessage(R.string.permission_denied);
                     finish();

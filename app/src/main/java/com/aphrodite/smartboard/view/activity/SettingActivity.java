@@ -3,7 +3,6 @@ package com.aphrodite.smartboard.view.activity;
 import android.widget.TextView;
 
 import com.aphrodite.framework.config.base.BaseConfig;
-import com.aphrodite.smartboard.BuildConfig;
 import com.aphrodite.smartboard.R;
 import com.aphrodite.smartboard.application.MainApplication;
 import com.aphrodite.smartboard.config.RuntimeConfig;

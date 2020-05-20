@@ -16,6 +16,7 @@ public class CW {
     private String author;
     private long time;
     private long editTime;
+    private String dpi;
 
     public String getVERSION() {
         return VERSION;
@@ -79,5 +80,13 @@ public class CW {
 
     public void setEditTime(long editTime) {
         this.editTime = editTime;
+    }
+
+    public String getDpi() {
+        return dpi;
+    }
+
+    public void setDpi(String dpi) {
+        this.dpi = dpi;
     }
 }

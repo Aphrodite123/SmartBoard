@@ -1,5 +1,5 @@
 #VERSION:1.0.0
-#RESOLUTION:[0,0]
+#RESOLUTION:[2255,1080]
 #AUDIO:audio.mp3
 #PAGES:[{"background":{"rgba":"255,255,255,1"}}]
 #AUTHOR:智能手写板

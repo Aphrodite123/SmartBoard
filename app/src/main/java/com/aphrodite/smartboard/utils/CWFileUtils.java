@@ -3,6 +3,8 @@ package com.aphrodite.smartboard.utils;
 import android.graphics.Point;
 
 import com.aphrodite.framework.utils.SPUtils;
+import com.aphrodite.smartboard.R;
+import com.aphrodite.smartboard.application.MainApplication;
 import com.aphrodite.smartboard.config.AppConfig;
 import com.aphrodite.smartboard.model.bean.CW;
 import com.aphrodite.smartboard.model.bean.CWACT;
@@ -67,7 +69,7 @@ public class CWFileUtils {
             Gson gson = new Gson();
             wr.write("#PAGES:" + gson.toJson(PAGES));
             wr.write("\n");
-            wr.write("#AUTHOR:" + SPUtils.get(AppConfig.SharePreferenceKey.PHONE_NUMBER, "无名"));
+            wr.write("#AUTHOR:" + SPUtils.get(AppConfig.SharePreferenceKey.PHONE_NUMBER, MainApplication.getApplication().getString(R.string.app_name)));
             wr.write("\n");
             wr.write("#TIME:" + System.currentTimeMillis());
             wr.write("\n\n");

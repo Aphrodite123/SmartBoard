@@ -1,8 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <com.apeman.sdk.widget.BoardView
+            android:id="@+id/board_view"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dip0"
+            android:layout_weight="1"
+            android:keepScreenOn="true"
+            app:playBackInterval="10"
+            app:recordQuality="0.5"
+            app:recordRate="16" />
+
+        <TextView
+            android:id="@+id/msg"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dip80"
+            android:text="点信息"
+            android:textColor="@color/black" />
+
+    </LinearLayout>
 
 </FrameLayout>

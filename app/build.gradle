@@ -7,7 +7,7 @@ android {
 
     defaultConfig {
         applicationId "com.aphrodite.smartboard"
-        minSdkVersion 19
+        minSdkVersion 21
         targetSdkVersion 28
         versionCode 1
         versionName "1.0.0"
@@ -95,6 +95,7 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.google.android.material:material:1.1.0'
     implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation "androidx.multidex:multidex:2.0.0"
     implementation 'com.aphrodite.framework:framework-base:1.0.5'
     /**
      * Log
@@ -123,4 +124,7 @@ dependencies {
      * WeChat
      */
     implementation 'com.tencent.mm.opensdk:wechat-sdk-android-without-mta:+'
+
+    //开发SDK
+    implementation 'com.apeman.sdk:smart_device:1.0.16-alpha'
 }

@@ -1,19 +1,19 @@
-Executable : /home/wl/Android/Sdk/cmake/3.10.2.4988404/bin/cmake
+Executable : E:\Software\Android\Sdk\cmake\3.10.2.4988404\bin\cmake.exe
 arguments : 
--H/home/share/Application/Aphrodite/SmartBoard/app
+-HD:\Application\SmartBoard\app
 -DCMAKE_BUILD_TYPE=Release
--DCMAKE_TOOLCHAIN_FILE=/home/wl/Android/Sdk/ndk/20.0.5594570/build/cmake/android.toolchain.cmake
+-DCMAKE_TOOLCHAIN_FILE=E:\Software\Android\Sdk\ndk\21.0.6113669\build\cmake\android.toolchain.cmake
 -DANDROID_ABI=arm64-v8a
--DANDROID_NDK=/home/wl/Android/Sdk/ndk/20.0.5594570
--DANDROID_PLATFORM=android-19
+-DANDROID_NDK=E:\Software\Android\Sdk\ndk\21.0.6113669
+-DANDROID_PLATFORM=android-21
 -DCMAKE_ANDROID_ARCH_ABI=arm64-v8a
--DCMAKE_ANDROID_NDK=/home/wl/Android/Sdk/ndk/20.0.5594570
+-DCMAKE_ANDROID_NDK=E:\Software\Android\Sdk\ndk\21.0.6113669
 -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
--DCMAKE_LIBRARY_OUTPUT_DIRECTORY=/home/share/Application/Aphrodite/SmartBoard/app/build/intermediates/cmake/release/obj/arm64-v8a
--DCMAKE_MAKE_PROGRAM=/home/wl/Android/Sdk/cmake/3.10.2.4988404/bin/ninja
+-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=D:\Application\SmartBoard\app\build\intermediates\cmake\release\obj\arm64-v8a
+-DCMAKE_MAKE_PROGRAM=E:\Software\Android\Sdk\cmake\3.10.2.4988404\bin\ninja.exe
 -DCMAKE_SYSTEM_NAME=Android
--DCMAKE_SYSTEM_VERSION=19
--B/home/share/Application/Aphrodite/SmartBoard/app/.cxx/cmake/release/arm64-v8a
+-DCMAKE_SYSTEM_VERSION=21
+-BD:\Application\SmartBoard\app\.cxx\cmake\release\arm64-v8a
 -GNinja
 jvmArgs : 
 

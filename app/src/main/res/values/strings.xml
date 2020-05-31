@@ -92,6 +92,7 @@
     <string name="clear">清空</string>
     <string name="work_playback">创作回放</string>
     <string name="play_rate">%sx</string>
+    <string name="device_disconnected">设备已断开连接</string>
 
     <!-- BoardOnlineFragment -->
     <string name="work_info">作品信息</string>

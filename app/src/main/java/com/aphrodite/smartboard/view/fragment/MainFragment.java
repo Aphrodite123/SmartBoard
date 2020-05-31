@@ -179,7 +179,7 @@ public class MainFragment extends BaseFragment {
                 WorkInfoBean infoBean = new WorkInfoBean();
                 infoBean.setAuthor(cw.getAuthor());
                 infoBean.setTime(TimeUtils.msToDateFormat(1000 * cw.getTime(), TimeUtils.FORMAT_CLOCK_ONE));
-                infoBean.setPicture(AppConfig.DATA_PATH + cw.getTime() + File.separator + "cover_image.jpg");
+                infoBean.setPicture(AppConfig.DATA_PATH + cw.getTime() + File.separator + AppConfig.COVER_IMAGE_NAME);
                 infoBean.setDataPath(AppConfig.DATA_PATH + cw.getTime() + File.separator + AppConfig.DATA_FILE_NAME);
                 infoBean.setAudioPath(AppConfig.DATA_PATH + cw.getTime() + File.separator + AppConfig.AUDIO_FILE_NAME);
 

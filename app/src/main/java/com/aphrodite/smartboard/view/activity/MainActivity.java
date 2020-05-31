@@ -3,25 +3,29 @@ package com.aphrodite.smartboard.view.activity;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
+import android.content.ComponentName;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.hardware.usb.UsbDevice;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Message;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
+import com.apeman.sdk.bean.UsbBoardInfo;
+import com.apeman.sdk.service.ConnectStatus;
+import com.apeman.sdk.service.UsbPenService;
+import com.apeman.sdk.service.usb.USBPenServiceImpl;
 import com.aphrodite.framework.utils.ObjectUtils;
 import com.aphrodite.framework.utils.SPUtils;
 import com.aphrodite.framework.utils.ToastUtils;
@@ -54,6 +58,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.lifecycle.Observer;
 import butterknife.BindView;
 import butterknife.BindViews;
 import butterknife.OnClick;
@@ -61,7 +69,7 @@ import butterknife.OnClick;
 import static com.aphrodite.smartboard.model.ffmpeg.FFmpegHandler.MSG_BEGIN;
 import static com.aphrodite.smartboard.model.ffmpeg.FFmpegHandler.MSG_FINISH;
 
-public class MainActivity extends BaseActivity {
+public class MainActivity extends BaseActivity  {
     @BindViews({R.id.tab_home_ic, R.id.tab_found_ic, R.id.tab_message_ic, R.id.tab_mine_ic})
     List<ImageView> mTabIcons;
     @BindViews({R.id.tab_home_text, R.id.tab_found_text, R.id.tab_message_text, R.id.tab_mine_text})
@@ -150,6 +158,10 @@ public class MainActivity extends BaseActivity {
 
     @Override
     public void onBackPressed() {
+        FileUtils.deleteSDFile("/storage/emulated/0/Android/data/com.aphrodite.smartboard/files/data/0/cover_image.jpg");
+        FileUtils.deleteSDFile("/storage/emulated/0/Android/data/com.aphrodite.smartboard/files/data/1/cover_image.jpg");
+
+
         if ((System.currentTimeMillis() - mExitTime) > 1000) {
             //双击退出
             ToastUtils.showMessage(R.string.press_exit_again);
@@ -406,12 +418,12 @@ public class MainActivity extends BaseActivity {
                 continue;
             }
             if (0 == i) {
-                path.moveTo(xyPoints.get(0), xyPoints.get(1));
+                path.moveTo(xyPoints.get(0), xyPoints.get(1) + 500);
             } else {
-                path.quadTo(mLastX, mLastY, xyPoints.get(0), xyPoints.get(1));
+                path.quadTo(mLastX, mLastY, xyPoints.get(0), xyPoints.get(1) + 500);
             }
             mLastX = xyPoints.get(0);
-            mLastY = xyPoints.get(1);
+            mLastY = xyPoints.get(1) + 500;
         }
         mPaths.add(path);
     }

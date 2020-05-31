@@ -1,4 +1,4 @@
-apply plugin: 'com.android.application'
+﻿apply plugin: 'com.android.application'
 apply plugin: 'realm-android'
 
 android {
@@ -77,6 +77,17 @@ android {
             //服务器地址
             buildConfigField 'String', 'SERVER_URL', '"https://www.dbmeinv.com/"'
             debuggable false
+        }
+    }
+
+    //自定义APK名称,多渠道打包
+    applicationVariants.all { variant ->
+        variant.outputs.all { output ->  // each 改为 all
+            def fileName = "智能手写板v" + defaultConfig.versionName + ".apk"
+            def outFile = output.outputFile
+            if (outFile != null && outFile.name.endsWith('.apk')) {
+                outputFileName = fileName  //  output.outputFile 改为 outputFileName
+            }
         }
     }
 

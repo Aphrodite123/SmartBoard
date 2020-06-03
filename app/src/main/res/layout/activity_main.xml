@@ -38,55 +38,11 @@
 
         </LinearLayout>
 
-        <LinearLayout
-            android:id="@+id/tab_found_ll"
-            style="@style/tab_bottom_style"
-            android:layout_weight="1"
-            android:visibility="gone">
-
-            <ImageView
-                android:id="@+id/tab_found_ic"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_tab_found_selector" />
-
-            <TextView
-                android:id="@+id/tab_found_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/tab_found"
-                android:textColor="@color/tab_text_color_selector"
-                android:textSize="@dimen/font10" />
-
-        </LinearLayout>
-
         <ImageView
             android:id="@+id/tab_middle_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/middle_blue" />
-
-        <LinearLayout
-            android:id="@+id/tab_message_ll"
-            style="@style/tab_bottom_style"
-            android:layout_weight="1"
-            android:visibility="gone">
-
-            <ImageView
-                android:id="@+id/tab_message_ic"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_tab_message_selector" />
-
-            <TextView
-                android:id="@+id/tab_message_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/tab_message"
-                android:textColor="@color/tab_text_color_selector"
-                android:textSize="@dimen/font10" />
-
-        </LinearLayout>
 
         <LinearLayout
             android:id="@+id/tab_mine_ll"

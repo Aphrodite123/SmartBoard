@@ -62,6 +62,7 @@
     <string name="tab_found">发现</string>
     <string name="tab_message">消息</string>
     <string name="tab_mine">我的</string>
+    <string name="check_connected_device">请检查设备是否已连接</string>
 
     <!-- RegisterActivity -->
     <string name="register_follow_agreement">同意协议并注册</string>

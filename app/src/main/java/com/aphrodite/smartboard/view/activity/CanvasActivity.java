@@ -199,6 +199,9 @@ public class CanvasActivity extends BaseActivity implements ServiceConnection {
 
     @Override
     public void onServiceDisconnected(ComponentName name) {
+        if(null!=mInfo){
+            mInfo.setText("Finish on onServiceDisconnected");
+        }
         ToastUtils.showMessage(R.string.device_disconnected);
         finish();
     }
@@ -247,6 +250,10 @@ public class CanvasActivity extends BaseActivity implements ServiceConnection {
                     }
                 });
             } else {
+                if(null!=mInfo){
+                    mInfo.setText("Finish on onChanged");
+                }
+
                 ToastUtils.showMessage(connectStatus.getMsg());
                 finish();
             }

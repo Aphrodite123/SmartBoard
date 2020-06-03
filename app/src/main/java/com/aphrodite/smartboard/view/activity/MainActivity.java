@@ -3,29 +3,22 @@ package com.aphrodite.smartboard.view.activity;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
-import android.content.ComponentName;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.hardware.usb.UsbDevice;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
-import android.os.IBinder;
 import android.os.Message;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.apeman.sdk.bean.UsbBoardInfo;
-import com.apeman.sdk.service.ConnectStatus;
-import com.apeman.sdk.service.UsbPenService;
-import com.apeman.sdk.service.usb.USBPenServiceImpl;
+import com.apeman.sdk.bean.DevicePoint;
 import com.aphrodite.framework.utils.ObjectUtils;
 import com.aphrodite.framework.utils.SPUtils;
 import com.aphrodite.framework.utils.ToastUtils;
@@ -46,6 +39,7 @@ import com.aphrodite.smartboard.utils.FileUtils;
 import com.aphrodite.smartboard.utils.ParseUtils;
 import com.aphrodite.smartboard.view.activity.base.BaseActivity;
 import com.aphrodite.smartboard.view.adapter.HomeViewPagerAdapter;
+import com.aphrodite.smartboard.view.fragment.CanvasFragment;
 import com.aphrodite.smartboard.view.fragment.MainFragment;
 import com.aphrodite.smartboard.view.fragment.MineFragment;
 import com.aphrodite.smartboard.view.fragment.base.BaseFragment;
@@ -61,7 +55,6 @@ import java.util.List;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.lifecycle.Observer;
 import butterknife.BindView;
 import butterknife.BindViews;
 import butterknife.OnClick;
@@ -69,10 +62,10 @@ import butterknife.OnClick;
 import static com.aphrodite.smartboard.model.ffmpeg.FFmpegHandler.MSG_BEGIN;
 import static com.aphrodite.smartboard.model.ffmpeg.FFmpegHandler.MSG_FINISH;
 
-public class MainActivity extends BaseActivity  {
-    @BindViews({R.id.tab_home_ic, R.id.tab_found_ic, R.id.tab_message_ic, R.id.tab_mine_ic})
+public class MainActivity extends BaseActivity {
+    @BindViews({R.id.tab_home_ic, R.id.tab_mine_ic})
     List<ImageView> mTabIcons;
-    @BindViews({R.id.tab_home_text, R.id.tab_found_text, R.id.tab_message_text, R.id.tab_mine_text})
+    @BindViews({R.id.tab_home_text, R.id.tab_mine_text})
     List<TextView> mTabTexts;
     @BindView(R.id.tab_viewpager)
     ConfigureSlideViewPager mViewPager;
@@ -94,6 +87,8 @@ public class MainActivity extends BaseActivity  {
     private Paint mPaint;
     private float mLastX;
     private float mLastY;
+
+    private BoardStatus mBoardStatus;
 
     @Override
     protected int getViewId() {
@@ -131,17 +126,17 @@ public class MainActivity extends BaseActivity  {
 
         //默认进入首页
         switchTab(0);
+        mViewPager.setCurrentItem(0);
     }
 
     private void initMainPage() {
         MainFragment mainFragment = new MainFragment();
-        MineFragment fragment2 = new MineFragment();
-        MineFragment fragment3 = new MineFragment();
+//        mBoardStatus = new BoardStatus();
+        CanvasFragment canvasFragment = new CanvasFragment();
         MineFragment mineFragment = new MineFragment();
         mFragments = new ArrayList<>();
         mFragments.add(mainFragment);
-        mFragments.add(fragment2);
-        mFragments.add(fragment3);
+        mFragments.add(canvasFragment);
         mFragments.add(mineFragment);
 
         mPagerAdapter = new HomeViewPagerAdapter(getSupportFragmentManager());
@@ -158,10 +153,6 @@ public class MainActivity extends BaseActivity  {
 
     @Override
     public void onBackPressed() {
-        FileUtils.deleteSDFile("/storage/emulated/0/Android/data/com.aphrodite.smartboard/files/data/0/cover_image.jpg");
-        FileUtils.deleteSDFile("/storage/emulated/0/Android/data/com.aphrodite.smartboard/files/data/1/cover_image.jpg");
-
-
         if ((System.currentTimeMillis() - mExitTime) > 1000) {
             //双击退出
             ToastUtils.showMessage(R.string.press_exit_again);
@@ -250,31 +241,18 @@ public class MainActivity extends BaseActivity  {
     @OnClick(R.id.tab_home_ll)
     public void onGoHomeClick() {
         switchTab(0);
-    }
-
-    @OnClick(R.id.tab_found_ll)
-    public void onGoFoundClick() {
-        switchTab(1);
-    }
-
-    @OnClick(R.id.tab_message_ll)
-    public void onGoMessageClick() {
-        switchTab(2);
+        mViewPager.setCurrentItem(0);
     }
 
     @OnClick(R.id.tab_mine_ll)
     public void onGoMineClick() {
-        switchTab(3);
+        switchTab(1);
+        mViewPager.setCurrentItem(2);
     }
 
     @OnClick(R.id.tab_middle_btn)
     public void onMiddleClick() {
-        if (hasPermission()) {
-            Intent intent = new Intent(IntentAction.CanvasAction.ACTION);
-            startActivity(intent);
-        } else {
-            requestPermission();
-        }
+        ToastUtils.showMessage(R.string.check_connected_device);
     }
 
     //    @OnClick(R.id.create_video_btn)
@@ -332,8 +310,6 @@ public class MainActivity extends BaseActivity  {
         if (!ObjectUtils.isOutOfBounds(mTabTexts, position)) {
             mTabTexts.get(position).setSelected(true);
         }
-
-        mViewPager.setCurrentItem(position);
 
         ImageView imageView;
         for (int i = 0; i < mTabIcons.size(); i++) {
@@ -520,6 +496,10 @@ public class MainActivity extends BaseActivity  {
             dismissLoadingDialog();
             EventBus.getDefault().post(SyncEvent.REFRESH_WORK_LIST);
         }
+    }
+
+    public interface BoardStatus {
+        void invoke(DevicePoint devicePoint);
     }
 
 }

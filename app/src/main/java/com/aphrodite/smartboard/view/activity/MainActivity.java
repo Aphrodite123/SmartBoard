@@ -3,22 +3,36 @@ package com.aphrodite.smartboard.view.activity;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
+import android.app.ProgressDialog;
+import android.content.ComponentName;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.hardware.usb.UsbDevice;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Message;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.apeman.sdk.bean.BoardType;
 import com.apeman.sdk.bean.DevicePoint;
+import com.apeman.sdk.bean.NoteDescription;
+import com.apeman.sdk.bean.UsbBoardInfo;
+import com.apeman.sdk.service.ConnectStatus;
+import com.apeman.sdk.service.PenService;
+import com.apeman.sdk.service.UsbPenService;
+import com.apeman.sdk.service.command.Command;
+import com.apeman.sdk.service.usb.USBPenServiceImpl;
+import com.apeman.sdk.widget.BoardViewCallback;
 import com.aphrodite.framework.utils.ObjectUtils;
 import com.aphrodite.framework.utils.SPUtils;
 import com.aphrodite.framework.utils.ToastUtils;
@@ -55,20 +69,28 @@ import java.util.List;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.Observer;
 import butterknife.BindView;
 import butterknife.BindViews;
 import butterknife.OnClick;
+import kotlin.Unit;
+import kotlin.jvm.functions.Function0;
+import kotlin.jvm.functions.Function1;
 
 import static com.aphrodite.smartboard.model.ffmpeg.FFmpegHandler.MSG_BEGIN;
 import static com.aphrodite.smartboard.model.ffmpeg.FFmpegHandler.MSG_FINISH;
 
-public class MainActivity extends BaseActivity {
+public class MainActivity extends BaseActivity implements ServiceConnection {
     @BindViews({R.id.tab_home_ic, R.id.tab_mine_ic})
     List<ImageView> mTabIcons;
     @BindViews({R.id.tab_home_text, R.id.tab_mine_text})
     List<TextView> mTabTexts;
     @BindView(R.id.tab_viewpager)
     ConfigureSlideViewPager mViewPager;
+
+    private MainFragment mainFragment;
+    private CanvasFragment mCanvasFragment;
+    private MineFragment mineFragment;
 
     private long mExitTime;
 
@@ -88,7 +110,8 @@ public class MainActivity extends BaseActivity {
     private float mLastX;
     private float mLastY;
 
-    private BoardStatus mBoardStatus;
+    private UsbPenService<UsbBoardInfo, UsbDevice> mUsbPenService;
+    private ProgressDialog mCleanProgressDialog;
 
     @Override
     protected int getViewId() {
@@ -130,13 +153,12 @@ public class MainActivity extends BaseActivity {
     }
 
     private void initMainPage() {
-        MainFragment mainFragment = new MainFragment();
-//        mBoardStatus = new BoardStatus();
-        CanvasFragment canvasFragment = new CanvasFragment();
-        MineFragment mineFragment = new MineFragment();
+        mainFragment = new MainFragment();
+        mCanvasFragment = new CanvasFragment();
+        mineFragment = new MineFragment();
         mFragments = new ArrayList<>();
         mFragments.add(mainFragment);
-        mFragments.add(canvasFragment);
+        mFragments.add(mCanvasFragment);
         mFragments.add(mineFragment);
 
         mPagerAdapter = new HomeViewPagerAdapter(getSupportFragmentManager());
@@ -144,11 +166,62 @@ public class MainActivity extends BaseActivity {
         mPagerAdapter.setFragments(mFragments);
 
         mFfmpegHandler = new FFmpegHandler(mHandler);
+
+        PenService.Companion.connectUsbService(this, this);
+    }
+
+    private void initBoardView() {
+        if (null == mCanvasFragment) {
+            return;
+        }
+
+        mCanvasFragment.mBoardView.post(new Runnable() {
+            @Override
+            public void run() {
+                Intent intent = getIntent();
+                NoteDescription description = null;
+                if (null != intent) {
+                    description = intent.getParcelableExtra("versionInfo");
+                }
+                mCanvasFragment.mBoardView.setup(BoardType.NoteMaker, description);
+
+                mCanvasFragment.mBoardView.setLoadFinishCallback(new BoardViewCallback() {
+                    @Override
+                    public void onLoadFinished() {
+                        if (null != mCanvasFragment.msg) {
+                            mCanvasFragment.msg.setText("onLoadFinished");
+                        }
+
+                        //这里需要注意一定要在完成画板的初始化后再监听硬件的报点
+                        mUsbPenService.observeDevicePoint(new Function1<DevicePoint, Unit>() {
+                            @Override
+                            public Unit invoke(DevicePoint devicePoint) {
+                                if (null != mCanvasFragment) {
+                                    mCanvasFragment.mBoardView.onPointReceived(devicePoint);
+                                }
+                                return null;
+                            }
+                        });
+
+                    }
+                });
+            }
+        });
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (null != mCleanProgressDialog) {
+            mCleanProgressDialog.dismiss();
+        }
+
+        PenService.Companion.disconnectUsbService(this, this);
+
+        if (null != mUsbPenService) {
+            mUsbPenService.observeDevicePoint(null);
+            mUsbPenService.getCommandLiveData().removeObserver(mCmdObserver);
+        }
     }
 
     @Override
@@ -220,8 +293,6 @@ public class MainActivity extends BaseActivity {
                         }
                         SPUtils.put(AppConfig.SharePreferenceKey.COPY_ASSETS_DATA_TO_SDCARD, true);
                     }
-
-
                 } else {
                     ToastUtils.showMessage(R.string.permission_denied);
                     finish();
@@ -238,6 +309,57 @@ public class MainActivity extends BaseActivity {
         }
     }
 
+    @Override
+    public void onServiceConnected(ComponentName name, IBinder service) {
+        USBPenServiceImpl.ConnBinder connBinder = (USBPenServiceImpl.ConnBinder) service;
+        mUsbPenService = connBinder.getService();
+        mUsbPenService.getConnLiveData().observe(this, mConnObserver);
+        mUsbPenService.getCommandLiveData().observe(this, mCmdObserver);
+        List<UsbDevice> usbDevices = mUsbPenService.listConnectedUsbDevice(this);
+        if (ObjectUtils.isEmpty(usbDevices)) {
+            return;
+        }
+
+        for (UsbDevice device : usbDevices) {
+            if (null == device) {
+                continue;
+            }
+
+            mUsbPenService.connectSmartBoard(device);
+        }
+    }
+
+    @Override
+    public void onServiceDisconnected(ComponentName name) {
+        ToastUtils.showMessage(R.string.device_disconnected);
+        checkTabStatus(0, false);
+        mViewPager.setCurrentItem(0);
+    }
+
+    private void cleanBoardView() {
+        if (null == mCleanProgressDialog) {
+            mCleanProgressDialog = new ProgressDialog(this);
+            mCleanProgressDialog.setCancelable(false);
+        }
+        if (!mCleanProgressDialog.isShowing()) {
+            mCleanProgressDialog.show();
+        }
+
+        if (null == mCanvasFragment) {
+            return;
+        }
+
+        mCanvasFragment.mBoardView.clearBoardAndFile(new Function0<Unit>() {
+            @Override
+            public Unit invoke() {
+                if (null != mCleanProgressDialog) {
+                    mCleanProgressDialog.dismiss();
+                }
+                return null;
+            }
+        });
+    }
+
     @OnClick(R.id.tab_home_ll)
     public void onGoHomeClick() {
         switchTab(0);
@@ -252,7 +374,9 @@ public class MainActivity extends BaseActivity {
 
     @OnClick(R.id.tab_middle_btn)
     public void onMiddleClick() {
-        ToastUtils.showMessage(R.string.check_connected_device);
+        if (null != mViewPager && 1 != mViewPager.getCurrentItem()) {
+            ToastUtils.showMessage(R.string.check_connected_device);
+        }
     }
 
     //    @OnClick(R.id.create_video_btn)
@@ -311,22 +435,30 @@ public class MainActivity extends BaseActivity {
             mTabTexts.get(position).setSelected(true);
         }
 
-        ImageView imageView;
-        for (int i = 0; i < mTabIcons.size(); i++) {
-            imageView = mTabIcons.get(i);
-            if (null == imageView || position == i) {
-                continue;
+        checkTabStatus(position, false);
+    }
+
+    private void checkTabStatus(int position, boolean isSelected) {
+        if (null != mTabIcons) {
+            ImageView imageView;
+            for (int i = 0; i < mTabIcons.size(); i++) {
+                imageView = mTabIcons.get(i);
+                if (null == imageView || position == i) {
+                    continue;
+                }
+                imageView.setSelected(isSelected);
             }
-            imageView.setSelected(false);
         }
 
-        TextView textView;
-        for (int i = 0; i < mTabTexts.size(); i++) {
-            textView = mTabTexts.get(i);
-            if (null == textView || position == i) {
-                continue;
+        if (null != mTabTexts) {
+            TextView textView;
+            for (int i = 0; i < mTabTexts.size(); i++) {
+                textView = mTabTexts.get(i);
+                if (null == textView || position == i) {
+                    continue;
+                }
+                textView.setSelected(isSelected);
             }
-            textView.setSelected(false);
         }
     }
 
@@ -435,6 +567,47 @@ public class MainActivity extends BaseActivity {
         mPaint.setStrokeCap(Paint.Cap.ROUND);
     }
 
+    private Observer mConnObserver = new Observer<ConnectStatus>() {
+        private ConnectStatus lastValue;
+
+        @Override
+        public void onChanged(ConnectStatus connectStatus) {
+            if (lastValue == connectStatus) {
+                return;
+            }
+            lastValue = connectStatus;
+            if (connectStatus.getResult()) {
+                checkTabStatus(-1, false);
+                mViewPager.setCurrentItem(1);
+                initBoardView();
+            } else {
+                ToastUtils.showMessage(connectStatus.getMsg());
+                checkTabStatus(0, false);
+                mViewPager.setCurrentItem(0);
+            }
+        }
+    };
+
+    private Observer mCmdObserver = new Observer<Command>() {
+        @Override
+        public void onChanged(Command command) {
+            if (null == command) {
+                return;
+            }
+
+            Byte bytes;
+            while ((bytes = command.getExtra()) != null) {
+                if (0x00 == bytes) {
+                    cleanBoardView();
+                } else if (0x01 == bytes) {
+                    if (null != mCanvasFragment) {
+                        mCanvasFragment.mBoardView.newPage();
+                    }
+                }
+            }
+        }
+    };
+
     @SuppressLint("HandlerLeak")
     private Handler mHandler = new Handler() {
         @Override
@@ -496,10 +669,6 @@ public class MainActivity extends BaseActivity {
             dismissLoadingDialog();
             EventBus.getDefault().post(SyncEvent.REFRESH_WORK_LIST);
         }
-    }
-
-    public interface BoardStatus {
-        void invoke(DevicePoint devicePoint);
     }
 
 }

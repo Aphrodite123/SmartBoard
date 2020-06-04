@@ -10,9 +10,9 @@ import butterknife.BindView;
 
 public class CanvasFragment extends BaseFragment {
     @BindView(R.id.board_view)
-    BoardView mBoardView;
+    public BoardView mBoardView;
     @BindView(R.id.msg)
-    TextView msg;
+    public TextView msg;
 
     @Override
     protected int getViewId() {

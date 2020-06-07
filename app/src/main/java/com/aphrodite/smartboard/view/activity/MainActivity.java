@@ -26,6 +26,7 @@ import android.widget.Toast;
 import com.apeman.sdk.bean.BoardType;
 import com.apeman.sdk.bean.DevicePoint;
 import com.apeman.sdk.bean.NoteDescription;
+import com.apeman.sdk.bean.SyncResult;
 import com.apeman.sdk.bean.UsbBoardInfo;
 import com.apeman.sdk.service.ConnectStatus;
 import com.apeman.sdk.service.PenService;
@@ -50,6 +51,7 @@ import com.aphrodite.smartboard.utils.BitmapUtils;
 import com.aphrodite.smartboard.utils.CWFileUtils;
 import com.aphrodite.smartboard.utils.FFmpegUtils;
 import com.aphrodite.smartboard.utils.FileUtils;
+import com.aphrodite.smartboard.utils.LogUtils;
 import com.aphrodite.smartboard.utils.ParseUtils;
 import com.aphrodite.smartboard.view.activity.base.BaseActivity;
 import com.aphrodite.smartboard.view.adapter.HomeViewPagerAdapter;
@@ -315,6 +317,10 @@ public class MainActivity extends BaseActivity implements ServiceConnection {
         mUsbPenService = connBinder.getService();
         mUsbPenService.getConnLiveData().observe(this, mConnObserver);
         mUsbPenService.getCommandLiveData().observe(this, mCmdObserver);
+        mUsbPenService.getBoardInfoLiveData().observe(this, mBoardInfo);
+
+        mUsbPenService.getSyncLiveData().observe(this, mSyncObserver);
+
         List<UsbDevice> usbDevices = mUsbPenService.listConnectedUsbDevice(this);
         if (ObjectUtils.isEmpty(usbDevices)) {
             return;
@@ -567,11 +573,26 @@ public class MainActivity extends BaseActivity implements ServiceConnection {
         mPaint.setStrokeCap(Paint.Cap.ROUND);
     }
 
+    private Observer mBoardInfo = new Observer() {
+        @Override
+        public void onChanged(Object o) {
+            mCanvasFragment.msg.setText("mBoardInfo: " + o.toString());
+        }
+    };
+
+    private Observer mSyncObserver = new Observer<SyncResult>() {
+        @Override
+        public void onChanged(SyncResult syncResult) {
+            mCanvasFragment.msg.setText("mSyncObserver: " + syncResult.toString());
+        }
+    };
+
     private Observer mConnObserver = new Observer<ConnectStatus>() {
         private ConnectStatus lastValue;
 
         @Override
         public void onChanged(ConnectStatus connectStatus) {
+            LogUtils.d("ConnectStatus: "+connectStatus.toString());
             if (lastValue == connectStatus) {
                 return;
             }

@@ -3,13 +3,8 @@ package com.aphrodite.smartboard.view.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.TextView;
-
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-import butterknife.BindView;
-
-import com.apeman.sdk.widget.BoardView;
 import com.aphrodite.framework.utils.ObjectUtils;
 import com.aphrodite.smartboard.R;
 import com.aphrodite.smartboard.config.IntentAction;
@@ -31,10 +26,6 @@ import java.util.List;
  * 画板
  */
 public class CanvasActivity extends BaseActivity {
-    @BindView(R.id.board_view)
-    BoardView mBoardView;
-    @BindView(R.id.msg)
-    TextView mInfo;
 
     private List<BaseFragment> mFragments;
 

@@ -123,6 +123,8 @@ public class MainActivity extends BaseActivity implements ServiceConnection {
     protected void initView() {
         setStatusBarColor(this);
         showLoadingDialog();
+
+        LogUtils.d(AppConfig.CACHE_PATH);
     }
 
     @Override
@@ -131,6 +133,7 @@ public class MainActivity extends BaseActivity implements ServiceConnection {
 
     @Override
     protected void initData() {
+        loadOnLineData();
         mCopyAssetsToSDcardTask = new CopyAssetsToSDcardTask();
         mPaths = new ArrayList<>();
         mLoadSDcardTask = new LoadSDcardTask();
@@ -360,6 +363,20 @@ public class MainActivity extends BaseActivity implements ServiceConnection {
                 return null;
             }
         });
+    }
+
+    private void loadOnLineData() {
+        File file = new File(AppConfig.BOARD_ONLINE_PATH);
+        if (!file.exists()) {
+            return;
+        }
+
+        String[] workFolders = file.list();
+        if (ObjectUtils.isEmpty(workFolders)) {
+            return;
+        }
+
+        CWFileUtils.readOnLineFile(AppConfig.BOARD_ONLINE_PATH + workFolders[workFolders.length - 1]);
     }
 
     @OnClick(R.id.tab_home_ll)

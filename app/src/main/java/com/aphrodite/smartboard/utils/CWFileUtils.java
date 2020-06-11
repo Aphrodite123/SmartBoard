@@ -1,6 +1,7 @@
 package com.aphrodite.smartboard.utils;
 
 import android.graphics.Point;
+import android.text.TextUtils;
 
 import com.aphrodite.framework.utils.SPUtils;
 import com.aphrodite.smartboard.R;
@@ -196,5 +197,33 @@ public class CWFileUtils {
             e.printStackTrace();
         }
         return cw;
+    }
+
+    public static CW readOnLineFile(String path) {
+        if (TextUtils.isEmpty(path)) {
+            return null;
+        }
+
+        File file = new File(path);
+        if (!file.exists()) {
+            return null;
+        }
+
+        try {
+            BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
+            String result;
+            String[] splitResult;
+            Gson gson = new Gson();
+            List<CWACT> cwacts = new ArrayList<>();
+            while ((result = bufferedReader.readLine()) != null) {
+                result = bufferedReader.readLine();
+                LogUtils.d("line: " + result.toString());
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

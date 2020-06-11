@@ -17,6 +17,16 @@ public class AppConfig extends BaseConfig {
     public static final String DATA_PATH = MainApplication.getApplication().getExternalFilesDir("data").getAbsolutePath() + File.separator;
 
     /**
+     * User缓存目录
+     */
+    public static final String CACHE_PATH = MainApplication.getApplication().getCacheDir().getAbsolutePath();
+
+    /**
+     * 在线模式板子数据保存路径
+     */
+    public static final String BOARD_ONLINE_PATH = CACHE_PATH + File.separator + "Notes/";
+
+    /**
      * 智能手写板ffmpeg文件存储路径，默认指定到ffmpeg
      */
     public static final String FFMPEG_PATH = MainApplication.getApplication().getExternalFilesDir("ffmpeg").getAbsolutePath() + File.separator;

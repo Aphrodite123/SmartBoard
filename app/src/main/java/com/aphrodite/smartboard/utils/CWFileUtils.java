@@ -2,7 +2,9 @@ package com.aphrodite.smartboard.utils;
 
 import android.graphics.Point;
 import android.text.TextUtils;
+import android.util.Log;
 
+import com.aphrodite.framework.utils.ObjectUtils;
 import com.aphrodite.framework.utils.SPUtils;
 import com.aphrodite.smartboard.R;
 import com.aphrodite.smartboard.application.MainApplication;
@@ -15,6 +17,7 @@ import com.aphrodite.smartboard.model.bean.CWPage;
 import com.aphrodite.smartboard.model.bean.CWSwitch;
 import com.aphrodite.smartboard.model.bean.ScreenRecordEntity;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -23,6 +26,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -199,7 +203,7 @@ public class CWFileUtils {
         return cw;
     }
 
-    public static CW readOnLineFile(String path) {
+    public static List<List<Object>> readOnLineFile(String path) {
         if (TextUtils.isEmpty(path)) {
             return null;
         }
@@ -209,21 +213,28 @@ public class CWFileUtils {
             return null;
         }
 
+        List<List<Object>> points = new ArrayList<>();
         try {
             BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
             String result;
-            String[] splitResult;
             Gson gson = new Gson();
-            List<CWACT> cwacts = new ArrayList<>();
+            Type type = new TypeToken<ArrayList<Integer>>() {
+            }.getType();
             while ((result = bufferedReader.readLine()) != null) {
                 result = bufferedReader.readLine();
-                LogUtils.d("line: " + result.toString());
+                if (ObjectUtils.isEmpty(result)) {
+                    continue;
+                }
+
+                ArrayList<Integer> arrayList = gson.fromJson(result, type);
+                Object[] coordinates = DataTransferUtils.splitArray(arrayList, 3);
+                points.add(Arrays.asList(coordinates));
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return null;
+        return points;
     }
 }

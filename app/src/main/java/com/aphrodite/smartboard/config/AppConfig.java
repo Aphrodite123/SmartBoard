@@ -4,6 +4,7 @@ import com.aphrodite.framework.config.base.BaseConfig;
 import com.aphrodite.smartboard.application.MainApplication;
 
 import java.io.File;
+import java.util.regex.Pattern;
 
 /**
  * Created by Aphrodite on 2019/5/28.
@@ -25,6 +26,11 @@ public class AppConfig extends BaseConfig {
      * 在线模式板子数据保存路径
      */
     public static final String BOARD_ONLINE_PATH = CACHE_PATH + File.separator + "Notes/";
+
+    /**
+     * 正则*从文件名中匹配出timestamp
+     */
+    public static final Pattern BOARD_ONLINE_FILE_PATTERN = Pattern.compile("Note-(\\d{13})\\.note");
 
     /**
      * 智能手写板ffmpeg文件存储路径，默认指定到ffmpeg

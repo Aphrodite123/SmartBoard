@@ -109,7 +109,7 @@ public class BoardOnlineFragment extends BaseFragment {
 
         mCw = CWFileUtils.read(mCurrentDataPath);
         if (null != mCw) {
-            String createTime = TimeUtils.msToDateFormat(1000 * mCw.getTime(), TimeUtils.FORMAT_SPECIAL_SYMBOL_ONE);
+            String createTime = TimeUtils.msToDateFormat(mCw.getTime(), TimeUtils.FORMAT_SPECIAL_SYMBOL_ONE);
             setTitleText(createTime);
         }
 

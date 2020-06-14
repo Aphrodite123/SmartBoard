@@ -126,10 +126,19 @@ public class TimeUtils {
      * @return
      */
     public static int convertTime(String timeTip) {
+        int time = 0;
         String[] split = timeTip.split("\\:");
-        int minutes = Integer.valueOf(split[0]);
-        int seconds = Integer.valueOf(split[1].substring(0, 2));
-        return minutes * 60 + seconds;
+        if (ObjectUtils.isEmpty(split)) {
+            return time;
+        }
+        try {
+            int minutes = Integer.valueOf(split[0]);
+            int seconds = Integer.valueOf(split[1].substring(0, 2));
+            time = minutes * 60 + seconds;
+        } catch (NumberFormatException e) {
+
+        }
+        return time;
     }
 
     public static boolean isSameDay(long secOne, long secTwo, TimeZone timeZone) {

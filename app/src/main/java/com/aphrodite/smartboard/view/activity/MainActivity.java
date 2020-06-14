@@ -13,6 +13,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.Point;
 import android.hardware.usb.UsbDevice;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -44,6 +45,7 @@ import com.aphrodite.smartboard.config.IntentAction;
 import com.aphrodite.smartboard.model.bean.CW;
 import com.aphrodite.smartboard.model.bean.CWACT;
 import com.aphrodite.smartboard.model.bean.CWLine;
+import com.aphrodite.smartboard.model.bean.ScreenRecordEntity;
 import com.aphrodite.smartboard.model.event.SyncEvent;
 import com.aphrodite.smartboard.model.ffmpeg.FFmpegHandler;
 import com.aphrodite.smartboard.utils.BitmapUtils;
@@ -66,6 +68,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
@@ -114,6 +117,12 @@ public class MainActivity extends BaseActivity implements ServiceConnection {
     private UsbPenService<UsbBoardInfo, UsbDevice> mUsbPenService;
     private ProgressDialog mCleanProgressDialog;
 
+    private int mCanvasWidth;
+    private int mCanvasHeight;
+
+    private Double mXScale;
+    private Double mYScale;
+
     @Override
     protected int getViewId() {
         return R.layout.activity_main;
@@ -124,7 +133,26 @@ public class MainActivity extends BaseActivity implements ServiceConnection {
         setStatusBarColor(this);
         showLoadingDialog();
 
-        LogUtils.d(AppConfig.CACHE_PATH);
+        getDeviceInfo();
+//        loadOnLineData();
+    }
+
+    private void getDeviceInfo() {
+        BoardType boardType = BoardType.NoteMaker;
+        float deviceScale = (float) (boardType.getMaxX() / boardType.getMaxY());
+        float screenScale = (float) (UIUtils.getDisplayWidthPixels(this)) / (float) (UIUtils.getDisplayHeightPixels(this));
+        if (screenScale > deviceScale) {
+            //设备更宽，以View的高为基准进行缩放
+            mCanvasHeight = UIUtils.getDisplayHeightPixels(this);
+            mCanvasWidth = (int) (mCanvasHeight * deviceScale);
+        } else {
+            //以View的宽为基准进行缩放
+            mCanvasWidth = UIUtils.getDisplayWidthPixels(this);
+            mCanvasHeight = (int) (mCanvasWidth * deviceScale);
+        }
+
+        mXScale = mCanvasWidth / boardType.getMaxX();
+        mYScale = mCanvasHeight / boardType.getMaxY();
     }
 
     @Override
@@ -133,7 +161,6 @@ public class MainActivity extends BaseActivity implements ServiceConnection {
 
     @Override
     protected void initData() {
-        loadOnLineData();
         mCopyAssetsToSDcardTask = new CopyAssetsToSDcardTask();
         mPaths = new ArrayList<>();
         mLoadSDcardTask = new LoadSDcardTask();
@@ -376,7 +403,51 @@ public class MainActivity extends BaseActivity implements ServiceConnection {
             return;
         }
 
-        CWFileUtils.readOnLineFile(AppConfig.BOARD_ONLINE_PATH + workFolders[workFolders.length - 1]);
+        String fileName = workFolders[workFolders.length - 1];
+        Matcher matcher = AppConfig.BOARD_ONLINE_FILE_PATTERN.matcher(fileName);
+        String timestamp = "";
+        while (matcher.find()) {
+            timestamp = matcher.group(1);
+        }
+
+        List<List<Object>> coordinates = CWFileUtils.readOnLineFile(AppConfig.BOARD_ONLINE_PATH + fileName);
+        if (ObjectUtils.isEmpty(coordinates)) {
+            return;
+        }
+
+        Paint paint = new Paint();
+        List<Point> points = new ArrayList<>();
+        List<Object> pointItem = null;
+        for (int i = 0; i < coordinates.size(); i++) {
+
+            pointItem = coordinates.get(i);
+            if (ObjectUtils.isEmpty(pointItem)) {
+                continue;
+            }
+
+            for (int j = 0; j < pointItem.size(); j++) {
+                int[] xy = (int[]) pointItem.get(j);
+                if (ObjectUtils.isEmpty(xy)) {
+                    continue;
+                }
+                points.add(new Point(xy[0], xy[1]));
+            }
+
+            paint.setColor(Color.BLACK);
+            paint.setStrokeWidth(10);
+
+            int red = (paint.getColor() & 0xff0000) >> 16;
+            int green = (paint.getColor() & 0x00ff00) >> 8;
+            int blue = (paint.getColor() & 0x0000ff);
+            CWFileUtils.writeACTLine(points, (int) paint.getStrokeWidth(), red + "," + green + "," + blue + ",1");
+        }
+
+        List<ScreenRecordEntity> data = new ArrayList<>();
+        ScreenRecordEntity screenRecordEntity = new ScreenRecordEntity();
+        screenRecordEntity.setType("data/0");
+        data.add(screenRecordEntity);
+
+        CWFileUtils.write(data, AppConfig.DATA_PATH + timestamp + File.separator, mCanvasWidth, mCanvasHeight);
     }
 
     @OnClick(R.id.tab_home_ll)
@@ -520,7 +591,7 @@ public class MainActivity extends BaseActivity implements ServiceConnection {
             }
             createPaths(cwact.getLine());
         }
-        drawPathToBitmap(UIUtils.getDisplayHeightPixels(this), UIUtils.getDisplayWidthPixels(this), fileDir, Bitmap.CompressFormat.JPEG, 100);
+        drawPathToBitmap(mCanvasWidth, mCanvasHeight, fileDir, Bitmap.CompressFormat.JPEG, 100);
     }
 
     private void createPaths(CWLine line) {
@@ -545,12 +616,12 @@ public class MainActivity extends BaseActivity implements ServiceConnection {
                 continue;
             }
             if (0 == i) {
-                path.moveTo(xyPoints.get(0), xyPoints.get(1) + 500);
+                path.moveTo((float) (xyPoints.get(0) * mXScale), (float) (xyPoints.get(1) * mYScale));
             } else {
-                path.quadTo(mLastX, mLastY, xyPoints.get(0), xyPoints.get(1) + 500);
+                path.quadTo(mLastX, mLastY, (float) (xyPoints.get(0) * mXScale), (float) (xyPoints.get(1) * mYScale));
             }
-            mLastX = xyPoints.get(0);
-            mLastY = xyPoints.get(1) + 500;
+            mLastX = (float) (xyPoints.get(0) * mXScale);
+            mLastY = (float) (xyPoints.get(1) * mYScale);
         }
         mPaths.add(path);
     }

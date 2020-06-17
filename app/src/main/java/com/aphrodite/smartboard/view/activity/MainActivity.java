@@ -74,6 +74,7 @@ import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Observer;
+
 import butterknife.BindView;
 import butterknife.BindViews;
 import butterknife.OnClick;
@@ -117,9 +118,12 @@ public class MainActivity extends BaseActivity implements ServiceConnection {
     private UsbPenService<UsbBoardInfo, UsbDevice> mUsbPenService;
     private ProgressDialog mCleanProgressDialog;
 
+    //按照设备比例缩放后的画布宽度
     private int mCanvasWidth;
+    //按照设备比例缩放后的画布高度
     private int mCanvasHeight;
 
+    //将设备坐标点转换为画布坐标点的缩放比例
     private Double mXScale;
     private Double mYScale;
 
@@ -140,15 +144,17 @@ public class MainActivity extends BaseActivity implements ServiceConnection {
     private void getDeviceInfo() {
         BoardType boardType = BoardType.NoteMaker;
         float deviceScale = (float) (boardType.getMaxX() / boardType.getMaxY());
-        float screenScale = (float) (UIUtils.getDisplayWidthPixels(this)) / (float) (UIUtils.getDisplayHeightPixels(this));
+        int viewWidth = UIUtils.getDisplayWidthPixels(this);
+        int viewHeight = UIUtils.getDisplayHeightPixels(this);
+        float screenScale = (float) (viewWidth) / (float) (viewHeight);
         if (screenScale > deviceScale) {
             //设备更宽，以View的高为基准进行缩放
-            mCanvasHeight = UIUtils.getDisplayHeightPixels(this);
-            mCanvasWidth = (int) (mCanvasHeight * deviceScale);
+            mCanvasHeight = viewHeight;
+            mCanvasWidth = (int) (viewHeight * deviceScale);
         } else {
             //以View的宽为基准进行缩放
-            mCanvasWidth = UIUtils.getDisplayWidthPixels(this);
-            mCanvasHeight = (int) (mCanvasWidth * deviceScale);
+            mCanvasWidth = viewWidth;
+            mCanvasHeight = (int) (viewWidth / deviceScale);
         }
 
         mXScale = mCanvasWidth / boardType.getMaxX();

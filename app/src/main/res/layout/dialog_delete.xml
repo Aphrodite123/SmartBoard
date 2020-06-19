@@ -22,7 +22,10 @@
         android:layout_below="@id/title"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="@dimen/dip20"
+        android:paddingLeft="@dimen/dip10"
+        android:paddingRight="@dimen/dip10"
         android:text="@string/delete_dialog_message"
+        android:textAlignment="center"
         android:textColor="@color/black_90_transparent"
         android:textSize="@dimen/font14" />
 

@@ -2,6 +2,7 @@ package com.aphrodite.smartboard.view.activity.base;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.ServiceConnection;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;

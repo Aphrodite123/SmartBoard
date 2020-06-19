@@ -109,5 +109,6 @@
     <string name="delete_dialog_message">删除后无法恢复</string>
     <string name="prompt">提示</string>
     <string name="message_edit_exit">有未保存修改，是否保存？</string>
+    <string name="message_save_image">图片将保存至本地相册，您可以查看相册并分享</string>
 
 </resources>

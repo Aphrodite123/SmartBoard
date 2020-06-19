@@ -1,6 +1,5 @@
 package com.aphrodite.smartboard.view.widget.dialog;
 
-
 import android.app.Dialog;
 import android.content.Context;
 import android.graphics.drawable.ColorDrawable;

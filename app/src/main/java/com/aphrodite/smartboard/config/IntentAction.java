@@ -37,4 +37,8 @@ public interface IntentAction {
         String ACTION = ACTION_SUFFIX + "SETTING";
     }
 
+    interface DeviceOnLineAction{
+        String ACTION = ACTION_SUFFIX+"DEVICEONLINE";
+    }
+
 }

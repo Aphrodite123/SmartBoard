@@ -2,6 +2,8 @@ package com.aphrodite.smartboard.view.activity;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.widget.TextView;
 
 import androidx.lifecycle.Observer;
@@ -14,9 +16,17 @@ import com.apeman.sdk.service.PenService;
 import com.apeman.sdk.service.command.Command;
 import com.apeman.sdk.widget.BoardView;
 import com.apeman.sdk.widget.BoardViewCallback;
+import com.aphrodite.framework.utils.UIUtils;
 import com.aphrodite.smartboard.R;
+import com.aphrodite.smartboard.config.AppConfig;
+import com.aphrodite.smartboard.model.bean.ScreenRecordEntity;
+import com.aphrodite.smartboard.utils.CWFileUtils;
 import com.aphrodite.smartboard.view.activity.base.BaseDeviceActivity;
 import com.aphrodite.smartboard.view.widget.dialog.DeleteDialog;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -35,6 +45,23 @@ public class DeviceOnLineActivity extends BaseDeviceActivity {
 
     private ProgressDialog mCleanProgressDialog;
     private DeleteDialog mPromptDialog;
+
+    private int mStrokeWidth = 10;
+    private int mDrawColor = Color.BLACK;
+    private long mTimestamp;
+
+    //按照设备比例缩放后的画布宽度
+    private int mCanvasWidth;
+    //按照设备比例缩放后的画布高度
+    private int mCanvasHeight;
+
+    //将设备坐标点转换为画布坐标点的缩放比例
+    private Double mXScale;
+    private Double mYScale;
+
+    private Paint mPaint;
+    private List<DevicePoint> mDevicePoints;
+    private List<ScreenRecordEntity> data = new ArrayList<>();
 
     @Override
     protected int getViewId() {
@@ -58,6 +85,8 @@ public class DeviceOnLineActivity extends BaseDeviceActivity {
 
     @Override
     protected void initData() {
+        getDeviceInfo();
+        mTimestamp = System.currentTimeMillis();
         PenService.Companion.connectUsbService(this, this);
     }
 
@@ -129,6 +158,9 @@ public class DeviceOnLineActivity extends BaseDeviceActivity {
                             @Override
                             public Unit invoke(DevicePoint devicePoint) {
                                 mBoardView.onPointReceived(devicePoint);
+                                msg.setText(devicePoint.toString());
+
+                                parseDevicePoint(devicePoint);
                                 return null;
                             }
                         });
@@ -137,6 +169,75 @@ public class DeviceOnLineActivity extends BaseDeviceActivity {
                 });
             }
         });
+    }
+
+    public void initPaint() {
+        mPaint = new Paint();
+        mPaint.setColor(mDrawColor);
+        mPaint.setStyle(Paint.Style.STROKE);
+        mPaint.setStrokeWidth(mStrokeWidth);
+        mPaint.setAntiAlias(true);
+        mPaint.setStrokeCap(Paint.Cap.ROUND);
+    }
+
+    private void getDeviceInfo() {
+        BoardType boardType = BoardType.NoteMaker;
+        float deviceScale = (float) (boardType.getMaxX() / boardType.getMaxY());
+        int viewWidth = UIUtils.getDisplayWidthPixels(this);
+        int viewHeight = UIUtils.getDisplayHeightPixels(this);
+        float screenScale = (float) (viewWidth) / (float) (viewHeight);
+        if (screenScale > deviceScale) {
+            //设备更宽，以View的高为基准进行缩放
+            mCanvasHeight = viewHeight;
+            mCanvasWidth = (int) (viewHeight * deviceScale);
+        } else {
+            //以View的宽为基准进行缩放
+            mCanvasWidth = viewWidth;
+            mCanvasHeight = (int) (viewWidth / deviceScale);
+        }
+
+        mXScale = mCanvasWidth / boardType.getMaxX();
+        mYScale = mCanvasHeight / boardType.getMaxY();
+    }
+
+    private void parseDevicePoint(DevicePoint devicePoint) {
+        if (null == devicePoint) {
+            return;
+        }
+
+        switch (devicePoint.getState()) {
+            case (byte) 0x00:
+                //离开
+                mDevicePoints = null;
+                break;
+            case (byte) 0x10:
+                initPaint();
+                //悬空
+                if (null == mDevicePoints) {
+                    mDevicePoints = new ArrayList<>();
+                } else {
+                    int red = (mPaint.getColor() & 0xff0000) >> 16;
+                    int green = (mPaint.getColor() & 0x00ff00) >> 8;
+                    int blue = (mPaint.getColor() & 0x0000ff);
+                    CWFileUtils.writeLine(mDevicePoints, (int) mPaint.getStrokeWidth(), red + "," + green + "," + blue + ",1");
+                    mDevicePoints.clear();
+                }
+                break;
+            case (byte) 0x11:
+                //压下
+                if (null != mDevicePoints) {
+                    mDevicePoints.add(devicePoint);
+                }
+                break;
+        }
+    }
+
+    private void saveData() {
+        ScreenRecordEntity screenRecordEntity = new ScreenRecordEntity();
+        screenRecordEntity.setType("data/0");
+        data.add(screenRecordEntity);
+
+        CWFileUtils.write(data, AppConfig.DATA_PATH + mTimestamp + File.separator, mCanvasWidth, mCanvasHeight, mTimestamp);
     }
 
     private void cleanBoardView() {
@@ -183,6 +284,7 @@ public class DeviceOnLineActivity extends BaseDeviceActivity {
 
     @OnClick(R.id.iv_right_btn)
     public void onToolbarRightBtn() {
+        saveData();
         showDialog();
     }
 

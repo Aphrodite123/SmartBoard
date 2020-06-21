@@ -4,6 +4,7 @@ import android.graphics.Point;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.apeman.sdk.bean.DevicePoint;
 import com.aphrodite.framework.utils.ObjectUtils;
 import com.aphrodite.framework.utils.SPUtils;
 import com.aphrodite.smartboard.R;
@@ -40,7 +41,7 @@ public class CWFileUtils {
     public static StringBuilder actStringBuilder = new StringBuilder();
     public static int mRecordSeconds;
 
-    public static void write(List<ScreenRecordEntity> data, String filePath, int width, int height) {
+    public static void write(List<ScreenRecordEntity> data, String filePath, int width, int height, long timestamp) {
         File path = new File(filePath);
         if (!path.exists()) {
             path.mkdirs();
@@ -76,7 +77,7 @@ public class CWFileUtils {
             wr.write("\n");
             wr.write("#AUTHOR:" + SPUtils.get(AppConfig.SharePreferenceKey.PHONE_NUMBER, MainApplication.getApplication().getString(R.string.app_name)));
             wr.write("\n");
-            wr.write("#TIME:" + System.currentTimeMillis());
+            wr.write("#TIME:" + timestamp);
             wr.write("\n\n");
             wr.write(actStringBuilder.toString());
             wr.write("\n");
@@ -111,6 +112,29 @@ public class CWFileUtils {
         actStringBuilder.append("{\"width\":" + width + ",\"color\":\"" + color + "\",\"points\":[");
         for (int i = 0; i < len; i++) {
             actStringBuilder.append((i == 0 ? "[" : ",[") + points.get(i).x + "," + points.get(i).y + "]");
+        }
+        actStringBuilder.append("]}");
+        actStringBuilder.append("\n");
+    }
+
+    public static void writeLine(List<DevicePoint> points, int width, String color) {
+        int len = points.size();
+        if (len == 0) {
+            return;
+        }
+        int minute = 0, second = 0;
+        if (mRecordSeconds >= 60) {
+            minute = mRecordSeconds / 60;
+            second = mRecordSeconds % 60;
+        } else {
+            second = mRecordSeconds;
+        }
+        String timeTip = minute + ":" + (second < 10 ? "data/0" + second : second + "") + ".000";
+        actStringBuilder.append("#ACT:" + timeTip + ",line");
+        actStringBuilder.append("\n");
+        actStringBuilder.append("{\"width\":" + width + ",\"color\":\"" + color + "\",\"points\":[");
+        for (int i = 0; i < len; i++) {
+            actStringBuilder.append((i == 0 ? "[" : ",[") + points.get(i).getX() + "," + points.get(i).getY() + "," + points.get(i).getPressure() + "]");
         }
         actStringBuilder.append("]}");
         actStringBuilder.append("\n");

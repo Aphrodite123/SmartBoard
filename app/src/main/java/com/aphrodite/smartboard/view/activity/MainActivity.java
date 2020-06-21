@@ -365,7 +365,7 @@ public class MainActivity extends BaseDeviceActivity {
         screenRecordEntity.setType("data/0");
         data.add(screenRecordEntity);
 
-        CWFileUtils.write(data, AppConfig.DATA_PATH + timestamp + File.separator, mCanvasWidth, mCanvasHeight);
+        CWFileUtils.write(data, AppConfig.DATA_PATH + timestamp + File.separator, mCanvasWidth, mCanvasHeight, Long.parseLong(timestamp));
     }
 
     @OnClick(R.id.tab_home_ll)

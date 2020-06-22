@@ -7,7 +7,6 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.net.Uri;
 import android.provider.MediaStore;
-import android.widget.TextView;
 
 import androidx.lifecycle.Observer;
 
@@ -45,9 +44,7 @@ import kotlin.jvm.functions.Function1;
  */
 public class DeviceOnLineActivity extends BaseDeviceActivity {
     @BindView(R.id.board_view)
-    public BoardView mBoardView;
-    @BindView(R.id.msg)
-    public TextView msg;
+    BoardView mBoardView;
 
     private ProgressDialog mCleanProgressDialog;
     private DeleteDialog mPromptDialog;
@@ -81,17 +78,16 @@ public class DeviceOnLineActivity extends BaseDeviceActivity {
         setLeftBtnRes(R.drawable.back);
         setRightBtnRes(R.drawable.share_toolbar_icon);
         setTitleColor(getResources().getColor(R.color.color_626262));
+        getDeviceInfo();
         initBoardView();
     }
 
     @Override
     protected void initListener() {
-
     }
 
     @Override
     protected void initData() {
-        getDeviceInfo();
         mTimestamp = System.currentTimeMillis();
         PenService.Companion.connectUsbService(this, this);
     }
@@ -129,19 +125,23 @@ public class DeviceOnLineActivity extends BaseDeviceActivity {
                     return;
                 }
 
-                Byte bytes;
-                while ((bytes = command.getExtra()) != null) {
-                    if ((byte) 0x00 == bytes) {
+                switch (command.getExtra()) {
+                    case 0x00:
                         cleanBoardView();
-                    } else if ((byte) 0x01 == bytes) {
-                        mBoardView.newPage();
-                    }
+                        break;
+                    case 0x01:
+                        if (null != mBoardView) {
+                            mBoardView.newPage();
+                        }
+                        break;
                 }
             }
         };
     }
 
     private void initBoardView() {
+
+
         mBoardView.post(new Runnable() {
             @Override
             public void run() {
@@ -155,16 +155,11 @@ public class DeviceOnLineActivity extends BaseDeviceActivity {
                 mBoardView.setLoadFinishCallback(new BoardViewCallback() {
                     @Override
                     public void onLoadFinished() {
-                        if (null != msg) {
-                            msg.setText("onLoadFinished");
-                        }
-
                         //这里需要注意一定要在完成画板的初始化后再监听硬件的报点
                         mUsbPenService.observeDevicePoint(new Function1<DevicePoint, Unit>() {
                             @Override
                             public Unit invoke(DevicePoint devicePoint) {
                                 mBoardView.onPointReceived(devicePoint);
-                                msg.setText(devicePoint.toString());
 
                                 parseDevicePoint(devicePoint);
                                 return null;
@@ -286,7 +281,7 @@ public class DeviceOnLineActivity extends BaseDeviceActivity {
     }
 
     private void savePicture() {
-        String dir = AppConfig.DATA_PATH + mTimestamp + File.separator;
+        String dir = AppConfig.DATA_PATH + mTimestamp;
         String imageName = "shot.jpg";
 
         try {
@@ -305,7 +300,7 @@ public class DeviceOnLineActivity extends BaseDeviceActivity {
 
     @OnClick(R.id.iv_right_btn)
     public void onToolbarRightBtn() {
-        saveData();
+//        saveData();
         showDialog();
     }
 

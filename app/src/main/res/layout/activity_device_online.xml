@@ -21,11 +21,4 @@
         app:recordQuality="0.5"
         app:recordRate="16" />
 
-    <TextView
-        android:id="@+id/msg"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/dip80"
-        android:text="点信息"
-        android:textColor="@color/black" />
-
 </LinearLayout>

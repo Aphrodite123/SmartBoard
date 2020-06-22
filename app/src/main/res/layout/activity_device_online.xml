@@ -15,6 +15,7 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/dip0"
         android:layout_weight="1"
+        android:background="@android:color/white"
         android:keepScreenOn="true"
         app:playBackInterval="10"
         app:recordQuality="0.5"

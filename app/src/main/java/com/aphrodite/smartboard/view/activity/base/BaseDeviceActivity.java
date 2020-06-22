@@ -25,6 +25,7 @@ import java.util.List;
  */
 public abstract class BaseDeviceActivity extends BaseActivity implements ServiceConnection {
     protected UsbPenService<UsbBoardInfo, UsbDevice> mUsbPenService;
+    protected boolean mDeviceConnected;
 
     protected abstract Observer<ConnectStatus> getConnObserver();
 
@@ -48,11 +49,13 @@ public abstract class BaseDeviceActivity extends BaseActivity implements Service
             }
 
             mUsbPenService.connectSmartBoard(device);
+            mDeviceConnected = true;
         }
     }
 
     @Override
     public void onServiceDisconnected(ComponentName name) {
+        mDeviceConnected = false;
         ToastUtils.showMessage(R.string.device_disconnected);
         if (this instanceof DeviceOnLineActivity) {
             finish();

@@ -2,8 +2,11 @@ package com.aphrodite.smartboard.view.activity;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.net.Uri;
+import android.provider.MediaStore;
 import android.widget.TextView;
 
 import androidx.lifecycle.Observer;
@@ -16,15 +19,18 @@ import com.apeman.sdk.service.PenService;
 import com.apeman.sdk.service.command.Command;
 import com.apeman.sdk.widget.BoardView;
 import com.apeman.sdk.widget.BoardViewCallback;
+import com.aphrodite.framework.utils.ToastUtils;
 import com.aphrodite.framework.utils.UIUtils;
 import com.aphrodite.smartboard.R;
 import com.aphrodite.smartboard.config.AppConfig;
 import com.aphrodite.smartboard.model.bean.ScreenRecordEntity;
+import com.aphrodite.smartboard.utils.BitmapUtils;
 import com.aphrodite.smartboard.utils.CWFileUtils;
 import com.aphrodite.smartboard.view.activity.base.BaseDeviceActivity;
 import com.aphrodite.smartboard.view.widget.dialog.DeleteDialog;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -125,9 +131,9 @@ public class DeviceOnLineActivity extends BaseDeviceActivity {
 
                 Byte bytes;
                 while ((bytes = command.getExtra()) != null) {
-                    if (0x00 == bytes) {
+                    if ((byte) 0x00 == bytes) {
                         cleanBoardView();
-                    } else if (0x01 == bytes) {
+                    } else if ((byte) 0x01 == bytes) {
                         mBoardView.newPage();
                     }
                 }
@@ -255,7 +261,7 @@ public class DeviceOnLineActivity extends BaseDeviceActivity {
                 if (null != mCleanProgressDialog) {
                     mCleanProgressDialog.dismiss();
                 }
-                return null;
+                return Unit.INSTANCE;
             }
         });
     }
@@ -280,6 +286,21 @@ public class DeviceOnLineActivity extends BaseDeviceActivity {
     }
 
     private void savePicture() {
+        String dir = AppConfig.DATA_PATH + mTimestamp + File.separator;
+        String imageName = "shot.jpg";
+
+        try {
+            BitmapUtils.saveBitmap(BitmapUtils.shotToView(mBoardView), dir, imageName, Bitmap.CompressFormat.JPEG, 100);
+            File file = new File(dir + File.separator + imageName);
+            MediaStore.Images.Media.insertImage(getContentResolver(), file.getAbsolutePath(), imageName, null);
+
+            Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(file));
+            sendBroadcast(intent);
+
+            ToastUtils.showMessage(R.string.toast_save_to_gallery_successed);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @OnClick(R.id.iv_right_btn)

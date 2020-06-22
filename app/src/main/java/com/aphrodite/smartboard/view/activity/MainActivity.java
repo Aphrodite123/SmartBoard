@@ -10,7 +10,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.graphics.Point;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
@@ -34,7 +33,6 @@ import com.aphrodite.smartboard.config.IntentAction;
 import com.aphrodite.smartboard.model.bean.CW;
 import com.aphrodite.smartboard.model.bean.CWACT;
 import com.aphrodite.smartboard.model.bean.CWLine;
-import com.aphrodite.smartboard.model.bean.ScreenRecordEntity;
 import com.aphrodite.smartboard.model.event.SyncEvent;
 import com.aphrodite.smartboard.model.ffmpeg.FFmpegHandler;
 import com.aphrodite.smartboard.utils.BitmapUtils;
@@ -55,7 +53,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
@@ -121,7 +118,6 @@ public class MainActivity extends BaseDeviceActivity {
         showLoadingDialog();
 
         getDeviceInfo();
-//        loadOnLineData();
     }
 
     private void getDeviceInfo() {
@@ -310,64 +306,6 @@ public class MainActivity extends BaseDeviceActivity {
         };
     }
 
-    private void loadOnLineData() {
-        File file = new File(AppConfig.BOARD_ONLINE_PATH);
-        if (!file.exists()) {
-            return;
-        }
-
-        String[] workFolders = file.list();
-        if (ObjectUtils.isEmpty(workFolders)) {
-            return;
-        }
-
-        String fileName = workFolders[workFolders.length - 1];
-        Matcher matcher = AppConfig.BOARD_ONLINE_FILE_PATTERN.matcher(fileName);
-        String timestamp = "";
-        while (matcher.find()) {
-            timestamp = matcher.group(1);
-        }
-
-        List<List<Object>> coordinates = CWFileUtils.readOnLineFile(AppConfig.BOARD_ONLINE_PATH + fileName);
-        if (ObjectUtils.isEmpty(coordinates)) {
-            return;
-        }
-
-        Paint paint = new Paint();
-        List<Point> points = new ArrayList<>();
-        List<Object> pointItem = null;
-        for (int i = 0; i < coordinates.size(); i++) {
-
-            pointItem = coordinates.get(i);
-            if (ObjectUtils.isEmpty(pointItem)) {
-                continue;
-            }
-
-            for (int j = 0; j < pointItem.size(); j++) {
-                int[] xy = (int[]) pointItem.get(j);
-                if (ObjectUtils.isEmpty(xy)) {
-                    continue;
-                }
-                points.add(new Point(xy[0], xy[1]));
-            }
-
-            paint.setColor(Color.BLACK);
-            paint.setStrokeWidth(10);
-
-            int red = (paint.getColor() & 0xff0000) >> 16;
-            int green = (paint.getColor() & 0x00ff00) >> 8;
-            int blue = (paint.getColor() & 0x0000ff);
-            CWFileUtils.writeACTLine(points, (int) paint.getStrokeWidth(), red + "," + green + "," + blue + ",1");
-        }
-
-        List<ScreenRecordEntity> data = new ArrayList<>();
-        ScreenRecordEntity screenRecordEntity = new ScreenRecordEntity();
-        screenRecordEntity.setType("data/0");
-        data.add(screenRecordEntity);
-
-        CWFileUtils.write(data, AppConfig.DATA_PATH + timestamp + File.separator, mCanvasWidth, mCanvasHeight, Long.parseLong(timestamp));
-    }
-
     @OnClick(R.id.tab_home_ll)
     public void onGoHomeClick() {
         switchTab(0);
@@ -382,11 +320,9 @@ public class MainActivity extends BaseDeviceActivity {
 
     @OnClick(R.id.tab_middle_btn)
     public void onMiddleClick() {
-//        if (null != mViewPager && 1 != mViewPager.getCurrentItem()) {
-//            ToastUtils.showMessage(R.string.check_connected_device);
-//        }
-        Intent intent = new Intent(IntentAction.DeviceOnLineAction.ACTION);
-        startActivity(intent);
+        if (!mDeviceConnected) {
+            ToastUtils.showMessage(R.string.check_connected_device);
+        }
     }
 
     //    @OnClick(R.id.create_video_btn)

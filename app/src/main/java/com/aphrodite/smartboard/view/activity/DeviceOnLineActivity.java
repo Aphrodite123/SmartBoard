@@ -140,8 +140,6 @@ public class DeviceOnLineActivity extends BaseDeviceActivity {
     }
 
     private void initBoardView() {
-
-
         mBoardView.post(new Runnable() {
             @Override
             public void run() {
@@ -162,7 +160,7 @@ public class DeviceOnLineActivity extends BaseDeviceActivity {
                                 mBoardView.onPointReceived(devicePoint);
 
                                 parseDevicePoint(devicePoint);
-                                return null;
+                                return Unit.INSTANCE;
                             }
                         });
 

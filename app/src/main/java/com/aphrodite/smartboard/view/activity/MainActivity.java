@@ -166,6 +166,8 @@ public class MainActivity extends BaseDeviceActivity {
         //默认进入首页
         switchTab(0);
         mViewPager.setCurrentItem(0);
+
+        PenService.Companion.connectUsbService(this, this);
     }
 
     private void initMainPage() {
@@ -180,8 +182,6 @@ public class MainActivity extends BaseDeviceActivity {
         mPagerAdapter.setFragments(mFragments);
 
         mFfmpegHandler = new FFmpegHandler(mHandler);
-
-        PenService.Companion.connectUsbService(this, this);
     }
 
     @Override

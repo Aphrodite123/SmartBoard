@@ -238,6 +238,7 @@ public class BoardEditorFragment extends BaseFragment {
                 if (null != mCanvas) {
                     mCanvas.setCanDraw(true);
                 }
+                mCanvas.setIsEraser(false);
                 break;
             //橡皮
             case 1:
@@ -258,10 +259,12 @@ public class BoardEditorFragment extends BaseFragment {
                     mPaletePopupWindow.showAtLocation(mRoot, Gravity.BOTTOM, 0, 0);
                     setWindowBackground(0.8f);
                 }
+                mCanvas.setIsEraser(false);
                 break;
             //清空
             case 3:
                 mCanvas.clear();
+                mCanvas.setIsEraser(false);
                 break;
         }
     }

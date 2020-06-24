@@ -89,7 +89,6 @@ public class DeviceOnLineActivity extends BaseDeviceActivity {
     @Override
     protected void initData() {
         mTimestamp = System.currentTimeMillis();
-        PenService.Companion.connectUsbService(this, this);
     }
 
     @Override
@@ -109,7 +108,24 @@ public class DeviceOnLineActivity extends BaseDeviceActivity {
         return new Observer<ConnectStatus>() {
             @Override
             public void onChanged(ConnectStatus connectStatus) {
-                if (!connectStatus.getResult()) {
+                if (connectStatus.getResult()) {
+                    mBoardView.setLoadFinishCallback(new BoardViewCallback() {
+                        @Override
+                        public void onLoadFinished() {
+                            //这里需要注意一定要在完成画板的初始化后再监听硬件的报点
+                            mUsbPenService.observeDevicePoint(new Function1<DevicePoint, Unit>() {
+                                @Override
+                                public Unit invoke(DevicePoint devicePoint) {
+                                    mBoardView.onPointReceived(devicePoint);
+
+                                    parseDevicePoint(devicePoint);
+                                    return Unit.INSTANCE;
+                                }
+                            });
+
+                        }
+                    });
+                } else {
                     finish();
                 }
             }
@@ -149,21 +165,10 @@ public class DeviceOnLineActivity extends BaseDeviceActivity {
                     description = intent.getParcelableExtra("versionInfo");
                 }
                 mBoardView.setup(BoardType.NoteMaker, description);
-
                 mBoardView.setLoadFinishCallback(new BoardViewCallback() {
                     @Override
                     public void onLoadFinished() {
-                        //这里需要注意一定要在完成画板的初始化后再监听硬件的报点
-                        mUsbPenService.observeDevicePoint(new Function1<DevicePoint, Unit>() {
-                            @Override
-                            public Unit invoke(DevicePoint devicePoint) {
-                                mBoardView.onPointReceived(devicePoint);
-
-                                parseDevicePoint(devicePoint);
-                                return Unit.INSTANCE;
-                            }
-                        });
-
+                        PenService.Companion.connectUsbService(DeviceOnLineActivity.this, DeviceOnLineActivity.this);
                     }
                 });
             }

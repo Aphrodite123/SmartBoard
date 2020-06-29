@@ -1,0 +1,223 @@
+package com.aphrodite.smartboard.model.handler;
+
+import android.annotation.SuppressLint;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
+import android.hardware.usb.UsbDevice;
+import android.hardware.usb.UsbDeviceConnection;
+import android.hardware.usb.UsbEndpoint;
+import android.hardware.usb.UsbInterface;
+import android.hardware.usb.UsbManager;
+import android.hardware.usb.UsbRequest;
+
+import com.aphrodite.smartboard.config.AppConfig;
+import com.aphrodite.smartboard.utils.LogUtils;
+
+import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
+
+public class UsbHandler {
+    public static final String ACTION_USB_PERMISSION = "com.cynoware.posmate.USB_PERMISSION";
+
+    public static final String ACTION_USB_SINGLE_PERMISSION = "com.cynoware.posmate.USB_SINGLE_PERMISSION";
+
+    public static final String ACTION_USB_COMPLETE = "com.cynoware.posmate.USB_COMPLETE";
+
+    private static final String TAG = "HidDevice";
+
+    private static final String INTERNAL_NAME_DOCK = "PosMate";
+
+    private static final String INTERNAL_NAME_FRAME = "PMFrame";
+
+    public static final int DEV_UNKOWN = -1;
+
+    public static final int DEV_DOCK = 0;
+
+    public static final int DEV_TRAY = 1;
+
+    private static final int USB_REQUEST_TYPE_INTERFACE = 1;
+
+    private static final int CMD_TIMEOUT_MS = 8192;
+
+    private int mDevType;
+
+    public UsbDevice mDevice;
+
+    UsbDeviceConnection mDevConn;
+
+    UsbInterface mInterface;
+
+    UsbRequest mRequest;
+
+    UsbInterface mInterfaceEvent;
+
+    UsbRequest mRequestEvent;
+
+    protected void finalize() throws Throwable {
+        super.finalize();
+    }
+
+    public UsbHandler(int type, UsbDevice device, UsbDeviceConnection conn, UsbInterface interFace, UsbRequest request, UsbInterface interFaceEvent, UsbRequest requestIn) {
+        this.mDevice = device;
+        this.mDevType = type;
+        this.mDevConn = conn;
+        this.mInterface = interFace;
+        this.mRequest = request;
+        this.mInterfaceEvent = interFace;
+        this.mRequestEvent = requestIn;
+    }
+
+    public int getDevType() {
+        return this.mDevType;
+    }
+
+    public static void detectUsb(Context context, UsbHandler handler1, UsbHandler handler2) {
+        boolean isfind = findDevice(context, AppConfig.DeviceCmds.USB_VID, AppConfig.DeviceCmds.USB_PID, 0, 0, 0, 2, handler1, handler2);
+        if (!isfind) {
+            LogUtils.i("HidDevice", "Device not found");
+        }
+    }
+
+    private static boolean findDevice(Context context, int vendorId, int productId, int deviceClass, int deviceProtocol, int deviceSubclass, int interfaceCount, UsbHandler handler1, UsbHandler handler2) {
+        UsbManager usbManager = (UsbManager) context.getSystemService(Context.USB_SERVICE);
+        HashMap<String, UsbDevice> deviceList = usbManager.getDeviceList();
+        int devVendorId = 0;
+        boolean found = false;
+        for (UsbDevice device : deviceList.values()) {
+            if (device.getVendorId() == vendorId)
+                devVendorId = device.getVendorId();
+            int devProductID = device.getProductId();
+            int devClass = device.getDeviceClass();
+            int devProtocol = device.getDeviceProtocol();
+            int devSubClass = device.getDeviceSubclass();
+            int devIFCount = device.getInterfaceCount();
+            if (devVendorId == vendorId && devProductID == productId && devClass == deviceClass && devSubClass == deviceSubclass && devProtocol == deviceProtocol && devIFCount == interfaceCount) {
+                found = true;
+                if ((handler1 != null && device.equals(handler1.mDevice)) || (handler2 != null && device.equals(handler2.mDevice)))
+                    continue;
+                PendingIntent permissionIntent = PendingIntent.getBroadcast(context, 0, new Intent("com.cynoware.posmate.USB_PERMISSION"), 0);
+                usbManager.requestPermission(device, permissionIntent);
+                LogUtils.i("HidDevice", "RequestPermission" + device);
+                return found;
+            }
+        }
+        Intent intent = new Intent("com.cynoware.posmate.USB_COMPLETE");
+        context.sendBroadcast(intent);
+        return found;
+    }
+
+    public static boolean requestDevicePermission(Context context, UsbDevice device, int vendorId, int productId, int deviceClass, int deviceProtocol, int deviceSubclass, int interfaceCount) {
+        UsbManager usbManager = (UsbManager) context.getSystemService(Context.USB_SERVICE);
+        int devVendorId = device.getVendorId();
+        int devProductID = device.getProductId();
+        int devClass = device.getDeviceClass();
+        int devProtocol = device.getDeviceProtocol();
+        int devSubClass = device.getDeviceSubclass();
+        int devIFCount = device.getInterfaceCount();
+        if (devVendorId == vendorId && devProductID == productId && devClass == deviceClass && devSubClass == deviceSubclass && devProtocol == deviceProtocol && devIFCount == interfaceCount) {
+            PendingIntent permissionIntent = PendingIntent.getBroadcast(context, 0, new Intent("com.cynoware.posmate.USB_SINGLE_PERMISSION"), 0);
+            usbManager.requestPermission(device, permissionIntent);
+            return true;
+        }
+        return false;
+    }
+
+    private static String getDeviceName(UsbDeviceConnection conn) {
+        String str = "";
+        byte[] buf = new byte[32];
+        buf[0] = 2;
+        buf[1] = 9;
+        int res = setFeature(conn, buf);
+        if (res < 0)
+            return str;
+        res = getFeature(conn, (byte) 2, buf);
+        if (res < 0)
+            return str;
+        try {
+            int i;
+            for (i = 8; i < buf.length && buf[i] != 0; i++) ;
+            str = new String(buf, 8, i - 8, "UTF-8");
+        } catch (UnsupportedEncodingException unsupportedEncodingException) {
+        }
+        return str;
+    }
+
+    @SuppressLint({"NewApi"})
+    public static UsbHandler open(Context context, UsbDevice usbDevice) {
+        try {
+            UsbManager usbManager = (UsbManager) context.getSystemService(Context.USB_SERVICE);
+            UsbDeviceConnection conn = usbManager.openDevice(usbDevice);
+            if (conn == null)
+                return null;
+            UsbInterface usbInterface = usbDevice.getInterface(0);
+            if (usbInterface == null)
+                return null;
+            if (!conn.claimInterface(usbInterface, true)) {
+                conn.close();
+                return null;
+            }
+            UsbInterface usbInterfaceEvent = usbDevice.getInterface(1);
+            if (usbInterfaceEvent == null)
+                return null;
+            if (!conn.claimInterface(usbInterfaceEvent, true)) {
+                conn.close();
+                return null;
+            }
+            UsbRequest request = new UsbRequest();
+            UsbEndpoint endPoint = usbInterface.getEndpoint(0);
+            request.initialize(conn, endPoint);
+            UsbRequest requestEvent = new UsbRequest();
+            UsbEndpoint endPointEvent = usbInterface.getEndpoint(0);
+            requestEvent.initialize(conn, endPointEvent);
+            String name = getDeviceName(conn);
+            int type = -1;
+            if (name.equals("PosMate")) {
+                type = 0;
+            } else if (name.equals("PMFrame")) {
+                type = 1;
+            } else {
+                conn.close();
+                return null;
+            }
+            return new UsbHandler(type, usbDevice, conn, usbInterface, request, usbInterfaceEvent, requestEvent);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    static int getFeature(UsbDeviceConnection conn, byte reportID, byte[] buf) {
+        buf[0] = reportID;
+        int res = conn.controlTransfer(161, 1, 770, 0, buf, buf.length, 8192);
+        return res;
+    }
+
+    private static int setFeature(UsbDeviceConnection connection, byte[] buf) {
+        int res = connection.controlTransfer(33, 9, 770, 0, buf, buf.length, 8192);
+        return res;
+    }
+
+    public int setFeature(byte[] buf) {
+        return setFeature(this.mDevConn, buf);
+    }
+
+    public int getFeature(byte reportID, byte[] buf) {
+        return getFeature(this.mDevConn, reportID, buf);
+    }
+
+    public void close() {
+        if (this.mDevConn != null) {
+            if (this.mRequest != null)
+                this.mRequest.cancel();
+            if (this.mRequestEvent != null)
+                this.mRequestEvent.cancel();
+            if (this.mInterface != null)
+                this.mDevConn.releaseInterface(this.mInterface);
+            if (this.mInterfaceEvent != null)
+                this.mDevConn.releaseInterface(this.mInterfaceEvent);
+            this.mDevConn.close();
+            this.mDevConn = null;
+        }
+    }
+}

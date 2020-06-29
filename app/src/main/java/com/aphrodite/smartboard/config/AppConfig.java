@@ -89,4 +89,10 @@ public class AppConfig extends BaseConfig {
         String CW = ".cw";
     }
 
+    public interface DeviceCmds {
+        int USB_PID = 0x0850;
+
+        int USB_VID = 0x8670;
+    }
+
 }

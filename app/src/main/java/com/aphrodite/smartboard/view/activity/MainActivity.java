@@ -3,13 +3,16 @@ package com.aphrodite.smartboard.view.activity;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.hardware.usb.UsbManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
@@ -35,6 +38,8 @@ import com.aphrodite.smartboard.model.bean.CWACT;
 import com.aphrodite.smartboard.model.bean.CWLine;
 import com.aphrodite.smartboard.model.event.SyncEvent;
 import com.aphrodite.smartboard.model.ffmpeg.FFmpegHandler;
+import com.aphrodite.smartboard.model.handler.UsbHandler;
+import com.aphrodite.smartboard.model.receiver.UsbDeviceReceiver;
 import com.aphrodite.smartboard.utils.BitmapUtils;
 import com.aphrodite.smartboard.utils.CWFileUtils;
 import com.aphrodite.smartboard.utils.FFmpegUtils;
@@ -73,6 +78,8 @@ public class MainActivity extends BaseDeviceActivity {
     List<TextView> mTabTexts;
     @BindView(R.id.tab_viewpager)
     ConfigureSlideViewPager mViewPager;
+
+    private UsbDeviceReceiver mUsbDeviceReceiver;
 
     private MainFragment mainFragment;
     private MineFragment mineFragment;
@@ -146,6 +153,8 @@ public class MainActivity extends BaseDeviceActivity {
 
     @Override
     protected void initData() {
+        registerDeviceReceiver();
+
         mCopyAssetsToSDcardTask = new CopyAssetsToSDcardTask();
         mPaths = new ArrayList<>();
         mLoadSDcardTask = new LoadSDcardTask();
@@ -167,7 +176,20 @@ public class MainActivity extends BaseDeviceActivity {
         switchTab(0);
         mViewPager.setCurrentItem(0);
 
+        UsbHandler.detectUsb(this, null, null);
+
         PenService.Companion.connectUsbService(this, this);
+    }
+
+    private void registerDeviceReceiver() {
+        if (null == mUsbDeviceReceiver) {
+            mUsbDeviceReceiver = new UsbDeviceReceiver();
+        }
+
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(UsbManager.ACTION_USB_ACCESSORY_ATTACHED);
+        filter.addAction(UsbManager.ACTION_USB_ACCESSORY_DETACHED);
+        registerReceiver(mUsbDeviceReceiver, filter);
     }
 
     private void initMainPage() {

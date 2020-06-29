@@ -25,6 +25,7 @@ import com.aphrodite.smartboard.config.AppConfig;
 import com.aphrodite.smartboard.model.bean.ScreenRecordEntity;
 import com.aphrodite.smartboard.utils.BitmapUtils;
 import com.aphrodite.smartboard.utils.CWFileUtils;
+import com.aphrodite.smartboard.utils.LogUtils;
 import com.aphrodite.smartboard.view.activity.base.BaseDeviceActivity;
 import com.aphrodite.smartboard.view.widget.dialog.DeleteDialog;
 

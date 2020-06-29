@@ -73,7 +73,7 @@ public class UsbHandler {
     }
 
     public static void detectUsb(Context context, UsbHandler handler1, UsbHandler handler2) {
-        boolean isfind = findDevice(context, AppConfig.DeviceCmds.USB_VID, AppConfig.DeviceCmds.USB_PID, 0, 0, 0, 2, handler1, handler2);
+        boolean isfind = findDevice(context, AppConfig.DeviceCmds.USB_VID, AppConfig.DeviceCmds.USB_PID, 0, 0, 0, 1, handler1, handler2);
         if (!isfind) {
             LogUtils.i("HidDevice", "Device not found");
         }
@@ -85,7 +85,7 @@ public class UsbHandler {
         int devVendorId = 0;
         boolean found = false;
         for (UsbDevice device : deviceList.values()) {
-            if (device.getVendorId() == vendorId)
+            if (device.getProductId() == productId)
                 devVendorId = device.getVendorId();
             int devProductID = device.getProductId();
             int devClass = device.getDeviceClass();

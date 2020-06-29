@@ -116,6 +116,7 @@ dependencies {
      * 注解框架
      */
     implementation 'com.jakewharton:butterknife:10.2.1'
+    implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.0.0'
     annotationProcessor 'com.jakewharton:butterknife-compiler:10.2.1'
     implementation 'com.jakewharton.rxbinding:rxbinding:0.4.0'
     /**

@@ -118,6 +118,7 @@
         <service android:name=".model.service.AudioService" />
         <service android:name=".model.service.RecordPlayerService" />
         <!--service end-->
+
     </application>
 
 </manifest>

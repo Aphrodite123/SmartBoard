@@ -3,16 +3,13 @@ package com.aphrodite.smartboard.view.activity;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.hardware.usb.UsbManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
@@ -39,7 +36,6 @@ import com.aphrodite.smartboard.model.bean.CWLine;
 import com.aphrodite.smartboard.model.event.SyncEvent;
 import com.aphrodite.smartboard.model.ffmpeg.FFmpegHandler;
 import com.aphrodite.smartboard.model.handler.UsbHandler;
-import com.aphrodite.smartboard.model.receiver.UsbDeviceReceiver;
 import com.aphrodite.smartboard.utils.BitmapUtils;
 import com.aphrodite.smartboard.utils.CWFileUtils;
 import com.aphrodite.smartboard.utils.FFmpegUtils;
@@ -63,7 +59,6 @@ import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Observer;
-
 import butterknife.BindView;
 import butterknife.BindViews;
 import butterknife.OnClick;
@@ -79,7 +74,6 @@ public class MainActivity extends BaseDeviceActivity {
     @BindView(R.id.tab_viewpager)
     ConfigureSlideViewPager mViewPager;
 
-    private UsbDeviceReceiver mUsbDeviceReceiver;
 
     private MainFragment mainFragment;
     private MineFragment mineFragment;
@@ -153,8 +147,6 @@ public class MainActivity extends BaseDeviceActivity {
 
     @Override
     protected void initData() {
-        registerDeviceReceiver();
-
         mCopyAssetsToSDcardTask = new CopyAssetsToSDcardTask();
         mPaths = new ArrayList<>();
         mLoadSDcardTask = new LoadSDcardTask();
@@ -176,20 +168,7 @@ public class MainActivity extends BaseDeviceActivity {
         switchTab(0);
         mViewPager.setCurrentItem(0);
 
-        UsbHandler.detectUsb(this, null, null);
-
         PenService.Companion.connectUsbService(this, this);
-    }
-
-    private void registerDeviceReceiver() {
-        if (null == mUsbDeviceReceiver) {
-            mUsbDeviceReceiver = new UsbDeviceReceiver();
-        }
-
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(UsbManager.ACTION_USB_ACCESSORY_ATTACHED);
-        filter.addAction(UsbManager.ACTION_USB_ACCESSORY_DETACHED);
-        registerReceiver(mUsbDeviceReceiver, filter);
     }
 
     private void initMainPage() {
@@ -344,7 +323,11 @@ public class MainActivity extends BaseDeviceActivity {
     public void onMiddleClick() {
         if (!mDeviceConnected) {
             ToastUtils.showMessage(R.string.check_connected_device);
+            return;
         }
+
+        Intent intent = new Intent(IntentAction.DeviceOnLineAction.ACTION);
+        startActivity(intent);
     }
 
     //    @OnClick(R.id.create_video_btn)

@@ -90,9 +90,9 @@ public class AppConfig extends BaseConfig {
     }
 
     public interface DeviceCmds {
-        int USB_PID = 0x0850;
+        int USB_PID = 0x8670;
 
-        int USB_VID = 0x8670;
+        int USB_VID = 0x0805;
     }
 
 }

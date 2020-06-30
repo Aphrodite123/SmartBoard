@@ -2,8 +2,10 @@ package com.aphrodite.smartboard.model.handler;
 
 import android.annotation.SuppressLint;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbEndpoint;
@@ -18,11 +20,14 @@ import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 
 public class UsbHandler {
-    public static final String ACTION_USB_PERMISSION = "com.cynoware.posmate.USB_PERMISSION";
+    private static UsbDeviceReceiver mUsbDeviceReceiver;
+    private static UsbPermissionReceiver mUsbPermissionReceiver;
 
-    public static final String ACTION_USB_SINGLE_PERMISSION = "com.cynoware.posmate.USB_SINGLE_PERMISSION";
+    public static final String ACTION_USB_PERMISSION = "com.aphrodite.smartboard.USB_PERMISSION";
 
-    public static final String ACTION_USB_COMPLETE = "com.cynoware.posmate.USB_COMPLETE";
+    public static final String ACTION_USB_SINGLE_PERMISSION = "com.aphrodite.smartboard.USB_SINGLE_PERMISSION";
+
+    public static final String ACTION_USB_COMPLETE = "com.aphrodite.smartboard.USB_COMPLETE";
 
     private static final String TAG = "HidDevice";
 
@@ -68,6 +73,37 @@ public class UsbHandler {
         this.mRequestEvent = requestIn;
     }
 
+    public static void registerUsbDeviceReceiver(Context context) {
+        if (null == mUsbDeviceReceiver) {
+            mUsbDeviceReceiver = new UsbDeviceReceiver();
+        }
+
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED);
+        filter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED);
+        context.registerReceiver(mUsbDeviceReceiver, filter);
+    }
+
+    public static void registerUsbPermissionReceiver(Context context) {
+        if (null == mUsbPermissionReceiver) {
+            mUsbPermissionReceiver = new UsbPermissionReceiver();
+        }
+
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(ACTION_USB_PERMISSION);
+        context.registerReceiver(mUsbPermissionReceiver, filter);
+    }
+
+    public static void unregisterReceiver(Context context) {
+        if (null != mUsbDeviceReceiver) {
+            context.unregisterReceiver(mUsbDeviceReceiver);
+        }
+
+        if (null != mUsbPermissionReceiver) {
+            context.unregisterReceiver(mUsbPermissionReceiver);
+        }
+    }
+
     public int getDevType() {
         return this.mDevType;
     }
@@ -96,13 +132,16 @@ public class UsbHandler {
                 found = true;
                 if ((handler1 != null && device.equals(handler1.mDevice)) || (handler2 != null && device.equals(handler2.mDevice)))
                     continue;
-                PendingIntent permissionIntent = PendingIntent.getBroadcast(context, 0, new Intent("com.cynoware.posmate.USB_PERMISSION"), 0);
-                usbManager.requestPermission(device, permissionIntent);
-                LogUtils.i("HidDevice", "RequestPermission" + device);
+                if (usbManager.hasPermission(device)) {
+                    open(context, device);
+                } else {
+                    PendingIntent permissionIntent = PendingIntent.getBroadcast(context, 0, new Intent(ACTION_USB_PERMISSION), 0);
+                    usbManager.requestPermission(device, permissionIntent);
+                }
                 return found;
             }
         }
-        Intent intent = new Intent("com.cynoware.posmate.USB_COMPLETE");
+        Intent intent = new Intent(ACTION_USB_COMPLETE);
         context.sendBroadcast(intent);
         return found;
     }
@@ -145,6 +184,10 @@ public class UsbHandler {
 
     @SuppressLint({"NewApi"})
     public static UsbHandler open(Context context, UsbDevice usbDevice) {
+        if (null == usbDevice) {
+            return null;
+        }
+
         try {
             UsbManager usbManager = (UsbManager) context.getSystemService(Context.USB_SERVICE);
             UsbDeviceConnection conn = usbManager.openDevice(usbDevice);
@@ -220,4 +263,37 @@ public class UsbHandler {
             this.mDevConn = null;
         }
     }
+
+    private static class UsbPermissionReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            switch (intent.getAction()) {
+                case ACTION_USB_PERMISSION:
+                    synchronized (this) {
+                        UsbDevice usbDevice = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+                        if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
+                            open(context, usbDevice);
+                        }
+                    }
+                    break;
+            }
+        }
+    }
+
+    private static class UsbDeviceReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            LogUtils.d("onReceive");
+            switch (intent.getAction()) {
+                case UsbManager.ACTION_USB_DEVICE_ATTACHED:
+                    detectUsb(context, null, null);
+                    break;
+                case UsbManager.ACTION_USB_DEVICE_DETACHED:
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
 }

@@ -59,6 +59,7 @@ import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Observer;
+
 import butterknife.BindView;
 import butterknife.BindViews;
 import butterknife.OnClick;
@@ -121,32 +122,15 @@ public class MainActivity extends BaseDeviceActivity {
         getDeviceInfo();
     }
 
-    private void getDeviceInfo() {
-        BoardType boardType = BoardType.NoteMaker;
-        float deviceScale = (float) (boardType.getMaxX() / boardType.getMaxY());
-        int viewWidth = UIUtils.getDisplayWidthPixels(this);
-        int viewHeight = UIUtils.getDisplayHeightPixels(this);
-        float screenScale = (float) (viewWidth) / (float) (viewHeight);
-        if (screenScale > deviceScale) {
-            //设备更宽，以View的高为基准进行缩放
-            mCanvasHeight = viewHeight;
-            mCanvasWidth = (int) (viewHeight * deviceScale);
-        } else {
-            //以View的宽为基准进行缩放
-            mCanvasWidth = viewWidth;
-            mCanvasHeight = (int) (viewWidth / deviceScale);
-        }
-
-        mXScale = mCanvasWidth / boardType.getMaxX();
-        mYScale = mCanvasHeight / boardType.getMaxY();
-    }
-
     @Override
     protected void initListener() {
     }
 
     @Override
     protected void initData() {
+        UsbHandler.registerUsbDeviceReceiver(this);
+        UsbHandler.registerUsbPermissionReceiver(this);
+
         mCopyAssetsToSDcardTask = new CopyAssetsToSDcardTask();
         mPaths = new ArrayList<>();
         mLoadSDcardTask = new LoadSDcardTask();
@@ -171,6 +155,26 @@ public class MainActivity extends BaseDeviceActivity {
         PenService.Companion.connectUsbService(this, this);
     }
 
+    private void getDeviceInfo() {
+        BoardType boardType = BoardType.NoteMaker;
+        float deviceScale = (float) (boardType.getMaxX() / boardType.getMaxY());
+        int viewWidth = UIUtils.getDisplayWidthPixels(this);
+        int viewHeight = UIUtils.getDisplayHeightPixels(this);
+        float screenScale = (float) (viewWidth) / (float) (viewHeight);
+        if (screenScale > deviceScale) {
+            //设备更宽，以View的高为基准进行缩放
+            mCanvasHeight = viewHeight;
+            mCanvasWidth = (int) (viewHeight * deviceScale);
+        } else {
+            //以View的宽为基准进行缩放
+            mCanvasWidth = viewWidth;
+            mCanvasHeight = (int) (viewWidth / deviceScale);
+        }
+
+        mXScale = mCanvasWidth / boardType.getMaxX();
+        mYScale = mCanvasHeight / boardType.getMaxY();
+    }
+
     private void initMainPage() {
         mainFragment = new MainFragment();
         mineFragment = new MineFragment();
@@ -188,6 +192,8 @@ public class MainActivity extends BaseDeviceActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
+        UsbHandler.unregisterReceiver(this);
 
         PenService.Companion.disconnectUsbService(this, this);
 

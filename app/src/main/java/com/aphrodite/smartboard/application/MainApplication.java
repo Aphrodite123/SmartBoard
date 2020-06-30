@@ -2,11 +2,8 @@ package com.aphrodite.smartboard.application;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.IntentFilter;
-import android.hardware.usb.UsbManager;
 import android.os.Bundle;
 
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.multidex.MultiDex;
 
 import com.aphrodite.framework.model.network.api.RetrofitInitial;
@@ -17,7 +14,6 @@ import com.aphrodite.smartboard.application.base.BaseApplication;
 import com.aphrodite.smartboard.config.AppConfig;
 import com.aphrodite.smartboard.config.RuntimeConfig;
 import com.aphrodite.smartboard.model.database.migration.GlobalRealmMigration;
-import com.aphrodite.smartboard.model.receiver.UsbDeviceReceiver;
 import com.aphrodite.smartboard.utils.LogUtils;
 import com.facebook.stetho.Stetho;
 import com.orhanobut.logger.AndroidLogAdapter;
@@ -47,8 +43,6 @@ public class MainApplication extends BaseApplication {
 
     private static IWXAPI mWXApi;
 
-    private UsbDeviceReceiver mUsbDeviceReceiver;
-
     @Override
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
@@ -72,8 +66,6 @@ public class MainApplication extends BaseApplication {
         SPUtils.init(this, RuntimeConfig.PACKAGE_NAME);
 
         registerWX(AppConfig.WX_APP_ID);
-
-        registerDeviceReceiver();
     }
 
     @Override
@@ -157,18 +149,6 @@ public class MainApplication extends BaseApplication {
     private void registerWX(String appId) {
         mWXApi = WXAPIFactory.createWXAPI(this, appId, true);
         mWXApi.registerApp(appId);
-    }
-
-    private void registerDeviceReceiver() {
-        if (null == mUsbDeviceReceiver) {
-            mUsbDeviceReceiver = new UsbDeviceReceiver();
-        }
-
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED);
-        filter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED);
-        registerReceiver(mUsbDeviceReceiver, filter);
-        LocalBroadcastManager.getInstance(this).registerReceiver(mUsbDeviceReceiver, filter);
     }
 
     public static void logout() {

@@ -193,6 +193,10 @@ public class UsbHandler {
             UsbDeviceConnection conn = usbManager.openDevice(usbDevice);
             if (conn == null)
                 return null;
+
+            byte[] host = {0x04, 0x00, 0x00, 0x00, 0x00, 0x00};
+            setFeature(conn, host);
+
             UsbInterface usbInterface = usbDevice.getInterface(0);
             if (usbInterface == null)
                 return null;

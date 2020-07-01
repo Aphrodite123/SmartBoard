@@ -194,12 +194,13 @@ public class UsbHandler {
             if (conn == null)
                 return null;
 
-            byte[] host = {0x04, 0x00, 0x00, 0x00, 0x00, 0x00};
-            setFeature(conn, host);
-
             UsbInterface usbInterface = usbDevice.getInterface(0);
             if (usbInterface == null)
                 return null;
+
+            byte[] host = {0x04, 0x00, 0x00, 0x00, 0x00, 0x00};
+            setFeature(conn, getOutEndpoint(usbInterface), host);
+
             if (!conn.claimInterface(usbInterface, true)) {
                 conn.close();
                 return null;
@@ -234,6 +235,46 @@ public class UsbHandler {
         }
     }
 
+    /**
+     * 获取输入端口
+     */
+    private static UsbEndpoint getInEndpoint(UsbInterface usbInterface) {
+        if (null == usbInterface) {
+            return null;
+        }
+
+        for (int i = 0; i < usbInterface.getEndpointCount(); i++) {
+            UsbEndpoint endpoint = usbInterface.getEndpoint(i);
+            if (null == endpoint) {
+                continue;
+            }
+            if (129 == endpoint.getAddress()) {
+                return endpoint;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 获取输出端口
+     */
+    private static UsbEndpoint getOutEndpoint(UsbInterface usbInterface) {
+        if (null == usbInterface) {
+            return null;
+        }
+
+        for (int i = 0; i < usbInterface.getEndpointCount(); i++) {
+            UsbEndpoint endpoint = usbInterface.getEndpoint(i);
+            if (null == endpoint) {
+                continue;
+            }
+            if (1 == endpoint.getAddress()) {
+                return endpoint;
+            }
+        }
+        return null;
+    }
+
     static int getFeature(UsbDeviceConnection conn, byte reportID, byte[] buf) {
         buf[0] = reportID;
         int res = conn.controlTransfer(161, 1, 770, 0, buf, buf.length, 8192);
@@ -242,6 +283,11 @@ public class UsbHandler {
 
     private static int setFeature(UsbDeviceConnection connection, byte[] buf) {
         int res = connection.controlTransfer(33, 9, 770, 0, buf, buf.length, 8192);
+        return res;
+    }
+
+    private static int setFeature(UsbDeviceConnection connection, UsbEndpoint endpoint, byte[] buf) {
+        int res = connection.bulkTransfer(endpoint, buf, 16 * 1024, 0);
         return res;
     }
 

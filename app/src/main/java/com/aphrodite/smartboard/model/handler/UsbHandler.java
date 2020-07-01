@@ -63,13 +63,12 @@ public class UsbHandler {
         super.finalize();
     }
 
-    public UsbHandler(int type, UsbDevice device, UsbDeviceConnection conn, UsbInterface interFace, UsbRequest request, UsbInterface interFaceEvent, UsbRequest requestIn) {
+    public UsbHandler(int type, UsbDevice device, UsbDeviceConnection conn, UsbInterface interFace, UsbRequest request, UsbRequest requestIn) {
         this.mDevice = device;
         this.mDevType = type;
         this.mDevConn = conn;
         this.mInterface = interFace;
         this.mRequest = request;
-        this.mInterfaceEvent = interFace;
         this.mRequestEvent = requestIn;
     }
 
@@ -167,7 +166,8 @@ public class UsbHandler {
         byte[] buf = new byte[32];
         buf[0] = 2;
         buf[1] = 9;
-        int res = setFeature(conn, buf);
+        byte[] host = {0x04, 0x00, 0x00, 0x00, 0x00, 0x00};
+        int res = setFeature(conn, host);
         if (res < 0)
             return str;
         res = getFeature(conn, (byte) 2, buf);
@@ -198,17 +198,10 @@ public class UsbHandler {
             if (usbInterface == null)
                 return null;
 
-            byte[] host = {0x04, 0x00, 0x00, 0x00, 0x00, 0x00};
-            setFeature(conn, getOutEndpoint(usbInterface), host);
+//            byte[] host = {0x04, 0x00, 0x00, 0x00, 0x00, 0x00};
+//            setFeature(conn, getOutEndpoint(usbInterface), host);
 
             if (!conn.claimInterface(usbInterface, true)) {
-                conn.close();
-                return null;
-            }
-            UsbInterface usbInterfaceEvent = usbDevice.getInterface(1);
-            if (usbInterfaceEvent == null)
-                return null;
-            if (!conn.claimInterface(usbInterfaceEvent, true)) {
                 conn.close();
                 return null;
             }
@@ -216,7 +209,7 @@ public class UsbHandler {
             UsbEndpoint endPoint = usbInterface.getEndpoint(0);
             request.initialize(conn, endPoint);
             UsbRequest requestEvent = new UsbRequest();
-            UsbEndpoint endPointEvent = usbInterface.getEndpoint(0);
+            UsbEndpoint endPointEvent = usbInterface.getEndpoint(1);
             requestEvent.initialize(conn, endPointEvent);
             String name = getDeviceName(conn);
             int type = -1;
@@ -228,7 +221,7 @@ public class UsbHandler {
                 conn.close();
                 return null;
             }
-            return new UsbHandler(type, usbDevice, conn, usbInterface, request, usbInterfaceEvent, requestEvent);
+            return new UsbHandler(type, usbDevice, conn, usbInterface, request, requestEvent);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -287,7 +280,7 @@ public class UsbHandler {
     }
 
     private static int setFeature(UsbDeviceConnection connection, UsbEndpoint endpoint, byte[] buf) {
-        int res = connection.bulkTransfer(endpoint, buf, 16 * 1024, 0);
+        int res = connection.bulkTransfer(endpoint, buf, 8 * 1024, 0);
         return res;
     }
 

@@ -65,13 +65,12 @@ public class UsbHandler {
         super.finalize();
     }
 
-    public UsbHandler(int type, UsbDevice device, UsbDeviceConnection conn, UsbInterface interFace, UsbRequest request, UsbInterface interFaceEvent, UsbRequest requestIn) {
+    public UsbHandler(int type, UsbDevice device, UsbDeviceConnection conn, UsbInterface interFace, UsbRequest request, UsbRequest requestIn) {
         this.mDevice = device;
         this.mDevType = type;
         this.mDevConn = conn;
         this.mInterface = interFace;
         this.mRequest = request;
-        this.mInterfaceEvent = interFace;
         this.mRequestEvent = requestIn;
     }
 
@@ -169,7 +168,8 @@ public class UsbHandler {
         byte[] buf = new byte[32];
         buf[0] = 2;
         buf[1] = 9;
-        int res = setFeature(conn, buf);
+        byte[] host = {0x04, 0x00, 0x00, 0x00, 0x00, 0x00};
+        int res = setFeature(conn, host);
         if (res < 0)
             return str;
         res = getFeature(conn, (byte) 2, buf);
@@ -200,40 +200,15 @@ public class UsbHandler {
             if (usbInterface == null)
                 return;
 
-            byte[] host = {0x04, 0x00, 0x00, 0x00, 0x00, 0x00};
-            setFeature(conn, getOutEndpoint(usbInterface), host);
-
             if (!conn.claimInterface(usbInterface, true)) {
                 conn.close();
                 return;
             }
-            UsbInterface usbInterfaceEvent = usbDevice.getInterface(1);
-            if (usbInterfaceEvent == null)
-                return;
-            if (!conn.claimInterface(usbInterfaceEvent, true)) {
-                conn.close();
-                return ;
-            }
-            UsbRequest request = new UsbRequest();
-            UsbEndpoint endPoint = usbInterface.getEndpoint(0);
-            request.initialize(conn, endPoint);
-            UsbRequest requestEvent = new UsbRequest();
-            UsbEndpoint endPointEvent = usbInterface.getEndpoint(0);
-            requestEvent.initialize(conn, endPointEvent);
-            String name = getDeviceName(conn);
-            int type = -1;
-            if (name.equals("PosMate")) {
-                type = 0;
-            } else if (name.equals("PMFrame")) {
-                type = 1;
-            } else {
-                conn.close();
-                return null;
-            }
-            return new UsbHandler(type, usbDevice, conn, usbInterface, request, usbInterfaceEvent, requestEvent);
+            byte[] host = {0x04, 0x00, 0x00, 0x00, 0x00, 0x00};
+            SyncOffLineDataTask syncOffLineDataTask = new SyncOffLineDataTask(conn, getOutEndpoint(usbInterface), getInEndpoint(usbInterface), host);
+            syncOffLineDataTask.execute(context);
         } catch (Exception e) {
             e.printStackTrace();
-            return null;
         }
     }
 
@@ -277,12 +252,6 @@ public class UsbHandler {
         return null;
     }
 
-    static int getFeature(UsbDeviceConnection conn, byte reportID, byte[] buf) {
-        buf[0] = reportID;
-        int res = conn.controlTransfer(161, 1, 770, 0, buf, buf.length, 8192);
-        return res;
-    }
-
     private static int setFeature(UsbDeviceConnection connection, byte[] buf) {
         int res = connection.controlTransfer(33, 9, 770, 0, buf, buf.length, 8192);
         return res;
@@ -311,6 +280,12 @@ public class UsbHandler {
         return res;
     }
 
+    static int getFeature(UsbDeviceConnection conn, byte reportID, byte[] buf) {
+        buf[0] = reportID;
+        int res = conn.controlTransfer(161, 1, 770, 0, buf, buf.length, 8192);
+        return res;
+    }
+
     public int getFeature(byte reportID, byte[] buf) {
         return getFeature(this.mDevConn, reportID, buf);
     }
@@ -320,7 +295,7 @@ public class UsbHandler {
         return res;
     }
 
-    private String syncOffLineNotes(UsbDeviceConnection conn, UsbEndpoint outUsbEndpoint, UsbEndpoint inUsbEndpoint, byte[] buf) {
+    private static String syncOffLineNotes(UsbDeviceConnection conn, UsbEndpoint outUsbEndpoint, UsbEndpoint inUsbEndpoint, byte[] buf) {
         String str = "";
 
         int res = setFeature(conn, outUsbEndpoint, buf);
@@ -372,7 +347,6 @@ public class UsbHandler {
     private static class UsbDeviceReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            LogUtils.d("onReceive");
             switch (intent.getAction()) {
                 case UsbManager.ACTION_USB_DEVICE_ATTACHED:
                     detectUsb(context, null, null);
@@ -385,7 +359,7 @@ public class UsbHandler {
         }
     }
 
-    private class SyncOffLineDataTask extends AsyncTask<Object, Object, Object> {
+    private static class SyncOffLineDataTask extends AsyncTask<Object, Object, Object> {
         private UsbDeviceConnection conn;
         private UsbEndpoint outUsbEndpoint;
         private UsbEndpoint inUsbEndpoint;
@@ -401,7 +375,6 @@ public class UsbHandler {
         @Override
         protected Object doInBackground(Object... objects) {
             return syncOffLineNotes(conn, outUsbEndpoint, inUsbEndpoint, buf);
-            ;
         }
     }
 

@@ -12,11 +12,13 @@ import android.hardware.usb.UsbEndpoint;
 import android.hardware.usb.UsbInterface;
 import android.hardware.usb.UsbManager;
 import android.hardware.usb.UsbRequest;
+import android.os.AsyncTask;
 
 import com.aphrodite.smartboard.config.AppConfig;
 import com.aphrodite.smartboard.utils.LogUtils;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
 import java.util.HashMap;
 
 public class UsbHandler {
@@ -183,34 +185,34 @@ public class UsbHandler {
     }
 
     @SuppressLint({"NewApi"})
-    public static UsbHandler open(Context context, UsbDevice usbDevice) {
+    public static void open(Context context, UsbDevice usbDevice) {
         if (null == usbDevice) {
-            return null;
+            return;
         }
 
         try {
             UsbManager usbManager = (UsbManager) context.getSystemService(Context.USB_SERVICE);
             UsbDeviceConnection conn = usbManager.openDevice(usbDevice);
             if (conn == null)
-                return null;
+                return;
 
             UsbInterface usbInterface = usbDevice.getInterface(0);
             if (usbInterface == null)
-                return null;
+                return;
 
             byte[] host = {0x04, 0x00, 0x00, 0x00, 0x00, 0x00};
             setFeature(conn, getOutEndpoint(usbInterface), host);
 
             if (!conn.claimInterface(usbInterface, true)) {
                 conn.close();
-                return null;
+                return;
             }
             UsbInterface usbInterfaceEvent = usbDevice.getInterface(1);
             if (usbInterfaceEvent == null)
-                return null;
+                return;
             if (!conn.claimInterface(usbInterfaceEvent, true)) {
                 conn.close();
-                return null;
+                return ;
             }
             UsbRequest request = new UsbRequest();
             UsbEndpoint endPoint = usbInterface.getEndpoint(0);
@@ -286,17 +288,54 @@ public class UsbHandler {
         return res;
     }
 
-    private static int setFeature(UsbDeviceConnection connection, UsbEndpoint endpoint, byte[] buf) {
-        int res = connection.bulkTransfer(endpoint, buf, 16 * 1024, 0);
-        return res;
-    }
-
     public int setFeature(byte[] buf) {
         return setFeature(this.mDevConn, buf);
     }
 
+    private static int setFeature(UsbDeviceConnection connection, UsbEndpoint endpoint, byte[] buf) {
+        int res = 0;
+        //检测buf长度
+        if (buf.length > 16 * 1024) {
+            int pack = buf.length / (16 * 1024);
+            if (pack % (16 * 1024) > 0) {
+                pack++;
+            }
+
+            for (int i = 0; i < pack; i++) {
+                byte[] newBuffer = Arrays.copyOfRange(buf, 16 * 1024 * i, 16 * 1024 * (i + 1));
+                res = connection.bulkTransfer(endpoint, newBuffer, newBuffer.length, 0);
+            }
+        } else {
+            res = connection.bulkTransfer(endpoint, buf, buf.length, 0);
+        }
+        return res;
+    }
+
     public int getFeature(byte reportID, byte[] buf) {
         return getFeature(this.mDevConn, reportID, buf);
+    }
+
+    private static int getFeature(UsbDeviceConnection connection, UsbEndpoint endpoint, byte[] buf) {
+        int res = connection.bulkTransfer(endpoint, buf, buf.length, 0);
+        return res;
+    }
+
+    private String syncOffLineNotes(UsbDeviceConnection conn, UsbEndpoint outUsbEndpoint, UsbEndpoint inUsbEndpoint, byte[] buf) {
+        String str = "";
+
+        int res = setFeature(conn, outUsbEndpoint, buf);
+        if (res < 0) {
+            return str;
+        }
+
+        res = getFeature(conn, inUsbEndpoint, buf);
+        if (res < 0)
+            return str;
+        try {
+            str = new String(buf, "UTF-8");
+        } catch (UnsupportedEncodingException unsupportedEncodingException) {
+        }
+        return str;
     }
 
     public void close() {
@@ -343,6 +382,26 @@ public class UsbHandler {
                 default:
                     break;
             }
+        }
+    }
+
+    private class SyncOffLineDataTask extends AsyncTask<Object, Object, Object> {
+        private UsbDeviceConnection conn;
+        private UsbEndpoint outUsbEndpoint;
+        private UsbEndpoint inUsbEndpoint;
+        private byte[] buf;
+
+        public SyncOffLineDataTask(UsbDeviceConnection conn, UsbEndpoint outUsbEndpoint, UsbEndpoint inUsbEndpoint, byte[] buf) {
+            this.conn = conn;
+            this.outUsbEndpoint = outUsbEndpoint;
+            this.inUsbEndpoint = inUsbEndpoint;
+            this.buf = buf;
+        }
+
+        @Override
+        protected Object doInBackground(Object... objects) {
+            return syncOffLineNotes(conn, outUsbEndpoint, inUsbEndpoint, buf);
+            ;
         }
     }
 

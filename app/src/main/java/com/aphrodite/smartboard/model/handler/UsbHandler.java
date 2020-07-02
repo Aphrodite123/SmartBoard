@@ -31,22 +31,6 @@ public class UsbHandler {
 
     public static final String ACTION_USB_COMPLETE = "com.aphrodite.smartboard.USB_COMPLETE";
 
-    private static final String TAG = "HidDevice";
-
-    private static final String INTERNAL_NAME_DOCK = "PosMate";
-
-    private static final String INTERNAL_NAME_FRAME = "PMFrame";
-
-    public static final int DEV_UNKOWN = -1;
-
-    public static final int DEV_DOCK = 0;
-
-    public static final int DEV_TRAY = 1;
-
-    private static final int USB_REQUEST_TYPE_INTERFACE = 1;
-
-    private static final int CMD_TIMEOUT_MS = 8192;
-
     private int mDevType;
 
     public UsbDevice mDevice;
@@ -56,8 +40,6 @@ public class UsbHandler {
     UsbInterface mInterface;
 
     UsbRequest mRequest;
-
-    UsbInterface mInterfaceEvent;
 
     UsbRequest mRequestEvent;
 
@@ -321,8 +303,6 @@ public class UsbHandler {
                 this.mRequestEvent.cancel();
             if (this.mInterface != null)
                 this.mDevConn.releaseInterface(this.mInterface);
-            if (this.mInterfaceEvent != null)
-                this.mDevConn.releaseInterface(this.mInterfaceEvent);
             this.mDevConn.close();
             this.mDevConn = null;
         }

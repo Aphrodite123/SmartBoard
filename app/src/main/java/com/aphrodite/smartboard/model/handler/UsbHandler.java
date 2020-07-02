@@ -150,8 +150,7 @@ public class UsbHandler {
         byte[] buf = new byte[32];
         buf[0] = 2;
         buf[1] = 9;
-        byte[] host = {0x04, 0x00, 0x00, 0x00, 0x00, 0x00};
-        int res = setFeature(conn, host);
+        int res = setFeature(conn, buf);
         if (res < 0)
             return str;
         res = getFeature(conn, (byte) 2, buf);
@@ -257,7 +256,7 @@ public class UsbHandler {
                 res = connection.bulkTransfer(endpoint, newBuffer, newBuffer.length, 0);
             }
         } else {
-            res = connection.bulkTransfer(endpoint, buf, buf.length, 0);
+            res = connection.bulkTransfer(endpoint, buf, buf.length, 8192);
         }
         return res;
     }
@@ -273,7 +272,7 @@ public class UsbHandler {
     }
 
     private static int getFeature(UsbDeviceConnection connection, UsbEndpoint endpoint, byte[] buf) {
-        int res = connection.bulkTransfer(endpoint, buf, buf.length, 0);
+        int res = connection.bulkTransfer(endpoint, buf, buf.length, 8192);
         return res;
     }
 
@@ -285,11 +284,12 @@ public class UsbHandler {
             return str;
         }
 
-        res = getFeature(conn, inUsbEndpoint, buf);
+        byte[] host = {0x05, 0x00, 0x02};
+        res = getFeature(conn, inUsbEndpoint, host);
         if (res < 0)
             return str;
         try {
-            str = new String(buf, "UTF-8");
+            str = new String(host, "UTF-8");
         } catch (UnsupportedEncodingException unsupportedEncodingException) {
         }
         return str;

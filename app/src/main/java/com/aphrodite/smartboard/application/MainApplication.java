@@ -15,12 +15,10 @@ import com.aphrodite.smartboard.config.AppConfig;
 import com.aphrodite.smartboard.config.RuntimeConfig;
 import com.aphrodite.smartboard.model.database.migration.GlobalRealmMigration;
 import com.aphrodite.smartboard.utils.LogUtils;
-import com.facebook.stetho.Stetho;
 import com.orhanobut.logger.AndroidLogAdapter;
 import com.orhanobut.logger.Logger;
 import com.tencent.mm.opensdk.openapi.IWXAPI;
 import com.tencent.mm.opensdk.openapi.WXAPIFactory;
-import com.uphyca.stetho_realm.RealmInspectorModulesProvider;
 
 import java.io.FileNotFoundException;
 
@@ -136,10 +134,10 @@ public class MainApplication extends BaseApplication {
      * 初始化Stetho调试工具
      */
     private void initStetho() {
-        Stetho.initialize(Stetho.newInitializerBuilder(this)
-                .enableDumpapp(Stetho.defaultDumperPluginsProvider(this))
-                .enableWebKitInspector(RealmInspectorModulesProvider.builder(this).build())
-                .build());
+//        Stetho.initialize(Stetho.newInitializerBuilder(this)
+//                .enableDumpapp(Stetho.defaultDumperPluginsProvider(this))
+//                .enableWebKitInspector(RealmInspectorModulesProvider.builder(this).build())
+//                .build());
     }
 
     private void initToast() {

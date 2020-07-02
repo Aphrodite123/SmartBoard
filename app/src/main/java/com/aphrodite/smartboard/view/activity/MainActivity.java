@@ -294,8 +294,8 @@ public class MainActivity extends BaseDeviceActivity {
             @Override
             public void onChanged(ConnectStatus connectStatus) {
                 if (connectStatus.getResult()) {
-                    Intent intent = new Intent(IntentAction.DeviceOnLineAction.ACTION);
-                    startActivity(intent);
+//                    Intent intent = new Intent(IntentAction.DeviceOnLineAction.ACTION);
+//                    startActivity(intent);
                 } else {
                     ToastUtils.showMessage(connectStatus.getMsg());
                 }

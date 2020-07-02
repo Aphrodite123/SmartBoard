@@ -26,7 +26,7 @@ allprojects {
         maven { url "https://dl.bintray.com/aphrodite/maven" }
         //Stetho调试 Realm
         maven {
-            url 'https://github.com/WickeDev/stetho-realm/raw/master/maven-repo'
+            url 'https://github.com/uPhyca/stetho-realm/raw/master/maven-repo'
         }
     }
 }

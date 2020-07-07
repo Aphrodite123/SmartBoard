@@ -18,6 +18,8 @@ import com.aphrodite.smartboard.config.AppConfig;
 import com.aphrodite.smartboard.utils.LogUtils;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.Arrays;
 import java.util.HashMap;
 
@@ -284,12 +286,20 @@ public class UsbHandler {
             return str;
         }
 
-        byte[] host = {0x05, 0x00, 0x02};
-        res = getFeature(conn, inUsbEndpoint, host);
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        int bufferLength = 8;
+        ByteBuffer buffer = ByteBuffer.allocate(bufferLength);
+        buffer.order(ByteOrder.nativeOrder());
+        res = getFeature(conn, inUsbEndpoint, buffer.array());
         if (res < 0)
             return str;
         try {
-            str = new String(host, "UTF-8");
+            str = new String(buf, "UTF-8");
         } catch (UnsupportedEncodingException unsupportedEncodingException) {
         }
         return str;

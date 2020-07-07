@@ -282,6 +282,7 @@ public class UsbHandler {
         String str = "";
 
         int res = setFeature(conn, outUsbEndpoint, buf);
+        LogUtils.d("Send command." + res + " , " + buf.toString());
         if (res < 0) {
             return str;
         }
@@ -296,10 +297,11 @@ public class UsbHandler {
         ByteBuffer buffer = ByteBuffer.allocate(bufferLength);
         buffer.order(ByteOrder.nativeOrder());
         res = getFeature(conn, inUsbEndpoint, buffer.array());
+        LogUtils.d("Accept data." + res + " , " + buffer.array().toString());
         if (res < 0)
             return str;
         try {
-            str = new String(buf, "UTF-8");
+            str = new String(buffer.array(), "UTF-8");
         } catch (UnsupportedEncodingException unsupportedEncodingException) {
         }
         return str;

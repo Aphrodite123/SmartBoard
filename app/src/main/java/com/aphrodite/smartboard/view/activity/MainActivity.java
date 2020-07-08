@@ -128,8 +128,8 @@ public class MainActivity extends BaseDeviceActivity {
 
     @Override
     protected void initData() {
-        UsbHandler.registerUsbDeviceReceiver(this);
-        UsbHandler.registerUsbPermissionReceiver(this);
+        UsbHandler.getInstance().registerUsbDeviceReceiver();
+        UsbHandler.getInstance().registerUsbPermissionReceiver();
 
         mCopyAssetsToSDcardTask = new CopyAssetsToSDcardTask();
         mPaths = new ArrayList<>();
@@ -193,7 +193,7 @@ public class MainActivity extends BaseDeviceActivity {
     protected void onDestroy() {
         super.onDestroy();
 
-        UsbHandler.unregisterReceiver(this);
+        UsbHandler.getInstance().close();
 
         PenService.Companion.disconnectUsbService(this, this);
 

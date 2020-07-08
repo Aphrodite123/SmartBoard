@@ -11,54 +11,55 @@ import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbEndpoint;
 import android.hardware.usb.UsbInterface;
 import android.hardware.usb.UsbManager;
-import android.hardware.usb.UsbRequest;
-import android.os.AsyncTask;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 
+import com.aphrodite.framework.utils.ObjectUtils;
+import com.aphrodite.smartboard.application.MainApplication;
 import com.aphrodite.smartboard.config.AppConfig;
 import com.aphrodite.smartboard.utils.LogUtils;
 
-import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
 import java.util.HashMap;
 
+import androidx.annotation.NonNull;
+
 public class UsbHandler {
-    private static UsbDeviceReceiver mUsbDeviceReceiver;
-    private static UsbPermissionReceiver mUsbPermissionReceiver;
-
+    private static UsbHandler mUsbHandler = null;
     public static final String ACTION_USB_PERMISSION = "com.aphrodite.smartboard.USB_PERMISSION";
-
     public static final String ACTION_USB_SINGLE_PERMISSION = "com.aphrodite.smartboard.USB_SINGLE_PERMISSION";
-
     public static final String ACTION_USB_COMPLETE = "com.aphrodite.smartboard.USB_COMPLETE";
 
-    private int mDevType;
+    private Context mContext;
+    private UsbDeviceReceiver mUsbDeviceReceiver;
+    private UsbPermissionReceiver mUsbPermissionReceiver;
+    private UsbDevice mCurUsbDevice;
+    private UsbDeviceConnection mUsbDeviceConnection;
+    private UsbInterface mUsbInterface;
+    private UsbEndpoint mOutUsbEndpoint;
+    private UsbEndpoint mInUsbEndpoint;
+    private DataHandler mHandler;
 
-    public UsbDevice mDevice;
-
-    UsbDeviceConnection mDevConn;
-
-    UsbInterface mInterface;
-
-    UsbRequest mRequest;
-
-    UsbRequest mRequestEvent;
-
-    protected void finalize() throws Throwable {
-        super.finalize();
+    public static UsbHandler getInstance() {
+        if (null == mUsbHandler) {
+            synchronized (UsbHandler.class) {
+                if (null == mUsbHandler) {
+                    mUsbHandler = new UsbHandler(MainApplication.getApplication());
+                }
+            }
+        }
+        return mUsbHandler;
     }
 
-    public UsbHandler(int type, UsbDevice device, UsbDeviceConnection conn, UsbInterface interFace, UsbRequest request, UsbRequest requestIn) {
-        this.mDevice = device;
-        this.mDevType = type;
-        this.mDevConn = conn;
-        this.mInterface = interFace;
-        this.mRequest = request;
-        this.mRequestEvent = requestIn;
+    public UsbHandler(Context context) {
+        this.mContext = context;
+        this.mHandler = new DataHandler();
     }
 
-    public static void registerUsbDeviceReceiver(Context context) {
+    public void registerUsbDeviceReceiver() {
         if (null == mUsbDeviceReceiver) {
             mUsbDeviceReceiver = new UsbDeviceReceiver();
         }
@@ -66,42 +67,38 @@ public class UsbHandler {
         IntentFilter filter = new IntentFilter();
         filter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED);
         filter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED);
-        context.registerReceiver(mUsbDeviceReceiver, filter);
+        mContext.registerReceiver(mUsbDeviceReceiver, filter);
     }
 
-    public static void registerUsbPermissionReceiver(Context context) {
+    public void registerUsbPermissionReceiver() {
         if (null == mUsbPermissionReceiver) {
             mUsbPermissionReceiver = new UsbPermissionReceiver();
         }
 
         IntentFilter filter = new IntentFilter();
         filter.addAction(ACTION_USB_PERMISSION);
-        context.registerReceiver(mUsbPermissionReceiver, filter);
+        mContext.registerReceiver(mUsbPermissionReceiver, filter);
     }
 
-    public static void unregisterReceiver(Context context) {
+    public void unregisterReceiver() {
         if (null != mUsbDeviceReceiver) {
-            context.unregisterReceiver(mUsbDeviceReceiver);
+            mContext.unregisterReceiver(mUsbDeviceReceiver);
         }
 
         if (null != mUsbPermissionReceiver) {
-            context.unregisterReceiver(mUsbPermissionReceiver);
+            mContext.unregisterReceiver(mUsbPermissionReceiver);
         }
     }
 
-    public int getDevType() {
-        return this.mDevType;
-    }
-
-    public static void detectUsb(Context context, UsbHandler handler1, UsbHandler handler2) {
-        boolean isfind = findDevice(context, AppConfig.DeviceCmds.USB_VID, AppConfig.DeviceCmds.USB_PID, 0, 0, 0, 1, handler1, handler2);
+    public void detectUsb(UsbHandler handler1, UsbHandler handler2) {
+        boolean isfind = findDevice(AppConfig.DeviceCmds.USB_VID, AppConfig.DeviceCmds.USB_PID, 0, 0, 0, 1, handler1, handler2);
         if (!isfind) {
-            LogUtils.i("HidDevice", "Device not found");
+            LogUtils.i("Device not found.");
         }
     }
 
-    private static boolean findDevice(Context context, int vendorId, int productId, int deviceClass, int deviceProtocol, int deviceSubclass, int interfaceCount, UsbHandler handler1, UsbHandler handler2) {
-        UsbManager usbManager = (UsbManager) context.getSystemService(Context.USB_SERVICE);
+    private boolean findDevice(int vendorId, int productId, int deviceClass, int deviceProtocol, int deviceSubclass, int interfaceCount, UsbHandler handler1, UsbHandler handler2) {
+        UsbManager usbManager = (UsbManager) mContext.getSystemService(Context.USB_SERVICE);
         HashMap<String, UsbDevice> deviceList = usbManager.getDeviceList();
         int devVendorId = 0;
         boolean found = false;
@@ -115,81 +112,46 @@ public class UsbHandler {
             int devIFCount = device.getInterfaceCount();
             if (devVendorId == vendorId && devProductID == productId && devClass == deviceClass && devSubClass == deviceSubclass && devProtocol == deviceProtocol && devIFCount == interfaceCount) {
                 found = true;
-                if ((handler1 != null && device.equals(handler1.mDevice)) || (handler2 != null && device.equals(handler2.mDevice)))
-                    continue;
                 if (usbManager.hasPermission(device)) {
-                    open(context, device);
+                    this.mCurUsbDevice = device;
+                    open();
                 } else {
-                    PendingIntent permissionIntent = PendingIntent.getBroadcast(context, 0, new Intent(ACTION_USB_PERMISSION), 0);
+                    PendingIntent permissionIntent = PendingIntent.getBroadcast(mContext, 0, new Intent(ACTION_USB_PERMISSION), 0);
                     usbManager.requestPermission(device, permissionIntent);
                 }
                 return found;
             }
         }
         Intent intent = new Intent(ACTION_USB_COMPLETE);
-        context.sendBroadcast(intent);
+        mContext.sendBroadcast(intent);
         return found;
     }
 
-    public static boolean requestDevicePermission(Context context, UsbDevice device, int vendorId, int productId, int deviceClass, int deviceProtocol, int deviceSubclass, int interfaceCount) {
-        UsbManager usbManager = (UsbManager) context.getSystemService(Context.USB_SERVICE);
-        int devVendorId = device.getVendorId();
-        int devProductID = device.getProductId();
-        int devClass = device.getDeviceClass();
-        int devProtocol = device.getDeviceProtocol();
-        int devSubClass = device.getDeviceSubclass();
-        int devIFCount = device.getInterfaceCount();
-        if (devVendorId == vendorId && devProductID == productId && devClass == deviceClass && devSubClass == deviceSubclass && devProtocol == deviceProtocol && devIFCount == interfaceCount) {
-            PendingIntent permissionIntent = PendingIntent.getBroadcast(context, 0, new Intent("com.cynoware.posmate.USB_SINGLE_PERMISSION"), 0);
-            usbManager.requestPermission(device, permissionIntent);
-            return true;
-        }
-        return false;
-    }
-
-    private static String getDeviceName(UsbDeviceConnection conn) {
-        String str = "";
-        byte[] buf = new byte[32];
-        buf[0] = 2;
-        buf[1] = 9;
-        int res = setFeature(conn, buf);
-        if (res < 0)
-            return str;
-        res = getFeature(conn, (byte) 2, buf);
-        if (res < 0)
-            return str;
-        try {
-            int i;
-            for (i = 8; i < buf.length && buf[i] != 0; i++) ;
-            str = new String(buf, 8, i - 8, "UTF-8");
-        } catch (UnsupportedEncodingException unsupportedEncodingException) {
-        }
-        return str;
-    }
-
     @SuppressLint({"NewApi"})
-    public static void open(Context context, UsbDevice usbDevice) {
-        if (null == usbDevice) {
+    public void open() {
+        if (null == mCurUsbDevice) {
             return;
         }
 
         try {
-            UsbManager usbManager = (UsbManager) context.getSystemService(Context.USB_SERVICE);
-            UsbDeviceConnection conn = usbManager.openDevice(usbDevice);
-            if (conn == null)
+            UsbManager usbManager = (UsbManager) mContext.getSystemService(Context.USB_SERVICE);
+            mUsbDeviceConnection = usbManager.openDevice(mCurUsbDevice);
+            if (mUsbDeviceConnection == null)
                 return;
 
-            UsbInterface usbInterface = usbDevice.getInterface(0);
-            if (usbInterface == null)
+            mUsbInterface = mCurUsbDevice.getInterface(0);
+            if (mUsbInterface == null)
                 return;
 
-            if (!conn.claimInterface(usbInterface, true)) {
-                conn.close();
+            mOutUsbEndpoint = getOutEndpoint(mUsbInterface);
+            mInUsbEndpoint = getInEndpoint(mUsbInterface);
+
+            if (!mUsbDeviceConnection.claimInterface(mUsbInterface, true)) {
+                mUsbDeviceConnection.close();
                 return;
             }
-            byte[] host = {0x04, 0x00, 0x00, 0x00, 0x00, 0x00};
-            SyncOffLineDataTask syncOffLineDataTask = new SyncOffLineDataTask(conn, getOutEndpoint(usbInterface), getInEndpoint(usbInterface), host);
-            syncOffLineDataTask.execute(context);
+            byte[] offlineCmd = {AppConfig.ByteCommand.CMD_04, AppConfig.ByteCommand.BASE, AppConfig.ByteCommand.BASE, AppConfig.ByteCommand.BASE, AppConfig.ByteCommand.BASE, AppConfig.ByteCommand.BASE};
+            queryOffLineInfo(offlineCmd);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -198,7 +160,7 @@ public class UsbHandler {
     /**
      * 获取输入端口
      */
-    private static UsbEndpoint getInEndpoint(UsbInterface usbInterface) {
+    private UsbEndpoint getInEndpoint(UsbInterface usbInterface) {
         if (null == usbInterface) {
             return null;
         }
@@ -218,7 +180,7 @@ public class UsbHandler {
     /**
      * 获取输出端口
      */
-    private static UsbEndpoint getOutEndpoint(UsbInterface usbInterface) {
+    private UsbEndpoint getOutEndpoint(UsbInterface usbInterface) {
         if (null == usbInterface) {
             return null;
         }
@@ -235,16 +197,7 @@ public class UsbHandler {
         return null;
     }
 
-    private static int setFeature(UsbDeviceConnection connection, byte[] buf) {
-        int res = connection.controlTransfer(33, 9, 770, 0, buf, buf.length, 8192);
-        return res;
-    }
-
-    public int setFeature(byte[] buf) {
-        return setFeature(this.mDevConn, buf);
-    }
-
-    private static int setFeature(UsbDeviceConnection connection, UsbEndpoint endpoint, byte[] buf) {
+    private int setFeature(byte[] buf) {
         int res = 0;
         //检测buf长度
         if (buf.length > 16 * 1024) {
@@ -255,36 +208,29 @@ public class UsbHandler {
 
             for (int i = 0; i < pack; i++) {
                 byte[] newBuffer = Arrays.copyOfRange(buf, 16 * 1024 * i, 16 * 1024 * (i + 1));
-                res = connection.bulkTransfer(endpoint, newBuffer, newBuffer.length, 0);
+                res = mUsbDeviceConnection.bulkTransfer(mOutUsbEndpoint, newBuffer, newBuffer.length, 0);
             }
         } else {
-            res = connection.bulkTransfer(endpoint, buf, buf.length, 8192);
+            res = mUsbDeviceConnection.bulkTransfer(mOutUsbEndpoint, buf, buf.length, 8192);
         }
         return res;
     }
 
-    static int getFeature(UsbDeviceConnection conn, byte reportID, byte[] buf) {
-        buf[0] = reportID;
-        int res = conn.controlTransfer(161, 1, 770, 0, buf, buf.length, 8192);
+    private int getFeature(byte[] buf) {
+        int res = mUsbDeviceConnection.bulkTransfer(mInUsbEndpoint, buf, buf.length, 8192);
         return res;
     }
 
-    public int getFeature(byte reportID, byte[] buf) {
-        return getFeature(this.mDevConn, reportID, buf);
-    }
-
-    private static int getFeature(UsbDeviceConnection connection, UsbEndpoint endpoint, byte[] buf) {
-        int res = connection.bulkTransfer(endpoint, buf, buf.length, 8192);
-        return res;
-    }
-
-    private static String syncOffLineNotes(UsbDeviceConnection conn, UsbEndpoint outUsbEndpoint, UsbEndpoint inUsbEndpoint, byte[] buf) {
-        String str = "";
-
-        int res = setFeature(conn, outUsbEndpoint, buf);
-        LogUtils.d("Send command." + res + " , " + buf.toString());
+    /**
+     * 3.2	查询当前状态
+     *
+     * @return
+     */
+    public byte[] queryDeviceStatus() {
+        byte[] pageTrans = {AppConfig.ByteCommand.BASE, AppConfig.ByteCommand.CMD_01, AppConfig.ByteCommand.BASE, AppConfig.ByteCommand.BASE, AppConfig.ByteCommand.BASE, AppConfig.ByteCommand.BASE};
+        int res = setFeature(pageTrans);
         if (res < 0) {
-            return str;
+            return null;
         }
 
         try {
@@ -296,39 +242,226 @@ public class UsbHandler {
         int bufferLength = 8;
         ByteBuffer buffer = ByteBuffer.allocate(bufferLength);
         buffer.order(ByteOrder.nativeOrder());
-        res = getFeature(conn, inUsbEndpoint, buffer.array());
-        LogUtils.d("Accept data." + res + " , " + buffer.array().toString());
+        res = getFeature(buffer.array());
         if (res < 0)
-            return str;
-        try {
-            str = new String(buffer.array(), "UTF-8");
-        } catch (UnsupportedEncodingException unsupportedEncodingException) {
+            return null;
+
+        return buffer.array();
+    }
+
+    /**
+     * 3.3	设置产品状态
+     *
+     * @param targetStatus Payload[0]说明：Target status
+     *                     0x00：离线模式（STATUS_OFFLINE）
+     *                     0x01：在线模式（STATUS_ONLINE）
+     *                     0x02：SYNC模式（STATUS_SYNC）
+     *                     0x03：固件升级模式（STATUS_DFU）
+     * @return
+     */
+    public byte[] setDeviceStatus(byte targetStatus) {
+        byte[] pageTrans = {AppConfig.ByteCommand.BASE, AppConfig.ByteCommand.CMD_02, AppConfig.ByteCommand.CMD_01, targetStatus, AppConfig.ByteCommand.BASE, AppConfig.ByteCommand.BASE};
+        int res = setFeature(pageTrans);
+        if (res < 0) {
+            return null;
         }
-        return str;
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        int bufferLength = 8;
+        ByteBuffer buffer = ByteBuffer.allocate(bufferLength);
+        buffer.order(ByteOrder.nativeOrder());
+        res = getFeature(buffer.array());
+        if (res < 0)
+            return null;
+
+        return buffer.array();
+    }
+
+    /**
+     * 5.3.2	离线存储信息查询
+     *
+     * @param buf
+     */
+    public void queryOffLineInfo(byte[] buf) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                int res = setFeature(buf);
+                if (res < 0) {
+                    return;
+                }
+
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                int bufferLength = 8;
+                ByteBuffer buffer = ByteBuffer.allocate(bufferLength);
+                buffer.order(ByteOrder.nativeOrder());
+                res = getFeature(buffer.array());
+                if (res < 0)
+                    return;
+
+                synchronized (this) {
+                    if (null != mHandler) {
+                        Message message = new Message();
+                        message.what = AppConfig.UsbHandler.WHAT_01;
+                        Bundle bundle = new Bundle();
+                        bundle.putByteArray(String.valueOf(AppConfig.UsbHandler.WHAT_01), buffer.array());
+                        message.setData(bundle);
+                        mHandler.sendMessage(message);
+                    }
+                }
+
+            }
+        }).start();
+    }
+
+    /**
+     * 5.3.3	页传输
+     *
+     * @param payload
+     * @return
+     */
+    public byte[] queryPages(byte[] payload) {
+        if (ObjectUtils.isOutOfBounds(payload, 3)) {
+            return null;
+        }
+
+        if (AppConfig.ByteCommand.CMD_05 != payload[0] || AppConfig.ByteCommand.BASE != payload[1] || AppConfig.ByteCommand.CMD_02 != payload[3]) {
+            return null;
+        }
+
+        byte[] pageTrans = {AppConfig.ByteCommand.CMD_04, AppConfig.ByteCommand.CMD_01, AppConfig.ByteCommand.CMD_01, AppConfig.ByteCommand.BASE, AppConfig.ByteCommand.BASE, AppConfig.ByteCommand.BASE};
+        int res = setFeature(pageTrans);
+        if (res < 0) {
+            return null;
+        }
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        int bufferLength = 8;
+        ByteBuffer buffer = ByteBuffer.allocate(bufferLength);
+        buffer.order(ByteOrder.nativeOrder());
+        res = getFeature(buffer.array());
+        if (res < 0)
+            return null;
+
+        return buffer.array();
+    }
+
+    /**
+     * 5.3.4	坐标传输
+     *
+     * @param payload
+     * @return
+     */
+    public byte[] queryCoordinates(byte[] payload) {
+        if (ObjectUtils.isOutOfBounds(payload, 3)) {
+            return null;
+        }
+
+        if (AppConfig.ByteCommand.CMD_05 != payload[0] || AppConfig.ByteCommand.BASE != payload[1] || AppConfig.ByteCommand.CMD_02 != payload[3]) {
+            return null;
+        }
+
+        byte[] pageTrans = {AppConfig.ByteCommand.CMD_04, AppConfig.ByteCommand.CMD_02, AppConfig.ByteCommand.CMD_02, AppConfig.ByteCommand.BASE, AppConfig.ByteCommand.BASE, AppConfig.ByteCommand.BASE};
+        int res = setFeature(pageTrans);
+        if (res < 0) {
+            return null;
+        }
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        int bufferLength = 8;
+        ByteBuffer buffer = ByteBuffer.allocate(bufferLength);
+        buffer.order(ByteOrder.nativeOrder());
+        res = getFeature(buffer.array());
+        if (res < 0)
+            return null;
+
+        return buffer.array();
+    }
+
+    /**
+     * 5.3.5	页删除
+     *
+     * @param payload
+     * @return
+     */
+    public byte[] deletePage(byte[] payload) {
+        if (ObjectUtils.isOutOfBounds(payload, 3)) {
+            return null;
+        }
+
+        if (AppConfig.ByteCommand.CMD_05 != payload[0] || AppConfig.ByteCommand.BASE != payload[1] || AppConfig.ByteCommand.CMD_02 != payload[3]) {
+            return null;
+        }
+
+        byte[] pageTrans = {AppConfig.ByteCommand.CMD_04, AppConfig.ByteCommand.CMD_03, AppConfig.ByteCommand.CMD_01, AppConfig.ByteCommand.BASE, AppConfig.ByteCommand.BASE, AppConfig.ByteCommand.BASE};
+        int res = setFeature(pageTrans);
+        if (res < 0) {
+            return null;
+        }
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        int bufferLength = 8;
+        ByteBuffer buffer = ByteBuffer.allocate(bufferLength);
+        buffer.order(ByteOrder.nativeOrder());
+        res = getFeature(buffer.array());
+        if (res < 0)
+            return null;
+
+        return buffer.array();
     }
 
     public void close() {
-        if (this.mDevConn != null) {
-            if (this.mRequest != null)
-                this.mRequest.cancel();
-            if (this.mRequestEvent != null)
-                this.mRequestEvent.cancel();
-            if (this.mInterface != null)
-                this.mDevConn.releaseInterface(this.mInterface);
-            this.mDevConn.close();
-            this.mDevConn = null;
+        unregisterReceiver();
+        mUsbHandler = null;
+        mContext = null;
+        mUsbDeviceReceiver = null;
+        mUsbPermissionReceiver = null;
+        mCurUsbDevice = null;
+        if (null != mUsbDeviceConnection) {
+            mUsbDeviceConnection.releaseInterface(mUsbInterface);
+            mUsbDeviceConnection.close();
         }
+        mUsbDeviceConnection = null;
+        mUsbInterface = null;
+        mOutUsbEndpoint = null;
+        mInUsbEndpoint = null;
     }
 
-    private static class UsbPermissionReceiver extends BroadcastReceiver {
+    private class UsbPermissionReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
             switch (intent.getAction()) {
                 case ACTION_USB_PERMISSION:
                     synchronized (this) {
                         UsbDevice usbDevice = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+                        mCurUsbDevice = usbDevice;
                         if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
-                            open(context, usbDevice);
+                            open();
                         }
                     }
                     break;
@@ -336,12 +469,12 @@ public class UsbHandler {
         }
     }
 
-    private static class UsbDeviceReceiver extends BroadcastReceiver {
+    private class UsbDeviceReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
             switch (intent.getAction()) {
                 case UsbManager.ACTION_USB_DEVICE_ATTACHED:
-                    detectUsb(context, null, null);
+                    detectUsb(null, null);
                     break;
                 case UsbManager.ACTION_USB_DEVICE_DETACHED:
                     break;
@@ -351,22 +484,18 @@ public class UsbHandler {
         }
     }
 
-    private static class SyncOffLineDataTask extends AsyncTask<Object, Object, Object> {
-        private UsbDeviceConnection conn;
-        private UsbEndpoint outUsbEndpoint;
-        private UsbEndpoint inUsbEndpoint;
-        private byte[] buf;
-
-        public SyncOffLineDataTask(UsbDeviceConnection conn, UsbEndpoint outUsbEndpoint, UsbEndpoint inUsbEndpoint, byte[] buf) {
-            this.conn = conn;
-            this.outUsbEndpoint = outUsbEndpoint;
-            this.inUsbEndpoint = inUsbEndpoint;
-            this.buf = buf;
-        }
-
+    private static class DataHandler extends Handler {
         @Override
-        protected Object doInBackground(Object... objects) {
-            return syncOffLineNotes(conn, outUsbEndpoint, inUsbEndpoint, buf);
+        public void handleMessage(@NonNull Message msg) {
+            switch (msg.what) {
+                case AppConfig.UsbHandler.WHAT_01:
+                    Bundle bundle = msg.getData();
+                    if (null != bundle) {
+                        byte[] buffer = bundle.getByteArray(String.valueOf(AppConfig.UsbHandler.WHAT_01));
+                        LogUtils.d("Enter to handleMessage. " + AppConfig.UsbHandler.WHAT_01 + " , " + buffer);
+                    }
+                    break;
+            }
         }
     }
 

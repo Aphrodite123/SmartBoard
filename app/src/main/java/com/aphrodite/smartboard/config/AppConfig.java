@@ -95,4 +95,32 @@ public class AppConfig extends BaseConfig {
         int USB_VID = 0x0805;
     }
 
+    public interface ByteCommand {
+        byte BASE = 0x00;
+
+        byte CMD_01 = BASE + 1;
+
+        byte CMD_02 = BASE + 2;
+
+        byte CMD_03 = BASE + 3;
+
+        byte CMD_04 = BASE + 4;
+
+        byte CMD_05 = BASE + 5;
+    }
+
+    public interface UsbHandler {
+        byte BASE = 0x00;
+
+        byte WHAT_01 = BASE + 1;
+
+        byte WHAT_02 = BASE + 2;
+
+        byte WHAT_03 = BASE + 3;
+
+        byte WHAT_04 = BASE + 4;
+
+        byte WHAT_05 = BASE + 5;
+    }
+
 }

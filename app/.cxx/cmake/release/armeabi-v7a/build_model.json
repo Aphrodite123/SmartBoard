@@ -5,9 +5,9 @@
     "environmentVariables": []
   },
   "cmake": {
-    "cmakeArtifactsBaseFolder": "D:\\Application\\Aphrodite\\SmartBoard\\app\\.cxx\\cmake\\release\\armeabi-v7a",
-    "cmakeServerLogFile": "D:\\Application\\Aphrodite\\SmartBoard\\app\\.cxx\\cmake\\release\\armeabi-v7a\\cmake_server_log.txt",
-    "cmakeWrappingBaseFolder": "D:\\Application\\Aphrodite\\SmartBoard\\app\\.cxx\\cxx\\release\\armeabi-v7a",
+    "cmakeArtifactsBaseFolder": "D:\\Application\\SmartBoard\\app\\.cxx\\cmake\\release\\armeabi-v7a",
+    "cmakeServerLogFile": "D:\\Application\\SmartBoard\\app\\.cxx\\cmake\\release\\armeabi-v7a\\cmake_server_log.txt",
+    "cmakeWrappingBaseFolder": "D:\\Application\\SmartBoard\\app\\.cxx\\cxx\\release\\armeabi-v7a",
     "effectiveConfiguration": {
       "name": "traditional-android-studio-cmake-environment",
       "description": "Composite reified CMakeSettings configuration",
@@ -15,13 +15,13 @@
       "inheritEnvironments": [
         "ndk"
       ],
-      "buildRoot": "D:\\Application\\Aphrodite\\SmartBoard\\app\\.cxx\\cmake\\release\\armeabi-v7a",
-      "cmakeToolchain": "D:\\SoftWare\\Android\\sdk\\ndk\\21.3.6528147\\build\\cmake\\android.toolchain.cmake",
-      "cmakeExecutable": "D:\\SoftWare\\Android\\sdk\\cmake\\3.10.2.4988404\\bin\\cmake.exe",
+      "buildRoot": "D:\\Application\\SmartBoard\\app\\.cxx\\cmake\\release\\armeabi-v7a",
+      "cmakeToolchain": "E:\\Software\\Android\\Sdk\\ndk\\21.0.6113669\\build\\cmake\\android.toolchain.cmake",
+      "cmakeExecutable": "E:\\Software\\Android\\Sdk\\cmake\\3.10.2.4988404\\bin\\cmake.exe",
       "variables": [
         {
           "name": "CMAKE_FIND_ROOT_PATH",
-          "value": "D:\\Application\\Aphrodite\\SmartBoard\\app\\.cxx\\cmake\\release\\prefab\\armeabi-v7a\\prefab"
+          "value": "D:\\Application\\SmartBoard\\app\\.cxx\\cmake\\release\\prefab\\armeabi-v7a\\prefab"
         },
         {
           "name": "CMAKE_BUILD_TYPE",
@@ -29,7 +29,7 @@
         },
         {
           "name": "CMAKE_TOOLCHAIN_FILE",
-          "value": "D:\\SoftWare\\Android\\sdk\\ndk\\21.3.6528147\\build\\cmake\\android.toolchain.cmake"
+          "value": "E:\\Software\\Android\\Sdk\\ndk\\21.0.6113669\\build\\cmake\\android.toolchain.cmake"
         },
         {
           "name": "ANDROID_ABI",
@@ -37,7 +37,7 @@
         },
         {
           "name": "ANDROID_NDK",
-          "value": "D:\\SoftWare\\Android\\sdk\\ndk\\21.3.6528147"
+          "value": "E:\\Software\\Android\\Sdk\\ndk\\21.0.6113669"
         },
         {
           "name": "ANDROID_PLATFORM",
@@ -49,7 +49,7 @@
         },
         {
           "name": "CMAKE_ANDROID_NDK",
-          "value": "D:\\SoftWare\\Android\\sdk\\ndk\\21.3.6528147"
+          "value": "E:\\Software\\Android\\Sdk\\ndk\\21.0.6113669"
         },
         {
           "name": "CMAKE_EXPORT_COMPILE_COMMANDS",
@@ -57,11 +57,11 @@
         },
         {
           "name": "CMAKE_LIBRARY_OUTPUT_DIRECTORY",
-          "value": "D:\\Application\\Aphrodite\\SmartBoard\\app\\build\\intermediates\\cmake\\release\\obj\\armeabi-v7a"
+          "value": "D:\\Application\\SmartBoard\\app\\build\\intermediates\\cmake\\release\\obj\\armeabi-v7a"
         },
         {
           "name": "CMAKE_MAKE_PROGRAM",
-          "value": "D:\\SoftWare\\Android\\sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe"
+          "value": "E:\\Software\\Android\\Sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe"
         },
         {
           "name": "CMAKE_SYSTEM_NAME",
@@ -74,14 +74,14 @@
       ]
     }
   },
-  "cxxBuildFolder": "D:\\Application\\Aphrodite\\SmartBoard\\app\\.cxx\\cmake\\release\\armeabi-v7a",
+  "cxxBuildFolder": "D:\\Application\\SmartBoard\\app\\.cxx\\cmake\\release\\armeabi-v7a",
   "info": {
     "abi": "ARMEABI_V7A",
     "bitness": 32,
     "deprecated": false,
     "default": true
   },
-  "originalCxxBuildFolder": "D:\\Application\\Aphrodite\\SmartBoard\\app\\.cxx\\cmake\\release\\armeabi-v7a",
+  "originalCxxBuildFolder": "D:\\Application\\SmartBoard\\app\\.cxx\\cmake\\release\\armeabi-v7a",
   "variant": {
     "buildSystemArgumentList": [],
     "buildTargetSet": [],
@@ -94,24 +94,24 @@
     "module": {
       "buildSystem": "CMAKE",
       "cmake": {
-        "cmakeExe": "D:\\SoftWare\\Android\\sdk\\cmake\\3.10.2.4988404\\bin\\cmake.exe",
+        "cmakeExe": "E:\\Software\\Android\\Sdk\\cmake\\3.10.2.4988404\\bin\\cmake.exe",
         "minimumCmakeVersion": "3.10.2",
-        "ninjaExe": "D:\\SoftWare\\Android\\sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe"
+        "ninjaExe": "E:\\Software\\Android\\Sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe"
       },
-      "cmakeToolchainFile": "D:\\SoftWare\\Android\\sdk\\ndk\\21.3.6528147\\build\\cmake\\android.toolchain.cmake",
-      "cxxFolder": "D:\\Application\\Aphrodite\\SmartBoard\\app\\.cxx",
+      "cmakeToolchainFile": "E:\\Software\\Android\\Sdk\\ndk\\21.0.6113669\\build\\cmake\\android.toolchain.cmake",
+      "cxxFolder": "D:\\Application\\SmartBoard\\app\\.cxx",
       "gradleModulePathName": ":app",
-      "intermediatesFolder": "D:\\Application\\Aphrodite\\SmartBoard\\app\\build\\intermediates",
-      "makeFile": "D:\\Application\\Aphrodite\\SmartBoard\\app\\CMakeLists.txt",
-      "moduleBuildFile": "D:\\Application\\Aphrodite\\SmartBoard\\app\\build.gradle",
-      "moduleRootFolder": "D:\\Application\\Aphrodite\\SmartBoard\\app",
+      "intermediatesFolder": "D:\\Application\\SmartBoard\\app\\build\\intermediates",
+      "makeFile": "D:\\Application\\SmartBoard\\app\\CMakeLists.txt",
+      "moduleBuildFile": "D:\\Application\\SmartBoard\\app\\build.gradle",
+      "moduleRootFolder": "D:\\Application\\SmartBoard\\app",
       "ndkDefaultAbiList": [
         "ARMEABI_V7A",
         "ARM64_V8A",
         "X86",
         "X86_64"
       ],
-      "ndkFolder": "D:\\SoftWare\\Android\\sdk\\ndk\\21.3.6528147",
+      "ndkFolder": "E:\\Software\\Android\\Sdk\\ndk\\21.0.6113669",
       "ndkMetaAbiList": [
         {
           "abi": "ARMEABI_V7A",
@@ -140,7 +140,7 @@
       ],
       "ndkMetaPlatforms": {
         "min": 16,
-        "max": 30,
+        "max": 29,
         "aliases": {
           "20": 19,
           "25": 24,
@@ -156,8 +156,7 @@
           "O": 26,
           "O-MR1": 27,
           "P": 28,
-          "Q": 29,
-          "R": 30
+          "Q": 29
         }
       },
       "ndkSupportedAbiList": [
@@ -167,38 +166,38 @@
         "X86_64"
       ],
       "ndkDefaultStl": "LIBCXX_STATIC",
-      "ndkVersion": "21.3.6528147",
+      "ndkVersion": "21.0.6113669",
       "project": {
-        "compilerSettingsCacheFolder": "D:\\Application\\Aphrodite\\SmartBoard\\.cxx",
-        "cxxFolder": "D:\\Application\\Aphrodite\\SmartBoard\\.cxx",
+        "compilerSettingsCacheFolder": "D:\\Application\\SmartBoard\\.cxx",
+        "cxxFolder": "D:\\Application\\SmartBoard\\.cxx",
         "isBuildOnlyTargetAbiEnabled": true,
         "isCmakeBuildCohabitationEnabled": false,
         "isNativeCompilerSettingsCacheEnabled": false,
-        "rootBuildGradleFolder": "D:\\Application\\Aphrodite\\SmartBoard",
-        "sdkFolder": "D:\\SoftWare\\Android\\sdk",
+        "rootBuildGradleFolder": "D:\\Application\\SmartBoard",
+        "sdkFolder": "E:\\Software\\Android\\Sdk",
         "isPrefabEnabled": false
       },
       "splitsAbiFilterSet": [],
       "stlSharedObjectMap": {
         "LIBCXX_SHARED": {
-          "ARMEABI_V7A": "D:\\SoftWare\\Android\\sdk\\ndk\\21.3.6528147\\toolchains\\llvm\\prebuilt\\windows-x86_64\\sysroot\\usr\\lib\\arm-linux-androideabi\\libc++_shared.so",
-          "ARM64_V8A": "D:\\SoftWare\\Android\\sdk\\ndk\\21.3.6528147\\toolchains\\llvm\\prebuilt\\windows-x86_64\\sysroot\\usr\\lib\\aarch64-linux-android\\libc++_shared.so",
-          "X86": "D:\\SoftWare\\Android\\sdk\\ndk\\21.3.6528147\\toolchains\\llvm\\prebuilt\\windows-x86_64\\sysroot\\usr\\lib\\i686-linux-android\\libc++_shared.so",
-          "X86_64": "D:\\SoftWare\\Android\\sdk\\ndk\\21.3.6528147\\toolchains\\llvm\\prebuilt\\windows-x86_64\\sysroot\\usr\\lib\\x86_64-linux-android\\libc++_shared.so"
+          "ARMEABI_V7A": "E:\\Software\\Android\\Sdk\\ndk\\21.0.6113669\\toolchains\\llvm\\prebuilt\\windows-x86_64\\sysroot\\usr\\lib\\arm-linux-androideabi\\libc++_shared.so",
+          "ARM64_V8A": "E:\\Software\\Android\\Sdk\\ndk\\21.0.6113669\\toolchains\\llvm\\prebuilt\\windows-x86_64\\sysroot\\usr\\lib\\aarch64-linux-android\\libc++_shared.so",
+          "X86": "E:\\Software\\Android\\Sdk\\ndk\\21.0.6113669\\toolchains\\llvm\\prebuilt\\windows-x86_64\\sysroot\\usr\\lib\\i686-linux-android\\libc++_shared.so",
+          "X86_64": "E:\\Software\\Android\\Sdk\\ndk\\21.0.6113669\\toolchains\\llvm\\prebuilt\\windows-x86_64\\sysroot\\usr\\lib\\x86_64-linux-android\\libc++_shared.so"
         },
         "LIBCXX_STATIC": {},
         "NONE": {},
         "SYSTEM": {}
       }
     },
-    "objFolder": "D:\\Application\\Aphrodite\\SmartBoard\\app\\build\\intermediates\\cmake\\release\\obj",
+    "objFolder": "D:\\Application\\SmartBoard\\app\\build\\intermediates\\cmake\\release\\obj",
     "variantName": "release",
     "validAbiList": [
       "ARMEABI_V7A",
       "ARM64_V8A"
     ],
-    "prefabDirectory": "D:\\Application\\Aphrodite\\SmartBoard\\app\\.cxx\\cmake\\release\\prefab",
+    "prefabDirectory": "D:\\Application\\SmartBoard\\app\\.cxx\\cmake\\release\\prefab",
     "prefabPackageDirectoryList": []
   },
-  "prefabFolder": "D:\\Application\\Aphrodite\\SmartBoard\\app\\.cxx\\cmake\\release\\prefab\\armeabi-v7a"
+  "prefabFolder": "D:\\Application\\SmartBoard\\app\\.cxx\\cmake\\release\\prefab\\armeabi-v7a"
 }

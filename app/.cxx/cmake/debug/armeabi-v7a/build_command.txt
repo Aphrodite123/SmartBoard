@@ -1,20 +1,20 @@
-Executable : D:\SoftWare\Android\sdk\cmake\3.10.2.4988404\bin\cmake.exe
+Executable : E:\Software\Android\Sdk\cmake\3.10.2.4988404\bin\cmake.exe
 arguments : 
--HD:\Application\Aphrodite\SmartBoard\app
--DCMAKE_FIND_ROOT_PATH=D:\Application\Aphrodite\SmartBoard\app\.cxx\cmake\debug\prefab\armeabi-v7a\prefab
+-HD:\Application\SmartBoard\app
+-DCMAKE_FIND_ROOT_PATH=D:\Application\SmartBoard\app\.cxx\cmake\debug\prefab\armeabi-v7a\prefab
 -DCMAKE_BUILD_TYPE=Debug
--DCMAKE_TOOLCHAIN_FILE=D:\SoftWare\Android\sdk\ndk\21.3.6528147\build\cmake\android.toolchain.cmake
+-DCMAKE_TOOLCHAIN_FILE=E:\Software\Android\Sdk\ndk\21.0.6113669\build\cmake\android.toolchain.cmake
 -DANDROID_ABI=armeabi-v7a
--DANDROID_NDK=D:\SoftWare\Android\sdk\ndk\21.3.6528147
+-DANDROID_NDK=E:\Software\Android\Sdk\ndk\21.0.6113669
 -DANDROID_PLATFORM=android-21
 -DCMAKE_ANDROID_ARCH_ABI=armeabi-v7a
--DCMAKE_ANDROID_NDK=D:\SoftWare\Android\sdk\ndk\21.3.6528147
+-DCMAKE_ANDROID_NDK=E:\Software\Android\Sdk\ndk\21.0.6113669
 -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
--DCMAKE_LIBRARY_OUTPUT_DIRECTORY=D:\Application\Aphrodite\SmartBoard\app\build\intermediates\cmake\debug\obj\armeabi-v7a
--DCMAKE_MAKE_PROGRAM=D:\SoftWare\Android\sdk\cmake\3.10.2.4988404\bin\ninja.exe
+-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=D:\Application\SmartBoard\app\build\intermediates\cmake\debug\obj\armeabi-v7a
+-DCMAKE_MAKE_PROGRAM=E:\Software\Android\Sdk\cmake\3.10.2.4988404\bin\ninja.exe
 -DCMAKE_SYSTEM_NAME=Android
 -DCMAKE_SYSTEM_VERSION=21
--BD:\Application\Aphrodite\SmartBoard\app\.cxx\cmake\debug\armeabi-v7a
+-BD:\Application\SmartBoard\app\.cxx\cmake\debug\armeabi-v7a
 -GNinja
 jvmArgs : 
 

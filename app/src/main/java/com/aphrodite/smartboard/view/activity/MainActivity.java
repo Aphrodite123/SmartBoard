@@ -49,6 +49,8 @@ import com.aphrodite.smartboard.view.fragment.base.BaseFragment;
 import com.aphrodite.smartboard.view.widget.viewpager.ConfigureSlideViewPager;
 
 import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.File;
 import java.io.IOException;
@@ -59,7 +61,6 @@ import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Observer;
-
 import butterknife.BindView;
 import butterknife.BindViews;
 import butterknife.OnClick;
@@ -75,7 +76,6 @@ public class MainActivity extends BaseDeviceActivity {
     @BindView(R.id.tab_viewpager)
     ConfigureSlideViewPager mViewPager;
 
-
     private MainFragment mainFragment;
     private MineFragment mineFragment;
 
@@ -86,7 +86,6 @@ public class MainActivity extends BaseDeviceActivity {
     private List<BaseFragment> mFragments;
     private HomeViewPagerAdapter mPagerAdapter;
 
-    private static final String ASSETS_FILE_PATH = "data";
     private boolean mIsCopied;
 
     private CopyAssetsToSDcardTask mCopyAssetsToSDcardTask;
@@ -124,6 +123,7 @@ public class MainActivity extends BaseDeviceActivity {
 
     @Override
     protected void initListener() {
+        EventBus.getDefault().register(mEventListener);
     }
 
     @Override
@@ -193,14 +193,32 @@ public class MainActivity extends BaseDeviceActivity {
     protected void onDestroy() {
         super.onDestroy();
 
+        EventBus.getDefault().unregister(mEventListener);
         UsbHandler.getInstance().close();
-
         PenService.Companion.disconnectUsbService(this, this);
+
+        //移除Handler
+        if (null != mHandler) {
+            mHandler.removeCallbacksAndMessages(null);
+            mHandler = null;
+        }
 
         if (null != mUsbPenService) {
             mUsbPenService.observeDevicePoint(null);
             mUsbPenService.getCommandLiveData().removeObserver(getCmdObserver());
         }
+
+        //释放异步线程
+        if (null != mCopyAssetsToSDcardTask) {
+            mCopyAssetsToSDcardTask.cancel(true);
+            mCopyAssetsToSDcardTask = null;
+        }
+
+        if (null != mLoadSDcardTask) {
+            mLoadSDcardTask.cancel(true);
+            mLoadSDcardTask = null;
+        }
+
     }
 
     @Override
@@ -600,6 +618,20 @@ public class MainActivity extends BaseDeviceActivity {
         }
     };
 
+    private Object mEventListener = new Object() {
+        @Subscribe(threadMode = ThreadMode.MAIN)
+        public void onEventMainThread(SyncEvent event) {
+            switch (event) {
+                case SYNC_OFFLINE_DATA:
+                    showLoadingDialog();
+                    break;
+                case END_SYNC_OFFLINE:
+                    dismissLoadingDialog();
+                    break;
+            }
+        }
+    };
+
     /**
      * 拷贝Assets文件到SDcard路径
      */
@@ -611,7 +643,7 @@ public class MainActivity extends BaseDeviceActivity {
 
         @Override
         protected Object doInBackground(Object... objects) {
-            return FileUtils.copyAssetsToSDcard(MainActivity.this, ASSETS_FILE_PATH, AppConfig.DATA_PATH);
+            return FileUtils.copyAssetsToSDcard(MainActivity.this, AppConfig.ASSETS_FILE_PATH, AppConfig.DATA_PATH);
         }
 
         @Override

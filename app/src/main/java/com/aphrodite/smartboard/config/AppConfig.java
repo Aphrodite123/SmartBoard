@@ -37,6 +37,11 @@ public class AppConfig extends BaseConfig {
      */
     public static final String FFMPEG_PATH = MainApplication.getApplication().getExternalFilesDir("ffmpeg").getAbsolutePath() + File.separator;
 
+    /**
+     * assets 数据路径
+     */
+    public static final String ASSETS_FILE_PATH = "data";
+
     public static final String DATA_FILE_NAME = "data.cw";
 
     public static final String AUDIO_FILE_NAME = "audio.mp3";
@@ -79,6 +84,7 @@ public class AppConfig extends BaseConfig {
 
     public interface ShareType {
         int BASE = 0x1000;
+
         int WECHAT_FRIEND = BASE + 1;
 
         int WECHAT_MOMENTS = BASE + 2;

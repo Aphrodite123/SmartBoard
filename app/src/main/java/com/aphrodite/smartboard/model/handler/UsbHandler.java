@@ -18,9 +18,13 @@ import android.os.Message;
 import com.aphrodite.framework.utils.ObjectUtils;
 import com.aphrodite.smartboard.application.MainApplication;
 import com.aphrodite.smartboard.config.AppConfig;
+import com.aphrodite.smartboard.model.event.SyncEvent;
 import com.aphrodite.smartboard.utils.LogUtils;
 import com.google.gson.Gson;
 
+import org.greenrobot.eventbus.EventBus;
+
+import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
@@ -44,8 +48,6 @@ public class UsbHandler {
     private UsbEndpoint mInUsbEndpoint;
     private DataHandler mHandler;
 
-    private int mPageCount;
-
     public static UsbHandler getInstance() {
         if (null == mUsbHandler) {
             synchronized (UsbHandler.class) {
@@ -59,7 +61,7 @@ public class UsbHandler {
 
     public UsbHandler(Context context) {
         this.mContext = context;
-        this.mHandler = new DataHandler();
+        this.mHandler = new DataHandler(context);
     }
 
     public void registerUsbDeviceReceiver() {
@@ -439,6 +441,10 @@ public class UsbHandler {
         mUsbInterface = null;
         mOutUsbEndpoint = null;
         mInUsbEndpoint = null;
+        if (null != mHandler) {
+            mHandler.removeCallbacksAndMessages(null);
+            mHandler = null;
+        }
     }
 
     private class UsbPermissionReceiver extends BroadcastReceiver {
@@ -464,8 +470,10 @@ public class UsbHandler {
             switch (intent.getAction()) {
                 case UsbManager.ACTION_USB_DEVICE_ATTACHED:
                     detectUsb(null, null);
+                    EventBus.getDefault().post(SyncEvent.SYNC_OFFLINE_DATA);
                     break;
                 case UsbManager.ACTION_USB_DEVICE_DETACHED:
+                    EventBus.getDefault().post(SyncEvent.END_SYNC_OFFLINE);
                     break;
                 default:
                     break;
@@ -474,6 +482,13 @@ public class UsbHandler {
     }
 
     private class DataHandler extends Handler {
+        private WeakReference reference;
+        private int pageCount;
+
+        public DataHandler(Context context) {
+            reference = new WeakReference<>(context);
+        }
+
         @Override
         public void handleMessage(@NonNull Message msg) {
             Bundle bundle = msg.getData();
@@ -488,7 +503,14 @@ public class UsbHandler {
                             break;
                         }
 
-                        queryPages(buffer);
+                        pageCount = buffer[3];
+                        while (pageCount >= 0) {
+                            queryPages(buffer);
+                        }
+
+                        //离线笔记传输完成切换成在线模式
+                        setDeviceStatus(AppConfig.ByteCommand.CMD_01);
+                        EventBus.getDefault().post(SyncEvent.END_SYNC_OFFLINE);
                     }
                     break;
                 case AppConfig.UsbHandler.WHAT_02:
@@ -507,6 +529,10 @@ public class UsbHandler {
                     if (null != bundle) {
                         byte[] buffer = bundle.getByteArray(String.valueOf(AppConfig.UsbHandler.WHAT_03));
                         LogUtils.d("Enter to handleMessage. " + AppConfig.UsbHandler.WHAT_03 + " , " + gson.toJson(buffer));
+
+                        //当前页笔记传输完成后，立即删除该页
+                        deletePage(buffer);
+                        pageCount--;
                     }
                     break;
             }

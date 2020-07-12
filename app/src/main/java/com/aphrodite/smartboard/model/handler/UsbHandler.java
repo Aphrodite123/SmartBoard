@@ -326,33 +326,33 @@ public class UsbHandler {
      * @param payload
      */
     public void queryPages(byte[] payload) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                byte[] pageTrans = {AppConfig.ByteCommand.CMD_04, AppConfig.ByteCommand.CMD_01, AppConfig.ByteCommand.CMD_01, AppConfig.ByteCommand.BASE, AppConfig.ByteCommand.BASE, AppConfig.ByteCommand.BASE};
-                int res = setFeature(pageTrans);
-                if (res < 0) {
-                    return;
-                }
+        byte[] pageTrans = {AppConfig.ByteCommand.CMD_04, AppConfig.ByteCommand.CMD_01, AppConfig.ByteCommand.CMD_01, payload[4], (byte) (payload[3] + payload[4]), (byte) (payload[3] + payload[4])};
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+        int res = setFeature(pageTrans);
+        if (res < 0) {
+            return;
+        }
 
-                int bufferLength = 8;
-                ByteBuffer buffer = ByteBuffer.allocate(bufferLength);
-                buffer.order(ByteOrder.nativeOrder());
-                res = getFeature(buffer.array());
-                if (res < 0)
-                    return;
+        int bufferLength = 8;
+        ByteBuffer buffer = ByteBuffer.allocate(bufferLength);
+        buffer.order(ByteOrder.nativeOrder());
+        res = getFeature(buffer.array());
+        if (res < 0)
+            return;
 
-                if (null != mHandler) {
-                    Message message = new Message();
-                    message.what = AppConfig.UsbHandler.WHAT_02;
-                    Bundle bundle = new Bundle();
-                    bundle.putByteArray(String.valueOf(AppConfig.UsbHandler.WHAT_02), buffer.array());
-                    message.setData(bundle);
-                    mHandler.sendMessage(message);
-                }
+        if (null != mHandler) {
+            Message message = new Message();
+            message.what = AppConfig.UsbHandler.WHAT_02;
+            Bundle bundle = new Bundle();
+            bundle.putByteArray(String.valueOf(AppConfig.UsbHandler.WHAT_02), buffer.array());
+            message.setData(bundle);
+            mHandler.sendMessage(message);
+        }
 
-            }
-        }).start();
+//            }
+//        }).start();
     }
 
     /**
@@ -361,32 +361,32 @@ public class UsbHandler {
      * @param payload
      */
     public void queryCoordinates(byte[] payload) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                byte[] pageTrans = {AppConfig.ByteCommand.CMD_04, AppConfig.ByteCommand.CMD_02, AppConfig.ByteCommand.CMD_02, AppConfig.ByteCommand.BASE, AppConfig.ByteCommand.BASE, AppConfig.ByteCommand.BASE};
-                int res = setFeature(pageTrans);
-                if (res < 0) {
-                    return;
-                }
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+        byte[] pageTrans = {AppConfig.ByteCommand.CMD_04, AppConfig.ByteCommand.CMD_02, AppConfig.ByteCommand.CMD_02, payload[3], (byte) (payload[3] + payload[4]), (byte) (payload[3] + payload[5])};
+        int res = setFeature(pageTrans);
+        if (res < 0) {
+            return;
+        }
 
-                int bufferLength = 8;
-                ByteBuffer buffer = ByteBuffer.allocate(bufferLength);
-                buffer.order(ByteOrder.nativeOrder());
-                res = getFeature(buffer.array());
-                if (res < 0)
-                    return;
+        int bufferLength = 8;
+        ByteBuffer buffer = ByteBuffer.allocate(bufferLength);
+        buffer.order(ByteOrder.nativeOrder());
+        res = getFeature(buffer.array());
+        if (res < 0)
+            return;
 
-                if (null != mHandler) {
-                    Message message = new Message();
-                    message.what = AppConfig.UsbHandler.WHAT_03;
-                    Bundle bundle = new Bundle();
-                    bundle.putByteArray(String.valueOf(AppConfig.UsbHandler.WHAT_03), buffer.array());
-                    message.setData(bundle);
-                    mHandler.sendMessage(message);
-                }
-            }
-        }).start();
+        if (null != mHandler) {
+            Message message = new Message();
+            message.what = AppConfig.UsbHandler.WHAT_03;
+            Bundle bundle = new Bundle();
+            bundle.putByteArray(String.valueOf(AppConfig.UsbHandler.WHAT_03), buffer.array());
+            message.setData(bundle);
+            mHandler.sendMessage(message);
+        }
+//            }
+//        }).start();
     }
 
     /**

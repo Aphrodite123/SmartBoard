@@ -127,6 +127,8 @@ public class AppConfig extends BaseConfig {
         byte WHAT_04 = BASE + 4;
 
         byte WHAT_05 = BASE + 5;
+
+        byte WHAT_06 = BASE + 6;
     }
 
 }

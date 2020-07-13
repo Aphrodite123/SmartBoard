@@ -15,7 +15,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 
-import com.aphrodite.framework.utils.ObjectUtils;
 import com.aphrodite.smartboard.application.MainApplication;
 import com.aphrodite.smartboard.config.AppConfig;
 import com.aphrodite.smartboard.model.event.SyncEvent;
@@ -29,6 +28,8 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import androidx.annotation.NonNull;
 
@@ -47,6 +48,7 @@ public class UsbHandler {
     private UsbEndpoint mOutUsbEndpoint;
     private UsbEndpoint mInUsbEndpoint;
     private DataHandler mHandler;
+    private ExecutorService mSingleThreadExecutor;
 
     public static UsbHandler getInstance() {
         if (null == mUsbHandler) {
@@ -59,9 +61,10 @@ public class UsbHandler {
         return mUsbHandler;
     }
 
-    public UsbHandler(Context context) {
+    private UsbHandler(Context context) {
         this.mContext = context;
         this.mHandler = new DataHandler(context);
+        this.mSingleThreadExecutor = Executors.newSingleThreadExecutor();
     }
 
     public void registerUsbDeviceReceiver() {
@@ -155,8 +158,7 @@ public class UsbHandler {
                 mUsbDeviceConnection.close();
                 return;
             }
-            byte[] offlineCmd = {AppConfig.ByteCommand.CMD_04, AppConfig.ByteCommand.BASE, AppConfig.ByteCommand.BASE, AppConfig.ByteCommand.BASE, AppConfig.ByteCommand.BASE, AppConfig.ByteCommand.BASE};
-            queryOffLineInfo(offlineCmd);
+            queryOffLineInfo();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -228,30 +230,36 @@ public class UsbHandler {
 
     /**
      * 3.2	查询当前状态
-     *
-     * @return
      */
-    public byte[] queryDeviceStatus() {
+    public void queryDeviceStatus() {
         byte[] pageTrans = {AppConfig.ByteCommand.BASE, AppConfig.ByteCommand.CMD_01, AppConfig.ByteCommand.BASE, AppConfig.ByteCommand.BASE, AppConfig.ByteCommand.BASE, AppConfig.ByteCommand.BASE};
-        int res = setFeature(pageTrans);
-        if (res < 0) {
-            return null;
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                int res = setFeature(pageTrans);
+                if (res < 0) {
+                    return;
+                }
+
+                int bufferLength = 8;
+                ByteBuffer buffer = ByteBuffer.allocate(bufferLength);
+                buffer.order(ByteOrder.nativeOrder());
+                res = getFeature(buffer.array());
+                if (res < 0)
+                    return;
+                if (null != mHandler) {
+                    Message message = new Message();
+                    message.what = AppConfig.UsbHandler.WHAT_05;
+                    Bundle bundle = new Bundle();
+                    bundle.putByteArray(String.valueOf(AppConfig.UsbHandler.WHAT_05), buffer.array());
+                    message.setData(bundle);
+                    mHandler.sendMessage(message);
+                }
+            }
+        };
+        if (null != mSingleThreadExecutor) {
+            mSingleThreadExecutor.execute(runnable);
         }
-
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        int bufferLength = 8;
-        ByteBuffer buffer = ByteBuffer.allocate(bufferLength);
-        buffer.order(ByteOrder.nativeOrder());
-        res = getFeature(buffer.array());
-        if (res < 0)
-            return null;
-
-        return buffer.array();
     }
 
     /**
@@ -262,38 +270,44 @@ public class UsbHandler {
      *                     0x01：在线模式（STATUS_ONLINE）
      *                     0x02：SYNC模式（STATUS_SYNC）
      *                     0x03：固件升级模式（STATUS_DFU）
-     * @return
      */
-    public byte[] setDeviceStatus(byte targetStatus) {
+    public void setDeviceStatus(byte targetStatus) {
         byte[] pageTrans = {AppConfig.ByteCommand.BASE, AppConfig.ByteCommand.CMD_02, AppConfig.ByteCommand.CMD_01, targetStatus, AppConfig.ByteCommand.BASE, AppConfig.ByteCommand.BASE};
-        int res = setFeature(pageTrans);
-        if (res < 0) {
-            return null;
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                int res = setFeature(pageTrans);
+                if (res < 0) {
+                    return;
+                }
+
+                int bufferLength = 8;
+                ByteBuffer buffer = ByteBuffer.allocate(bufferLength);
+                buffer.order(ByteOrder.nativeOrder());
+                res = getFeature(buffer.array());
+                if (res < 0)
+                    return;
+                if (null != mHandler) {
+                    Message message = new Message();
+                    message.what = AppConfig.UsbHandler.WHAT_06;
+                    Bundle bundle = new Bundle();
+                    bundle.putByteArray(String.valueOf(AppConfig.UsbHandler.WHAT_06), buffer.array());
+                    message.setData(bundle);
+                    mHandler.sendMessage(message);
+                }
+            }
+        };
+        if (null != mSingleThreadExecutor) {
+            mSingleThreadExecutor.execute(runnable);
         }
-
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        int bufferLength = 8;
-        ByteBuffer buffer = ByteBuffer.allocate(bufferLength);
-        buffer.order(ByteOrder.nativeOrder());
-        res = getFeature(buffer.array());
-        if (res < 0)
-            return null;
-
-        return buffer.array();
     }
 
     /**
      * 5.3.2	离线存储信息查询
-     *
-     * @param buf
      */
-    public void queryOffLineInfo(byte[] buf) {
-        new Thread(new Runnable() {
+    public void queryOffLineInfo() {
+        byte[] buf = {AppConfig.ByteCommand.CMD_04, AppConfig.ByteCommand.BASE, AppConfig.ByteCommand.BASE, AppConfig.ByteCommand.BASE, AppConfig.ByteCommand.BASE, AppConfig.ByteCommand.BASE};
+        Runnable runnable = new Runnable() {
             @Override
             public void run() {
                 int res = setFeature(buf);
@@ -317,7 +331,10 @@ public class UsbHandler {
                     mHandler.sendMessage(message);
                 }
             }
-        }).start();
+        };
+        if (null != mSingleThreadExecutor) {
+            mSingleThreadExecutor.execute(runnable);
+        }
     }
 
     /**
@@ -327,32 +344,33 @@ public class UsbHandler {
      */
     public void queryPages(byte[] payload) {
         byte[] pageTrans = {AppConfig.ByteCommand.CMD_04, AppConfig.ByteCommand.CMD_01, AppConfig.ByteCommand.CMD_01, payload[4], (byte) (payload[3] + payload[4]), (byte) (payload[3] + payload[4])};
-//        new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-        int res = setFeature(pageTrans);
-        if (res < 0) {
-            return;
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                int res = setFeature(pageTrans);
+                if (res < 0) {
+                    return;
+                }
+
+                int bufferLength = 8;
+                ByteBuffer buffer = ByteBuffer.allocate(bufferLength);
+                buffer.order(ByteOrder.nativeOrder());
+                res = getFeature(buffer.array());
+                if (res < 0)
+                    return;
+                if (null != mHandler) {
+                    Message message = new Message();
+                    message.what = AppConfig.UsbHandler.WHAT_02;
+                    Bundle bundle = new Bundle();
+                    bundle.putByteArray(String.valueOf(AppConfig.UsbHandler.WHAT_02), buffer.array());
+                    message.setData(bundle);
+                    mHandler.sendMessage(message);
+                }
+            }
+        };
+        if (null != mSingleThreadExecutor) {
+            mSingleThreadExecutor.execute(runnable);
         }
-
-        int bufferLength = 8;
-        ByteBuffer buffer = ByteBuffer.allocate(bufferLength);
-        buffer.order(ByteOrder.nativeOrder());
-        res = getFeature(buffer.array());
-        if (res < 0)
-            return;
-
-        if (null != mHandler) {
-            Message message = new Message();
-            message.what = AppConfig.UsbHandler.WHAT_02;
-            Bundle bundle = new Bundle();
-            bundle.putByteArray(String.valueOf(AppConfig.UsbHandler.WHAT_02), buffer.array());
-            message.setData(bundle);
-            mHandler.sendMessage(message);
-        }
-
-//            }
-//        }).start();
     }
 
     /**
@@ -361,69 +379,70 @@ public class UsbHandler {
      * @param payload
      */
     public void queryCoordinates(byte[] payload) {
-//        new Thread(new Runnable() {
-//            @Override
-//            public void run() {
         byte[] pageTrans = {AppConfig.ByteCommand.CMD_04, AppConfig.ByteCommand.CMD_02, AppConfig.ByteCommand.CMD_02, payload[3], (byte) (payload[3] + payload[4]), (byte) (payload[3] + payload[5])};
-        int res = setFeature(pageTrans);
-        if (res < 0) {
-            return;
-        }
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                int res = setFeature(pageTrans);
+                if (res < 0) {
+                    return;
+                }
 
-        int bufferLength = 8;
-        ByteBuffer buffer = ByteBuffer.allocate(bufferLength);
-        buffer.order(ByteOrder.nativeOrder());
-        res = getFeature(buffer.array());
-        if (res < 0)
-            return;
-
-        if (null != mHandler) {
-            Message message = new Message();
-            message.what = AppConfig.UsbHandler.WHAT_03;
-            Bundle bundle = new Bundle();
-            bundle.putByteArray(String.valueOf(AppConfig.UsbHandler.WHAT_03), buffer.array());
-            message.setData(bundle);
-            mHandler.sendMessage(message);
+                int bufferLength = 8;
+                ByteBuffer buffer = ByteBuffer.allocate(bufferLength);
+                buffer.order(ByteOrder.nativeOrder());
+                res = getFeature(buffer.array());
+                if (res < 0)
+                    return;
+                if (null != mHandler) {
+                    Message message = new Message();
+                    message.what = AppConfig.UsbHandler.WHAT_03;
+                    Bundle bundle = new Bundle();
+                    bundle.putByteArray(String.valueOf(AppConfig.UsbHandler.WHAT_03), buffer.array());
+                    message.setData(bundle);
+                    mHandler.sendMessage(message);
+                }
+            }
+        };
+        if (null != mSingleThreadExecutor) {
+            mSingleThreadExecutor.execute(runnable);
         }
-//            }
-//        }).start();
     }
 
     /**
      * 5.3.5	页删除
      *
      * @param payload
-     * @return
      */
-    public byte[] deletePage(byte[] payload) {
-        if (ObjectUtils.isOutOfBounds(payload, 3)) {
-            return null;
-        }
-
-        if (AppConfig.ByteCommand.CMD_05 != payload[0] || AppConfig.ByteCommand.BASE != payload[1] || AppConfig.ByteCommand.CMD_02 != payload[3]) {
-            return null;
-        }
-
+    public void deletePage(byte[] payload) {
         byte[] pageTrans = {AppConfig.ByteCommand.CMD_04, AppConfig.ByteCommand.CMD_03, AppConfig.ByteCommand.CMD_01, AppConfig.ByteCommand.BASE, AppConfig.ByteCommand.BASE, AppConfig.ByteCommand.BASE};
-        int res = setFeature(pageTrans);
-        if (res < 0) {
-            return null;
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                int res = setFeature(pageTrans);
+                if (res < 0) {
+                    return;
+                }
+
+                int bufferLength = 8;
+                ByteBuffer buffer = ByteBuffer.allocate(bufferLength);
+                buffer.order(ByteOrder.nativeOrder());
+                res = getFeature(buffer.array());
+                if (res < 0)
+                    return;
+                if (null != mHandler) {
+                    Message message = new Message();
+                    message.what = AppConfig.UsbHandler.WHAT_04;
+                    Bundle bundle = new Bundle();
+                    bundle.putByteArray(String.valueOf(AppConfig.UsbHandler.WHAT_04), buffer.array());
+                    message.setData(bundle);
+                    mHandler.sendMessage(message);
+                }
+            }
+        };
+        if (null != mSingleThreadExecutor) {
+            mSingleThreadExecutor.execute(runnable);
         }
-
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        int bufferLength = 8;
-        ByteBuffer buffer = ByteBuffer.allocate(bufferLength);
-        buffer.order(ByteOrder.nativeOrder());
-        res = getFeature(buffer.array());
-        if (res < 0)
-            return null;
-
-        return buffer.array();
     }
 
     public void close() {
@@ -444,6 +463,10 @@ public class UsbHandler {
         if (null != mHandler) {
             mHandler.removeCallbacksAndMessages(null);
             mHandler = null;
+        }
+        if (null != mSingleThreadExecutor) {
+            mSingleThreadExecutor.shutdownNow();
+            mSingleThreadExecutor = null;
         }
     }
 
@@ -494,6 +517,7 @@ public class UsbHandler {
             Bundle bundle = msg.getData();
             Gson gson = new Gson();
             switch (msg.what) {
+                //离线存储信息查询
                 case AppConfig.UsbHandler.WHAT_01:
                     if (null != bundle) {
                         byte[] buffer = bundle.getByteArray(String.valueOf(AppConfig.UsbHandler.WHAT_01));
@@ -513,6 +537,7 @@ public class UsbHandler {
                         EventBus.getDefault().post(SyncEvent.END_SYNC_OFFLINE);
                     }
                     break;
+                //页传输
                 case AppConfig.UsbHandler.WHAT_02:
                     if (null != bundle) {
                         byte[] buffer = bundle.getByteArray(String.valueOf(AppConfig.UsbHandler.WHAT_02));
@@ -525,6 +550,7 @@ public class UsbHandler {
                         queryCoordinates(buffer);
                     }
                     break;
+                //坐标传输
                 case AppConfig.UsbHandler.WHAT_03:
                     if (null != bundle) {
                         byte[] buffer = bundle.getByteArray(String.valueOf(AppConfig.UsbHandler.WHAT_03));
@@ -533,6 +559,27 @@ public class UsbHandler {
                         //当前页笔记传输完成后，立即删除该页
                         deletePage(buffer);
                         pageCount--;
+                    }
+                    break;
+                //页面删除回调
+                case AppConfig.UsbHandler.WHAT_04:
+                    if (null != bundle) {
+                        byte[] buffer = bundle.getByteArray(String.valueOf(AppConfig.UsbHandler.WHAT_04));
+                        LogUtils.d("Enter to handleMessage. " + AppConfig.UsbHandler.WHAT_04 + " , " + gson.toJson(buffer));
+                    }
+                    break;
+                //查询设备状态
+                case AppConfig.UsbHandler.WHAT_05:
+                    if (null != bundle) {
+                        byte[] buffer = bundle.getByteArray(String.valueOf(AppConfig.UsbHandler.WHAT_05));
+                        LogUtils.d("Enter to handleMessage. " + AppConfig.UsbHandler.WHAT_05 + " ," + gson.toJson(buffer));
+                    }
+                    break;
+                //设置设备状态
+                case AppConfig.UsbHandler.WHAT_06:
+                    if (null != bundle) {
+                        byte[] buffer = bundle.getByteArray(String.valueOf(AppConfig.UsbHandler.WHAT_06));
+                        LogUtils.d("Enter to handleMessage. " + AppConfig.UsbHandler.WHAT_06 + " ," + gson.toJson(buffer));
                     }
                     break;
             }

@@ -528,13 +528,15 @@ public class UsbHandler {
                         }
 
                         pageCount = buffer[3];
-                        while (pageCount >= 0) {
+                        for (int i = 0; i < pageCount; i++) {
                             queryPages(buffer);
                         }
 
-                        //离线笔记传输完成切换成在线模式
-                        setDeviceStatus(AppConfig.ByteCommand.CMD_01);
-                        EventBus.getDefault().post(SyncEvent.END_SYNC_OFFLINE);
+                        if (pageCount <= 0) {
+                            //离线笔记传输完成切换成在线模式
+                            setDeviceStatus(AppConfig.ByteCommand.CMD_01);
+                            EventBus.getDefault().post(SyncEvent.END_SYNC_OFFLINE);
+                        }
                     }
                     break;
                 //页传输

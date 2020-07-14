@@ -111,4 +111,12 @@
     <string name="message_edit_exit">有未保存修改，是否保存？</string>
     <string name="message_save_image">图片将保存至本地相册，您可以查看相册并分享</string>
 
+    <!-- Error Message -->
+    <string name="illegal_instruction">指令ID非法，HOST发送的cmd_id不在预设指令列表中</string>
+    <string name="check_code_failed">校验和失败</string>
+    <string name="length_instruction">指令Payload长度非法，长度与协议定义不一致</string>
+    <string name="device_busy_status">系统忙状态，当前设备状态无法执行目标指令</string>
+    <string name="index_instruction">笔记索引值错误</string>
+    <string name="coordinate_index_instruction">请求坐标索引值错误</string>
+
 </resources>

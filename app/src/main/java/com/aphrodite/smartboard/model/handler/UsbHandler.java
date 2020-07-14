@@ -15,11 +15,11 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 
+import com.aphrodite.smartboard.R;
 import com.aphrodite.smartboard.application.MainApplication;
 import com.aphrodite.smartboard.config.AppConfig;
 import com.aphrodite.smartboard.model.event.SyncEvent;
 import com.aphrodite.smartboard.utils.LogUtils;
-import com.google.gson.Gson;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -470,6 +470,31 @@ public class UsbHandler {
         }
     }
 
+    private void handleError(byte code) {
+        switch (code) {
+            case AppConfig.ErrorId.BASE:
+                LogUtils.d("Request failed." + mContext.getString(R.string.illegal_instruction));
+                break;
+            case AppConfig.ErrorId.ERROR_01:
+                LogUtils.d("Request failed." + mContext.getString(R.string.check_code_failed));
+                break;
+            case AppConfig.ErrorId.ERROR_02:
+                LogUtils.d("Request failed." + mContext.getString(R.string.length_instruction));
+                break;
+            case AppConfig.ErrorId.ERROR_03:
+                LogUtils.d("Request failed." + mContext.getString(R.string.device_busy_status));
+                break;
+            case AppConfig.ErrorId.ERROR_04:
+                LogUtils.d("Request failed." + mContext.getString(R.string.index_instruction));
+                break;
+            case AppConfig.ErrorId.ERROR_05:
+                LogUtils.d("Request failed." + mContext.getString(R.string.coordinate_index_instruction));
+                break;
+            default:
+                break;
+        }
+    }
+
     private class UsbPermissionReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -515,14 +540,17 @@ public class UsbHandler {
         @Override
         public void handleMessage(@NonNull Message msg) {
             Bundle bundle = msg.getData();
-            Gson gson = new Gson();
             switch (msg.what) {
                 //离线存储信息查询
                 case AppConfig.UsbHandler.WHAT_01:
                     if (null != bundle) {
                         byte[] buffer = bundle.getByteArray(String.valueOf(AppConfig.UsbHandler.WHAT_01));
-                        LogUtils.d("Enter to handleMessage. " + AppConfig.UsbHandler.WHAT_01 + " , " + gson.toJson(buffer));
+                        if (AppConfig.ByteCommand.CMD_03 == buffer[0]) {
+                            handleError(buffer[1]);
+                            break;
+                        }
 
+                        //Slave:0x05 0x00 0x02
                         if (AppConfig.ByteCommand.CMD_05 != buffer[0] || AppConfig.ByteCommand.BASE != buffer[1] || AppConfig.ByteCommand.CMD_02 != buffer[2]) {
                             break;
                         }
@@ -543,8 +571,12 @@ public class UsbHandler {
                 case AppConfig.UsbHandler.WHAT_02:
                     if (null != bundle) {
                         byte[] buffer = bundle.getByteArray(String.valueOf(AppConfig.UsbHandler.WHAT_02));
-                        LogUtils.d("Enter to handleMessage. " + AppConfig.UsbHandler.WHAT_02 + " , " + gson.toJson(buffer));
+                        if (AppConfig.ByteCommand.CMD_03 == buffer[0]) {
+                            handleError(buffer[1]);
+                            break;
+                        }
 
+                        //Slave:0x05 0x01 0x03
                         if (AppConfig.ByteCommand.CMD_05 != buffer[0] || AppConfig.ByteCommand.CMD_01 != buffer[1] || AppConfig.ByteCommand.CMD_03 != buffer[2]) {
                             break;
                         }
@@ -556,32 +588,99 @@ public class UsbHandler {
                 case AppConfig.UsbHandler.WHAT_03:
                     if (null != bundle) {
                         byte[] buffer = bundle.getByteArray(String.valueOf(AppConfig.UsbHandler.WHAT_03));
-                        LogUtils.d("Enter to handleMessage. " + AppConfig.UsbHandler.WHAT_03 + " , " + gson.toJson(buffer));
+                        if (AppConfig.ByteCommand.CMD_03 == buffer[0]) {
+                            handleError(buffer[1]);
+                            break;
+                        }
+
+                        //Slave:0x05 0x02 0x08
+                        if (AppConfig.ByteCommand.CMD_05 != buffer[0] || AppConfig.ByteCommand.CMD_02 != buffer[1] || AppConfig.ByteCommand.CMD_08 != buffer[2]) {
+                            break;
+                        }
 
                         //当前页笔记传输完成后，立即删除该页
                         deletePage(buffer);
-                        pageCount--;
                     }
                     break;
                 //页面删除回调
                 case AppConfig.UsbHandler.WHAT_04:
                     if (null != bundle) {
                         byte[] buffer = bundle.getByteArray(String.valueOf(AppConfig.UsbHandler.WHAT_04));
-                        LogUtils.d("Enter to handleMessage. " + AppConfig.UsbHandler.WHAT_04 + " , " + gson.toJson(buffer));
+                        if (AppConfig.ByteCommand.CMD_03 == buffer[0]) {
+                            handleError(buffer[1]);
+                            break;
+                        }
+
+                        //Slave:0x05 0x03 0x02
+                        if (AppConfig.ByteCommand.CMD_05 != buffer[0] || AppConfig.ByteCommand.CMD_03 != buffer[1] || AppConfig.ByteCommand.CMD_02 != buffer[2]) {
+                            break;
+                        }
+
+                        if (AppConfig.ByteCommand.BASE == buffer[4]) {
+                            LogUtils.d("Delete page success.");
+                        } else {
+                            LogUtils.d("Delete page failed.");
+                        }
                     }
                     break;
                 //查询设备状态
                 case AppConfig.UsbHandler.WHAT_05:
                     if (null != bundle) {
                         byte[] buffer = bundle.getByteArray(String.valueOf(AppConfig.UsbHandler.WHAT_05));
-                        LogUtils.d("Enter to handleMessage. " + AppConfig.UsbHandler.WHAT_05 + " ," + gson.toJson(buffer));
+                        if (AppConfig.ByteCommand.CMD_03 == buffer[0]) {
+                            handleError(buffer[1]);
+                            break;
+                        }
+
+                        //Slave:0x01 0x01 0x01
+                        if (AppConfig.ByteCommand.CMD_01 != buffer[0] || AppConfig.ByteCommand.CMD_01 != buffer[1] || AppConfig.ByteCommand.CMD_01 != buffer[1]) {
+                            break;
+                        }
+
+                        switch (buffer[3]) {
+                            case AppConfig.ByteCommand.BASE:
+                                LogUtils.d("Query device status: " + "离线模式");
+                                break;
+                            case AppConfig.ByteCommand.CMD_01:
+                                LogUtils.d("Query device status: " + "在线模式");
+                                break;
+                            case AppConfig.ByteCommand.CMD_02:
+                                LogUtils.d("Query device status: " + "SYNC模式");
+                                break;
+                            case AppConfig.ByteCommand.CMD_03:
+                                LogUtils.d("Query device status: " + "固件升级模式");
+                                break;
+                        }
                     }
                     break;
                 //设置设备状态
                 case AppConfig.UsbHandler.WHAT_06:
                     if (null != bundle) {
                         byte[] buffer = bundle.getByteArray(String.valueOf(AppConfig.UsbHandler.WHAT_06));
-                        LogUtils.d("Enter to handleMessage. " + AppConfig.UsbHandler.WHAT_06 + " ," + gson.toJson(buffer));
+                        if (AppConfig.ByteCommand.CMD_03 == buffer[0]) {
+                            handleError(buffer[1]);
+                            break;
+                        }
+
+                        //Slave:0x01 0x01 0x01
+                        if (AppConfig.ByteCommand.CMD_01 != buffer[0] || AppConfig.ByteCommand.CMD_01 != buffer[1] || AppConfig.ByteCommand.CMD_01 != buffer[1]) {
+                            break;
+                        }
+
+                        switch (buffer[3]) {
+                            case AppConfig.ByteCommand.BASE:
+                                LogUtils.d("Query device status: " + "离线模式");
+                                break;
+                            case AppConfig.ByteCommand.CMD_01:
+                                LogUtils.d("Query device status: " + "在线模式");
+                                break;
+                            case AppConfig.ByteCommand.CMD_02:
+                                LogUtils.d("Query device status: " + "SYNC模式");
+                                break;
+                            case AppConfig.ByteCommand.CMD_03:
+                                LogUtils.d("Query device status: " + "固件升级模式");
+                                break;
+                        }
                     }
                     break;
             }

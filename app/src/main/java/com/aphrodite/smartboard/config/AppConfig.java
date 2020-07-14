@@ -113,6 +113,12 @@ public class AppConfig extends BaseConfig {
         byte CMD_04 = BASE + 4;
 
         byte CMD_05 = BASE + 5;
+
+        byte CMD_06 = BASE + 6;
+
+        byte CMD_07 = BASE + 7;
+
+        byte CMD_08 = BASE + 8;
     }
 
     public interface UsbHandler {
@@ -129,6 +135,29 @@ public class AppConfig extends BaseConfig {
         byte WHAT_05 = BASE + 5;
 
         byte WHAT_06 = BASE + 6;
+    }
+
+    /**
+     * 错误码解释
+     */
+    public interface ErrorId {
+        //指令ID非法，HOST发送的cmd_id不在预设指令列表中
+        byte BASE = 0x00;
+
+        //校验和失败
+        byte ERROR_01 = BASE + 1;
+
+        //指令Payload长度非法，长度与协议定义不一致
+        byte ERROR_02 = BASE + 2;
+
+        //系统忙状态，当前设备状态无法执行目标指令
+        byte ERROR_03 = BASE + 3;
+
+        //笔记索引值错误
+        byte ERROR_04 = BASE + 4;
+
+        //请求坐标索引值错误
+        byte ERROR_05 = BASE + 5;
     }
 
 }

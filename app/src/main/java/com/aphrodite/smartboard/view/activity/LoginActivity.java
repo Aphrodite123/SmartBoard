@@ -88,12 +88,10 @@ public class LoginActivity extends BaseActivity implements IResponseListener {
 
     @Override
     protected void initListener() {
-
     }
 
     @Override
     protected void initData() {
-
     }
 
     @Override
@@ -105,6 +103,11 @@ public class LoginActivity extends BaseActivity implements IResponseListener {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (null != mDownTimer) {
+            mDownTimer.cancel();
+            mDownTimer = null;
+        }
+        mCountDownListener = null;
     }
 
     @OnClick(R.id.login_auth)

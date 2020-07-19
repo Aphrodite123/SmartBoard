@@ -6,6 +6,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbEndpoint;
@@ -15,19 +17,30 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 
+import com.apeman.sdk.bean.BoardType;
+import com.apeman.sdk.bean.DevicePoint;
+import com.aphrodite.framework.utils.ObjectUtils;
+import com.aphrodite.framework.utils.UIUtils;
 import com.aphrodite.smartboard.R;
 import com.aphrodite.smartboard.application.MainApplication;
 import com.aphrodite.smartboard.config.AppConfig;
+import com.aphrodite.smartboard.model.bean.ScreenRecordEntity;
 import com.aphrodite.smartboard.model.event.SyncEvent;
+import com.aphrodite.smartboard.utils.ByteUtils;
+import com.aphrodite.smartboard.utils.CWFileUtils;
 import com.aphrodite.smartboard.utils.LogUtils;
+import com.google.gson.Gson;
 
 import org.greenrobot.eventbus.EventBus;
 
+import java.io.File;
 import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -307,6 +320,8 @@ public class UsbHandler {
      */
     public void queryOffLineInfo() {
         byte[] buf = {AppConfig.ByteCommand.CMD_04, AppConfig.ByteCommand.BASE, AppConfig.ByteCommand.BASE, AppConfig.ByteCommand.BASE, AppConfig.ByteCommand.BASE, AppConfig.ByteCommand.BASE};
+        Gson gson = new Gson();
+        LogUtils.d("Enter to queryOffLineInfo: " + gson.toJson(buf));
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
@@ -342,8 +357,10 @@ public class UsbHandler {
      *
      * @param payload
      */
-    public void queryPages(byte[] payload) {
-        byte[] pageTrans = {AppConfig.ByteCommand.CMD_04, AppConfig.ByteCommand.CMD_01, AppConfig.ByteCommand.CMD_01, payload[4], (byte) (payload[3] + payload[4]), (byte) (payload[3] + payload[4])};
+    public void queryPages(byte payload) {
+        byte[] pageTrans = {AppConfig.ByteCommand.CMD_04, AppConfig.ByteCommand.CMD_01, AppConfig.ByteCommand.CMD_01, payload, payload, payload};
+        Gson gson = new Gson();
+        LogUtils.d("Enter to queryPages: " + gson.toJson(pageTrans));
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
@@ -379,7 +396,9 @@ public class UsbHandler {
      * @param payload
      */
     public void queryCoordinates(byte[] payload) {
-        byte[] pageTrans = {AppConfig.ByteCommand.CMD_04, AppConfig.ByteCommand.CMD_02, AppConfig.ByteCommand.CMD_02, payload[3], (byte) (payload[3] + payload[4]), (byte) (payload[3] + payload[5])};
+        byte[] pageTrans = {AppConfig.ByteCommand.CMD_04, AppConfig.ByteCommand.CMD_02, AppConfig.ByteCommand.CMD_02, payload[4], payload[5], (byte) (payload[3] + payload[4]), (byte) (payload[3] + payload[5])};
+        Gson gson = new Gson();
+        LogUtils.d("Enter to queryCoordinates: " + gson.toJson(pageTrans));
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
@@ -388,19 +407,21 @@ public class UsbHandler {
                     return;
                 }
 
-                int bufferLength = 8;
+                int bufferLength = 16;
                 ByteBuffer buffer = ByteBuffer.allocate(bufferLength);
                 buffer.order(ByteOrder.nativeOrder());
                 res = getFeature(buffer.array());
                 if (res < 0)
                     return;
                 if (null != mHandler) {
-                    Message message = new Message();
-                    message.what = AppConfig.UsbHandler.WHAT_03;
-                    Bundle bundle = new Bundle();
-                    bundle.putByteArray(String.valueOf(AppConfig.UsbHandler.WHAT_03), buffer.array());
-                    message.setData(bundle);
-                    mHandler.sendMessage(message);
+                    synchronized (mHandler) {
+                        Message message = new Message();
+                        message.what = AppConfig.UsbHandler.WHAT_03;
+                        Bundle bundle = new Bundle();
+                        bundle.putByteArray(String.valueOf(AppConfig.UsbHandler.WHAT_03), buffer.array());
+                        message.setData(bundle);
+                        mHandler.sendMessage(message);
+                    }
                 }
             }
         };
@@ -414,8 +435,8 @@ public class UsbHandler {
      *
      * @param payload
      */
-    public void deletePage(byte[] payload) {
-        byte[] pageTrans = {AppConfig.ByteCommand.CMD_04, AppConfig.ByteCommand.CMD_03, AppConfig.ByteCommand.CMD_01, AppConfig.ByteCommand.BASE, AppConfig.ByteCommand.BASE, AppConfig.ByteCommand.BASE};
+    public void deletePage(byte payload) {
+        byte[] pageTrans = {AppConfig.ByteCommand.CMD_04, AppConfig.ByteCommand.CMD_03, AppConfig.ByteCommand.CMD_01, payload, payload, payload};
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
@@ -530,21 +551,45 @@ public class UsbHandler {
     }
 
     private class DataHandler extends Handler {
-        private WeakReference reference;
-        private int pageCount;
+        private WeakReference mReference;
+        private int mPageCount;
+        private int mCurPageIndex;
+
+        private long mTimestamp;
+        //按照设备比例缩放后的画布宽度
+        private int mCanvasWidth;
+        //按照设备比例缩放后的画布高度
+        private int mCanvasHeight;
+        //将设备坐标点转换为画布坐标点的缩放比例
+        private Double mXScale;
+        private Double mYScale;
+
+        private List<ScreenRecordEntity> mData = new ArrayList<>();
+        private Paint mPaint;
+        private int mStrokeWidth = 10;
+        private int mDrawColor = Color.BLACK;
+
+        private int mCoordinateCount;
+        private List<DevicePoint> mDevicePoints;
 
         public DataHandler(Context context) {
-            reference = new WeakReference<>(context);
+            mReference = new WeakReference<>(context);
+            mTimestamp = System.currentTimeMillis();
+            mDevicePoints = new ArrayList<>();
+            this.queryDeviceInfo();
+            this.initPaint();
         }
 
         @Override
         public void handleMessage(@NonNull Message msg) {
             Bundle bundle = msg.getData();
+            Gson gson = new Gson();
             switch (msg.what) {
                 //离线存储信息查询
                 case AppConfig.UsbHandler.WHAT_01:
                     if (null != bundle) {
                         byte[] buffer = bundle.getByteArray(String.valueOf(AppConfig.UsbHandler.WHAT_01));
+                        LogUtils.d("Enter to handleMessage: " + gson.toJson(buffer));
                         if (AppConfig.ByteCommand.CMD_03 == buffer[0]) {
                             handleError(buffer[1]);
                             break;
@@ -555,22 +600,23 @@ public class UsbHandler {
                             break;
                         }
 
-                        pageCount = buffer[3];
-                        for (int i = 0; i < pageCount; i++) {
-                            queryPages(buffer);
-                        }
+                        mPageCount = buffer[3];
+                        mCurPageIndex = buffer[4];
+//                        while (mCurPageIndex <= mPageCount) {
+                        queryPages((byte) mCurPageIndex);
+//                        mCurPageIndex++;
+//                        }
 
-                        if (pageCount <= 0) {
-                            //离线笔记传输完成切换成在线模式
-                            setDeviceStatus(AppConfig.ByteCommand.CMD_01);
-                            EventBus.getDefault().post(SyncEvent.END_SYNC_OFFLINE);
-                        }
+                        //离线笔记传输完成切换成在线模式
+                        setDeviceStatus(AppConfig.ByteCommand.CMD_01);
+                        EventBus.getDefault().post(SyncEvent.END_SYNC_OFFLINE);
                     }
                     break;
                 //页传输
                 case AppConfig.UsbHandler.WHAT_02:
                     if (null != bundle) {
                         byte[] buffer = bundle.getByteArray(String.valueOf(AppConfig.UsbHandler.WHAT_02));
+                        LogUtils.d("Enter to handleMessage: " + gson.toJson(buffer));
                         if (AppConfig.ByteCommand.CMD_03 == buffer[0]) {
                             handleError(buffer[1]);
                             break;
@@ -581,13 +627,24 @@ public class UsbHandler {
                             break;
                         }
 
-                        queryCoordinates(buffer);
+                        mCoordinateCount = ByteUtils.byteToInteger(new byte[]{buffer[4], buffer[5]});
+                        int[] positionCount;
+                        for (int i = 0; i < mCoordinateCount; i++) {
+                            positionCount = ByteUtils.integerToArray(i);
+                            if (ObjectUtils.isOutOfBounds(positionCount, 2)) {
+                                continue;
+                            }
+                            buffer[4] = (byte) positionCount[1];
+                            buffer[5] = (byte) positionCount[0];
+                            queryCoordinates(buffer);
+                        }
                     }
                     break;
                 //坐标传输
                 case AppConfig.UsbHandler.WHAT_03:
                     if (null != bundle) {
                         byte[] buffer = bundle.getByteArray(String.valueOf(AppConfig.UsbHandler.WHAT_03));
+                        LogUtils.d("Enter to handleMessage: " + gson.toJson(buffer));
                         if (AppConfig.ByteCommand.CMD_03 == buffer[0]) {
                             handleError(buffer[1]);
                             break;
@@ -598,14 +655,28 @@ public class UsbHandler {
                             break;
                         }
 
-                        //当前页笔记传输完成后，立即删除该页
-                        deletePage(buffer);
+                        DevicePoint devicePoint = new DevicePoint();
+                        devicePoint.setX(ByteUtils.byteToInteger(new byte[]{buffer[6], buffer[5]}));
+                        devicePoint.setY(ByteUtils.byteToInteger(new byte[]{buffer[8], buffer[7]}));
+                        devicePoint.setPressure(ByteUtils.byteToInteger(new byte[]{buffer[10], buffer[9]}));
+                        mDevicePoints.add(devicePoint);
+
+                        if (mCoordinateCount == mDevicePoints.size()) {
+                            int red = (mPaint.getColor() & 0xff0000) >> 16;
+                            int green = (mPaint.getColor() & 0x00ff00) >> 8;
+                            int blue = (mPaint.getColor() & 0x0000ff);
+                            CWFileUtils.writeLine(mDevicePoints, (int) mPaint.getStrokeWidth(), red + "," + green + "," + blue + ",1");
+
+                            //页坐标传输完成后将数据写入文件
+                            saveData();
+                        }
                     }
                     break;
                 //页面删除回调
                 case AppConfig.UsbHandler.WHAT_04:
                     if (null != bundle) {
                         byte[] buffer = bundle.getByteArray(String.valueOf(AppConfig.UsbHandler.WHAT_04));
+                        LogUtils.d("Enter to handleMessage: " + gson.toJson(buffer));
                         if (AppConfig.ByteCommand.CMD_03 == buffer[0]) {
                             handleError(buffer[1]);
                             break;
@@ -627,6 +698,7 @@ public class UsbHandler {
                 case AppConfig.UsbHandler.WHAT_05:
                     if (null != bundle) {
                         byte[] buffer = bundle.getByteArray(String.valueOf(AppConfig.UsbHandler.WHAT_05));
+                        LogUtils.d("Enter to handleMessage: " + gson.toJson(buffer));
                         if (AppConfig.ByteCommand.CMD_03 == buffer[0]) {
                             handleError(buffer[1]);
                             break;
@@ -657,6 +729,7 @@ public class UsbHandler {
                 case AppConfig.UsbHandler.WHAT_06:
                     if (null != bundle) {
                         byte[] buffer = bundle.getByteArray(String.valueOf(AppConfig.UsbHandler.WHAT_06));
+                        LogUtils.d("Enter to handleMessage: " + gson.toJson(buffer));
                         if (AppConfig.ByteCommand.CMD_03 == buffer[0]) {
                             handleError(buffer[1]);
                             break;
@@ -685,6 +758,44 @@ public class UsbHandler {
                     break;
             }
         }
+
+        private void queryDeviceInfo() {
+            BoardType boardType = BoardType.NoteMaker;
+            float deviceScale = (float) (boardType.getMaxX() / boardType.getMaxY());
+            int viewWidth = UIUtils.getDisplayWidthPixels(mContext);
+            int viewHeight = UIUtils.getDisplayHeightPixels(mContext);
+            float screenScale = (float) (viewWidth) / (float) (viewHeight);
+            if (screenScale > deviceScale) {
+                //设备更宽，以View的高为基准进行缩放
+                mCanvasHeight = viewHeight;
+                mCanvasWidth = (int) (viewHeight * deviceScale);
+            } else {
+                //以View的宽为基准进行缩放
+                mCanvasWidth = viewWidth;
+                mCanvasHeight = (int) (viewWidth / deviceScale);
+            }
+
+            mXScale = mCanvasWidth / boardType.getMaxX();
+            mYScale = mCanvasHeight / boardType.getMaxY();
+        }
+
+        private void initPaint() {
+            mPaint = new Paint();
+            mPaint.setColor(mDrawColor);
+            mPaint.setStyle(Paint.Style.STROKE);
+            mPaint.setStrokeWidth(mStrokeWidth);
+            mPaint.setAntiAlias(true);
+            mPaint.setStrokeCap(Paint.Cap.ROUND);
+        }
+
+        private void saveData() {
+            ScreenRecordEntity screenRecordEntity = new ScreenRecordEntity();
+            screenRecordEntity.setType("data/0");
+            mData.add(screenRecordEntity);
+
+            CWFileUtils.write(mData, AppConfig.DATA_PATH + mTimestamp + File.separator, mCanvasWidth, mCanvasHeight, mTimestamp);
+        }
+
     }
 
 }

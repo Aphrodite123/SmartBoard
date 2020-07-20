@@ -602,14 +602,11 @@ public class UsbHandler {
 
                         mPageCount = buffer[3];
                         mCurPageIndex = buffer[4];
-//                        while (mCurPageIndex <= mPageCount) {
-                        queryPages((byte) mCurPageIndex);
-//                        mCurPageIndex++;
-//                        }
+                        queryPages((byte) 4);
 
                         //离线笔记传输完成切换成在线模式
-                        setDeviceStatus(AppConfig.ByteCommand.CMD_01);
-                        EventBus.getDefault().post(SyncEvent.END_SYNC_OFFLINE);
+//                        setDeviceStatus(AppConfig.ByteCommand.CMD_01);
+//                        EventBus.getDefault().post(SyncEvent.END_SYNC_OFFLINE);
                     }
                     break;
                 //页传输

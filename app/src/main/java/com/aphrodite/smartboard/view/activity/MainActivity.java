@@ -542,7 +542,7 @@ public class MainActivity extends BaseDeviceActivity {
         List<Integer> xyPoints;
         for (int i = 0; i < points.size(); i++) {
             xyPoints = points.get(i);
-            if (ObjectUtils.isOutOfBounds(xyPoints, 1)) {
+            if (ObjectUtils.isOutOfBounds(xyPoints, 2) || xyPoints.get(2) <= 0) {
                 continue;
             }
             if (0 == i) {

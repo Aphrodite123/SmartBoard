@@ -114,6 +114,10 @@ public class BitmapUtils {
         File saveFile = new File(path, fileName);
         if (!saveFile.exists()) {
             saveFile.createNewFile();
+        } else {
+            if (saveFile.delete()) {
+                saveFile.createNewFile();
+            }
         }
 
         BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(saveFile));

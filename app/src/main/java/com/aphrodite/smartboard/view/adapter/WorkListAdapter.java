@@ -8,16 +8,16 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import com.aphrodite.framework.view.adapter.BaseRecyclerAdapter;
 import com.aphrodite.smartboard.R;
 import com.aphrodite.smartboard.model.bean.WorkInfoBean;
 import com.bumptech.glide.Glide;
 
 import java.io.File;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 public class WorkListAdapter<T> extends BaseRecyclerAdapter<T, WorkListAdapter.ViewHolder> {
     private Context mContext;
@@ -109,6 +109,7 @@ public class WorkListAdapter<T> extends BaseRecyclerAdapter<T, WorkListAdapter.V
                 return spanSize;
             }
         });
+        super.onAttachedToRecyclerView(recyclerView);
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {

@@ -15,16 +15,15 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-
 import com.aphrodite.framework.utils.KeyboardUtils;
 import com.aphrodite.framework.utils.ObjectUtils;
 import com.aphrodite.framework.view.manager.ActivitysManager;
 import com.aphrodite.framework.view.widget.dialog.LoadingDialog;
 import com.aphrodite.smartboard.R;
 
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import butterknife.ButterKnife;
@@ -195,7 +194,6 @@ public abstract class BaseActivity extends AppCompatActivity {
         if (null == mLoadingDialog) {
             mLoadingDialog = new LoadingDialog(this, R.style.dialog_loading, R.drawable.loading_animation);
         }
-
         if (!mLoadingDialog.isShowing()) {
             mLoadingDialog.show();
         }

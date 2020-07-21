@@ -574,7 +574,6 @@ public class UsbHandler {
 
         public DataHandler(Context context) {
             mReference = new WeakReference<>(context);
-            mTimestamp = System.currentTimeMillis();
             mDevicePoints = new ArrayList<>();
             this.queryDeviceInfo();
             this.initPaint();
@@ -612,8 +611,12 @@ public class UsbHandler {
         private void saveData() {
             ScreenRecordEntity screenRecordEntity = new ScreenRecordEntity();
             screenRecordEntity.setType("data/0");
+            if (null != mData) {
+                mData.clear();
+            }
             mData.add(screenRecordEntity);
 
+            mTimestamp = System.currentTimeMillis();
             CWFileUtils.write(mData, AppConfig.DATA_PATH + mTimestamp + File.separator, mCanvasWidth, mCanvasHeight, mTimestamp);
         }
 
@@ -684,6 +687,7 @@ public class UsbHandler {
                         if (AppConfig.ByteCommand.CMD_05 != buffer[0] || AppConfig.ByteCommand.CMD_02 != buffer[1] || AppConfig.ByteCommand.CMD_08 != buffer[2]) {
                             break;
                         }
+                        mCoordinateCount--;
 
                         int pressure = ByteUtils.byteToInteger(new byte[]{buffer[10], buffer[9]});
                         if (pressure <= 0) {
@@ -694,7 +698,6 @@ public class UsbHandler {
 
                             //保存完后将mDevicePoints置为空
                             mDevicePoints.clear();
-                            mCoordinateCount--;
                         } else {
                             DevicePoint devicePoint = new DevicePoint();
                             devicePoint.setX(ByteUtils.byteToInteger(new byte[]{buffer[6], buffer[5]}));
@@ -703,7 +706,7 @@ public class UsbHandler {
                             mDevicePoints.add(devicePoint);
                         }
 
-                        if (mCoordinateCount == mDevicePoints.size()) {
+                        if (mCoordinateCount <= 0) {
                             //页坐标传输完成后将数据写入文件
                             saveData();
 

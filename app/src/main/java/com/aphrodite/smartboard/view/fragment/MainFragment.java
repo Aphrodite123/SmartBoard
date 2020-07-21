@@ -4,9 +4,6 @@ import android.content.Intent;
 import android.text.TextUtils;
 import android.widget.LinearLayout;
 
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
-
 import com.aphrodite.framework.utils.ObjectUtils;
 import com.aphrodite.smartboard.R;
 import com.aphrodite.smartboard.config.AppConfig;
@@ -32,6 +29,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.TimeZone;
 
+import androidx.recyclerview.widget.GridLayoutManager;
 import butterknife.BindView;
 
 /**
@@ -92,6 +90,7 @@ public class MainFragment extends BaseFragment {
             mInfoBeans.addAll(mWorksBeans.get(i).getData());
         }
         mListAdapter.setItems(mInfoBeans);
+        mListAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -249,6 +248,7 @@ public class MainFragment extends BaseFragment {
 
                 if (null != mListAdapter) {
                     mListAdapter.setItems(mInfoBeans);
+                    mListAdapter.notifyDataSetChanged();
                 }
             }
         }

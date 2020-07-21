@@ -2,7 +2,6 @@ package com.aphrodite.smartboard.utils;
 
 import android.graphics.Point;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.apeman.sdk.bean.DevicePoint;
 import com.aphrodite.framework.utils.ObjectUtils;
@@ -82,7 +81,10 @@ public class CWFileUtils {
             wr.write(actStringBuilder.toString());
             wr.write("\n");
             wr.close();
+
+            actStringBuilder = null;
             actStringBuilder = new StringBuilder();
+
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {

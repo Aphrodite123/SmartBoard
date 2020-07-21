@@ -73,26 +73,28 @@ public class MainFragment extends BaseFragment {
     protected void initData() {
         mWorksBeans = new ArrayList<>();
         mCws = new ArrayList<>();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (null != mWorksBeans) {
-            mWorksBeans.clear();
-        }
-        if (null != mCws) {
-            mCws.clear();
-        }
         loadSDcardData();
         parseData();
         mListAdapter.setItems(mWorksBeans);
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+    }
+
+    @Override
     public void onDestroyView() {
         super.onDestroyView();
         EventBus.getDefault().unregister(mEventListener);
+        if (null != mWorksBeans) {
+            mWorksBeans.clear();
+            mWorksBeans = null;
+        }
+        if (null != mCws) {
+            mCws.clear();
+            mCws = null;
+        }
     }
 
     private void loadSDcardData() {

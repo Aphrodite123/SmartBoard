@@ -580,6 +580,43 @@ public class UsbHandler {
             this.initPaint();
         }
 
+        private void queryDeviceInfo() {
+            BoardType boardType = BoardType.NoteMaker;
+            float deviceScale = (float) (boardType.getMaxX() / boardType.getMaxY());
+            int viewWidth = UIUtils.getDisplayWidthPixels(mContext);
+            int viewHeight = UIUtils.getDisplayHeightPixels(mContext);
+            float screenScale = (float) (viewWidth) / (float) (viewHeight);
+            if (screenScale > deviceScale) {
+                //设备更宽，以View的高为基准进行缩放
+                mCanvasHeight = viewHeight;
+                mCanvasWidth = (int) (viewHeight * deviceScale);
+            } else {
+                //以View的宽为基准进行缩放
+                mCanvasWidth = viewWidth;
+                mCanvasHeight = (int) (viewWidth / deviceScale);
+            }
+
+            mXScale = mCanvasWidth / boardType.getMaxX();
+            mYScale = mCanvasHeight / boardType.getMaxY();
+        }
+
+        private void initPaint() {
+            mPaint = new Paint();
+            mPaint.setColor(mDrawColor);
+            mPaint.setStyle(Paint.Style.STROKE);
+            mPaint.setStrokeWidth(mStrokeWidth);
+            mPaint.setAntiAlias(true);
+            mPaint.setStrokeCap(Paint.Cap.ROUND);
+        }
+
+        private void saveData() {
+            ScreenRecordEntity screenRecordEntity = new ScreenRecordEntity();
+            screenRecordEntity.setType("data/0");
+            mData.add(screenRecordEntity);
+
+            CWFileUtils.write(mData, AppConfig.DATA_PATH + mTimestamp + File.separator, mCanvasWidth, mCanvasHeight, mTimestamp);
+        }
+
         @Override
         public void handleMessage(@NonNull Message msg) {
             Bundle bundle = msg.getData();
@@ -602,11 +639,7 @@ public class UsbHandler {
 
                         mPageCount = buffer[3];
                         mCurPageIndex = buffer[4];
-                        queryPages((byte) 4);
-
-                        //离线笔记传输完成切换成在线模式
-//                        setDeviceStatus(AppConfig.ByteCommand.CMD_01);
-//                        EventBus.getDefault().post(SyncEvent.END_SYNC_OFFLINE);
+                        queryPages((byte) mCurPageIndex);
                     }
                     break;
                 //页传输
@@ -652,20 +685,38 @@ public class UsbHandler {
                             break;
                         }
 
-                        DevicePoint devicePoint = new DevicePoint();
-                        devicePoint.setX(ByteUtils.byteToInteger(new byte[]{buffer[6], buffer[5]}));
-                        devicePoint.setY(ByteUtils.byteToInteger(new byte[]{buffer[8], buffer[7]}));
-                        devicePoint.setPressure(ByteUtils.byteToInteger(new byte[]{buffer[10], buffer[9]}));
-                        mDevicePoints.add(devicePoint);
-
-                        if (mCoordinateCount == mDevicePoints.size()) {
+                        int pressure = ByteUtils.byteToInteger(new byte[]{buffer[10], buffer[9]});
+                        if (pressure <= 0) {
                             int red = (mPaint.getColor() & 0xff0000) >> 16;
                             int green = (mPaint.getColor() & 0x00ff00) >> 8;
                             int blue = (mPaint.getColor() & 0x0000ff);
                             CWFileUtils.writeLine(mDevicePoints, (int) mPaint.getStrokeWidth(), red + "," + green + "," + blue + ",1");
 
+                            //保存完后将mDevicePoints置为空
+                            mDevicePoints.clear();
+                            mCoordinateCount--;
+                        } else {
+                            DevicePoint devicePoint = new DevicePoint();
+                            devicePoint.setX(ByteUtils.byteToInteger(new byte[]{buffer[6], buffer[5]}));
+                            devicePoint.setY(ByteUtils.byteToInteger(new byte[]{buffer[8], buffer[7]}));
+                            devicePoint.setPressure(pressure);
+                            mDevicePoints.add(devicePoint);
+                        }
+
+                        if (mCoordinateCount == mDevicePoints.size()) {
                             //页坐标传输完成后将数据写入文件
                             saveData();
+
+                            //当前页坐标传输完成后将进行下一页的传输
+                            mCurPageIndex++;
+                            if (mCurPageIndex < mPageCount) {
+                                queryPages((byte) mCurPageIndex);
+                            } else {
+                                deletePage((byte) 0);
+                                //离线笔记传输完成切换成在线模式
+                                setDeviceStatus(AppConfig.ByteCommand.CMD_01);
+                                EventBus.getDefault().post(SyncEvent.END_SYNC_OFFLINE);
+                            }
                         }
                     }
                     break;
@@ -755,44 +806,6 @@ public class UsbHandler {
                     break;
             }
         }
-
-        private void queryDeviceInfo() {
-            BoardType boardType = BoardType.NoteMaker;
-            float deviceScale = (float) (boardType.getMaxX() / boardType.getMaxY());
-            int viewWidth = UIUtils.getDisplayWidthPixels(mContext);
-            int viewHeight = UIUtils.getDisplayHeightPixels(mContext);
-            float screenScale = (float) (viewWidth) / (float) (viewHeight);
-            if (screenScale > deviceScale) {
-                //设备更宽，以View的高为基准进行缩放
-                mCanvasHeight = viewHeight;
-                mCanvasWidth = (int) (viewHeight * deviceScale);
-            } else {
-                //以View的宽为基准进行缩放
-                mCanvasWidth = viewWidth;
-                mCanvasHeight = (int) (viewWidth / deviceScale);
-            }
-
-            mXScale = mCanvasWidth / boardType.getMaxX();
-            mYScale = mCanvasHeight / boardType.getMaxY();
-        }
-
-        private void initPaint() {
-            mPaint = new Paint();
-            mPaint.setColor(mDrawColor);
-            mPaint.setStyle(Paint.Style.STROKE);
-            mPaint.setStrokeWidth(mStrokeWidth);
-            mPaint.setAntiAlias(true);
-            mPaint.setStrokeCap(Paint.Cap.ROUND);
-        }
-
-        private void saveData() {
-            ScreenRecordEntity screenRecordEntity = new ScreenRecordEntity();
-            screenRecordEntity.setType("data/0");
-            mData.add(screenRecordEntity);
-
-            CWFileUtils.write(mData, AppConfig.DATA_PATH + mTimestamp + File.separator, mCanvasWidth, mCanvasHeight, mTimestamp);
-        }
-
     }
 
 }

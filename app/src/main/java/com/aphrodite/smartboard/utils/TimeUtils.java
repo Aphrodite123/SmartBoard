@@ -141,12 +141,20 @@ public class TimeUtils {
         return time;
     }
 
-    public static boolean isSameDay(long secOne, long secTwo, TimeZone timeZone) {
-        return Math.abs(secOne - secTwo) < 24 * 60 * 60 && secToAbsoluteDays(secOne, timeZone) == secToAbsoluteDays(secTwo, timeZone);
+    /**
+     * 比较两个时间戳，单位：ms
+     *
+     * @param msOne
+     * @param msTwo
+     * @param timeZone
+     * @return
+     */
+    public static boolean isSameDay(long msOne, long msTwo, TimeZone timeZone) {
+        return Math.abs(msOne - msTwo) < 24 * 60 * 60 * 1000 && secToAbsoluteDays(msOne, timeZone) == secToAbsoluteDays(msTwo, timeZone);
     }
 
-    private static long secToAbsoluteDays(long sec, TimeZone timeZone) {
-        return (1000 * sec + timeZone.getOffset(1000 * sec)) / (24 * 60 * 60 * 1000);
+    private static long secToAbsoluteDays(long ms, TimeZone timeZone) {
+        return (ms + timeZone.getOffset(ms)) / (24 * 60 * 60 * 1000);
     }
 
 }

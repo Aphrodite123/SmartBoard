@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.text.TextUtils;
 import android.widget.LinearLayout;
 
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.aphrodite.framework.utils.ObjectUtils;
@@ -59,7 +60,7 @@ public class MainFragment extends BaseFragment {
         setTitleText(R.string.main_page);
         setTitleColor(getResources().getColor(R.color.color_626262));
 
-        mRefreshRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        mRefreshRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
         mListAdapter = new WorkListAdapter(getContext(), mClickListener);
         mRefreshRecyclerView.setAdapter(mListAdapter);
     }
@@ -75,7 +76,22 @@ public class MainFragment extends BaseFragment {
         mCws = new ArrayList<>();
         loadSDcardData();
         parseData();
-        mListAdapter.setItems(mWorksBeans);
+
+        if (ObjectUtils.isEmpty(mWorksBeans)) {
+            return;
+        }
+
+        List<WorkInfoBean> mInfoBeans = new ArrayList<>();
+        WorkInfoBean infoBean = null;
+        for (int i = 0; i < mWorksBeans.size(); i++) {
+            infoBean = new WorkInfoBean();
+            infoBean.setDate(mWorksBeans.get(i).getDate());
+            infoBean.setType(WorkListAdapter.VIEW_TYPE_DATE);
+            mInfoBeans.add(infoBean);
+
+            mInfoBeans.addAll(mWorksBeans.get(i).getData());
+        }
+        mListAdapter.setItems(mInfoBeans);
     }
 
     @Override
@@ -184,6 +200,7 @@ public class MainFragment extends BaseFragment {
                 infoBean.setPicture(AppConfig.DATA_PATH + cw.getTime() + File.separator + AppConfig.COVER_IMAGE_NAME);
                 infoBean.setDataPath(AppConfig.DATA_PATH + cw.getTime() + File.separator + AppConfig.DATA_FILE_NAME);
                 infoBean.setAudioPath(AppConfig.DATA_PATH + cw.getTime() + File.separator + AppConfig.AUDIO_FILE_NAME);
+                infoBean.setType(WorkListAdapter.VIEW_TYPE_ITEM);
 
                 workInfoBeans.add(infoBean);
             }
@@ -218,8 +235,20 @@ public class MainFragment extends BaseFragment {
                 }
                 loadSDcardData();
                 parseData();
+
+                List<WorkInfoBean> mInfoBeans = new ArrayList<>();
+                WorkInfoBean infoBean = null;
+                for (int i = 0; i < mWorksBeans.size(); i++) {
+                    infoBean = new WorkInfoBean();
+                    infoBean.setDate(mWorksBeans.get(i).getDate());
+                    infoBean.setType(WorkListAdapter.VIEW_TYPE_DATE);
+                    mInfoBeans.add(infoBean);
+
+                    mInfoBeans.addAll(mWorksBeans.get(i).getData());
+                }
+
                 if (null != mListAdapter) {
-                    mListAdapter.setItems(mWorksBeans);
+                    mListAdapter.setItems(mInfoBeans);
                 }
             }
         }

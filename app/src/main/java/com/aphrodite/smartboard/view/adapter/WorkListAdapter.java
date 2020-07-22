@@ -14,6 +14,7 @@ import com.aphrodite.smartboard.model.bean.WorkInfoBean;
 import com.bumptech.glide.Glide;
 
 import java.io.File;
+import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -76,6 +77,11 @@ public class WorkListAdapter<T> extends BaseRecyclerAdapter<T, WorkListAdapter.V
     }
 
     @Override
+    public void onBindViewHolder(@NonNull WorkListAdapter.ViewHolder holder, int position, @NonNull List<Object> payloads) {
+        onBindViewHolder(holder, position);
+    }
+
+    @Override
     public int getItemViewType(int position) {
         WorkInfoBean bean = (WorkInfoBean) getItem(position);
         if (null == bean) {
@@ -100,10 +106,11 @@ public class WorkListAdapter<T> extends BaseRecyclerAdapter<T, WorkListAdapter.V
                 }
                 switch (bean.getType()) {
                     case VIEW_TYPE_DATE:
-                        spanSize = 1;
+                        //如果是date就占据2个单元格
+                        spanSize = 2;
                         break;
                     case VIEW_TYPE_ITEM:
-                        spanSize = 2;
+                        spanSize = 1;
                         break;
                 }
                 return spanSize;

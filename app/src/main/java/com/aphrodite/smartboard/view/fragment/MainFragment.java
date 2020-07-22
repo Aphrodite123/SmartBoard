@@ -90,7 +90,6 @@ public class MainFragment extends BaseFragment {
             mInfoBeans.addAll(mWorksBeans.get(i).getData());
         }
         mListAdapter.setItems(mInfoBeans);
-        mListAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -248,7 +247,6 @@ public class MainFragment extends BaseFragment {
 
                 if (null != mListAdapter) {
                     mListAdapter.setItems(mInfoBeans);
-                    mListAdapter.notifyDataSetChanged();
                 }
             }
         }

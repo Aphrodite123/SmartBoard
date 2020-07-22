@@ -172,6 +172,8 @@ public class UsbHandler {
                 return;
             }
             queryOffLineInfo();
+            //通知Activity显示loading
+            EventBus.getDefault().post(SyncEvent.SYNC_OFFLINE_DATA);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -539,7 +541,6 @@ public class UsbHandler {
             switch (intent.getAction()) {
                 case UsbManager.ACTION_USB_DEVICE_ATTACHED:
                     detectUsb(null, null);
-                    EventBus.getDefault().post(SyncEvent.SYNC_OFFLINE_DATA);
                     break;
                 case UsbManager.ACTION_USB_DEVICE_DETACHED:
                     EventBus.getDefault().post(SyncEvent.END_SYNC_OFFLINE);

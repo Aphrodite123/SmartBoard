@@ -312,8 +312,8 @@ public class MainActivity extends BaseDeviceActivity {
             @Override
             public void onChanged(ConnectStatus connectStatus) {
                 if (connectStatus.getResult()) {
-//                    Intent intent = new Intent(IntentAction.DeviceOnLineAction.ACTION);
-//                    startActivity(intent);
+                    Intent intent = new Intent(IntentAction.DeviceOnLineAction.ACTION);
+                    startActivity(intent);
                 } else {
                     ToastUtils.showMessage(connectStatus.getMsg());
                 }
@@ -627,6 +627,12 @@ public class MainActivity extends BaseDeviceActivity {
                     break;
                 case END_SYNC_OFFLINE:
                     dismissLoadingDialog();
+
+                    //离线笔记传输完成切换成在线模式
+                    UsbHandler.getInstance().setDeviceStatus(AppConfig.ByteCommand.CMD_01);
+
+                    Intent intent = new Intent(IntentAction.DeviceOnLineAction.ACTION);
+                    startActivity(intent);
                     break;
             }
         }

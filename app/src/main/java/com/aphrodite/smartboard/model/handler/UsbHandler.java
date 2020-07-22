@@ -221,6 +221,9 @@ public class UsbHandler {
 
     private int setFeature(byte[] buf) {
         int res = 0;
+        if (null == mUsbDeviceConnection || null == mOutUsbEndpoint) {
+            return res;
+        }
         //检测buf长度
         if (buf.length > 16 * 1024) {
             int pack = buf.length / (16 * 1024);
@@ -239,6 +242,9 @@ public class UsbHandler {
     }
 
     private int getFeature(byte[] buf) {
+        if (null == mUsbDeviceConnection || null == mInUsbEndpoint) {
+            return 0;
+        }
         int res = mUsbDeviceConnection.bulkTransfer(mInUsbEndpoint, buf, buf.length, 8192);
         return res;
     }
@@ -633,11 +639,13 @@ public class UsbHandler {
                         LogUtils.d("Enter to handleMessage: " + gson.toJson(buffer));
                         if (AppConfig.ByteCommand.CMD_03 == buffer[0]) {
                             handleError(buffer[1]);
+                            EventBus.getDefault().post(SyncEvent.END_SYNC_OFFLINE);
                             break;
                         }
 
                         //Slave:0x05 0x00 0x02
                         if (AppConfig.ByteCommand.CMD_05 != buffer[0] || AppConfig.ByteCommand.BASE != buffer[1] || AppConfig.ByteCommand.CMD_02 != buffer[2]) {
+                            EventBus.getDefault().post(SyncEvent.END_SYNC_OFFLINE);
                             break;
                         }
 
@@ -653,11 +661,17 @@ public class UsbHandler {
                         LogUtils.d("Enter to handleMessage: " + gson.toJson(buffer));
                         if (AppConfig.ByteCommand.CMD_03 == buffer[0]) {
                             handleError(buffer[1]);
+                            //离线笔记传输完成切换成在线模式
+                            setDeviceStatus(AppConfig.ByteCommand.CMD_01);
+                            EventBus.getDefault().post(SyncEvent.END_SYNC_OFFLINE);
                             break;
                         }
 
                         //Slave:0x05 0x01 0x03
                         if (AppConfig.ByteCommand.CMD_05 != buffer[0] || AppConfig.ByteCommand.CMD_01 != buffer[1] || AppConfig.ByteCommand.CMD_03 != buffer[2]) {
+                            //离线笔记传输完成切换成在线模式
+                            setDeviceStatus(AppConfig.ByteCommand.CMD_01);
+                            EventBus.getDefault().post(SyncEvent.END_SYNC_OFFLINE);
                             break;
                         }
 
@@ -681,11 +695,13 @@ public class UsbHandler {
                         LogUtils.d("Enter to handleMessage: " + gson.toJson(buffer));
                         if (AppConfig.ByteCommand.CMD_03 == buffer[0]) {
                             handleError(buffer[1]);
+                            EventBus.getDefault().post(SyncEvent.END_SYNC_OFFLINE);
                             break;
                         }
 
                         //Slave:0x05 0x02 0x08
                         if (AppConfig.ByteCommand.CMD_05 != buffer[0] || AppConfig.ByteCommand.CMD_02 != buffer[1] || AppConfig.ByteCommand.CMD_08 != buffer[2]) {
+                            EventBus.getDefault().post(SyncEvent.END_SYNC_OFFLINE);
                             break;
                         }
                         mCoordinateCount--;
@@ -731,11 +747,13 @@ public class UsbHandler {
                         LogUtils.d("Enter to handleMessage: " + gson.toJson(buffer));
                         if (AppConfig.ByteCommand.CMD_03 == buffer[0]) {
                             handleError(buffer[1]);
+                            EventBus.getDefault().post(SyncEvent.END_SYNC_OFFLINE);
                             break;
                         }
 
                         //Slave:0x05 0x03 0x02
                         if (AppConfig.ByteCommand.CMD_05 != buffer[0] || AppConfig.ByteCommand.CMD_03 != buffer[1] || AppConfig.ByteCommand.CMD_02 != buffer[2]) {
+                            EventBus.getDefault().post(SyncEvent.END_SYNC_OFFLINE);
                             break;
                         }
 
@@ -753,11 +771,13 @@ public class UsbHandler {
                         LogUtils.d("Enter to handleMessage: " + gson.toJson(buffer));
                         if (AppConfig.ByteCommand.CMD_03 == buffer[0]) {
                             handleError(buffer[1]);
+                            EventBus.getDefault().post(SyncEvent.END_SYNC_OFFLINE);
                             break;
                         }
 
                         //Slave:0x01 0x01 0x01
                         if (AppConfig.ByteCommand.CMD_01 != buffer[0] || AppConfig.ByteCommand.CMD_01 != buffer[1] || AppConfig.ByteCommand.CMD_01 != buffer[1]) {
+                            EventBus.getDefault().post(SyncEvent.END_SYNC_OFFLINE);
                             break;
                         }
 
@@ -784,11 +804,13 @@ public class UsbHandler {
                         LogUtils.d("Enter to handleMessage: " + gson.toJson(buffer));
                         if (AppConfig.ByteCommand.CMD_03 == buffer[0]) {
                             handleError(buffer[1]);
+                            EventBus.getDefault().post(SyncEvent.END_SYNC_OFFLINE);
                             break;
                         }
 
                         //Slave:0x01 0x01 0x01
                         if (AppConfig.ByteCommand.CMD_01 != buffer[0] || AppConfig.ByteCommand.CMD_01 != buffer[1] || AppConfig.ByteCommand.CMD_01 != buffer[1]) {
+                            EventBus.getDefault().post(SyncEvent.END_SYNC_OFFLINE);
                             break;
                         }
 

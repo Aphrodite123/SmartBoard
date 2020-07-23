@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true">
+    android:fitsSystemWindows="true"
+    android:orientation="vertical">
 
     <com.aphrodite.smartboard.view.widget.viewpager.ConfigureSlideViewPager
         android:id="@+id/tab_viewpager"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="@dimen/dip0"
+        android:layout_weight="1" />
 
     <LinearLayout
         android:id="@+id/tab_bottom_ll"
@@ -67,4 +69,4 @@
 
     </LinearLayout>
 
-</RelativeLayout>
+</LinearLayout>

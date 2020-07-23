@@ -171,6 +171,7 @@ public class UsbHandler {
                 mUsbDeviceConnection.close();
                 return;
             }
+//            setDeviceStatus(AppConfig.ByteCommand.CMD_02);
             queryOffLineInfo();
             //通知Activity显示loading
             EventBus.getDefault().post(SyncEvent.SYNC_OFFLINE_DATA);
@@ -649,8 +650,8 @@ public class UsbHandler {
                             break;
                         }
 
-                        mPageCount = buffer[3];
-                        mCurPageIndex = buffer[4];
+                        mCurPageIndex = buffer[3];
+                        mPageCount = buffer[4];
                         queryPages((byte) mCurPageIndex);
                     }
                     break;
@@ -822,6 +823,7 @@ public class UsbHandler {
                                 LogUtils.d("Query device status: " + "在线模式");
                                 break;
                             case AppConfig.ByteCommand.CMD_02:
+                                queryOffLineInfo();
                                 LogUtils.d("Query device status: " + "SYNC模式");
                                 break;
                             case AppConfig.ByteCommand.CMD_03:

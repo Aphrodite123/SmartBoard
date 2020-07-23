@@ -628,6 +628,9 @@ public class MainActivity extends BaseDeviceActivity {
                 case END_SYNC_OFFLINE:
                     dismissLoadingDialog();
 
+                    mLoadSDcardTask = new LoadSDcardTask();
+                    mLoadSDcardTask.execute();
+
                     //离线笔记传输完成切换成在线模式
                     UsbHandler.getInstance().setDeviceStatus(AppConfig.ByteCommand.CMD_01);
 

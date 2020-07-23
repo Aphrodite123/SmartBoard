@@ -109,20 +109,14 @@ public class DeviceOnLineActivity extends BaseDeviceActivity {
             @Override
             public void onChanged(ConnectStatus connectStatus) {
                 if (connectStatus.getResult()) {
-                    mBoardView.setLoadFinishCallback(new BoardViewCallback() {
+                    //这里需要注意一定要在完成画板的初始化后再监听硬件的报点
+                    mUsbPenService.observeDevicePoint(new Function1<DevicePoint, Unit>() {
                         @Override
-                        public void onLoadFinished() {
-                            //这里需要注意一定要在完成画板的初始化后再监听硬件的报点
-                            mUsbPenService.observeDevicePoint(new Function1<DevicePoint, Unit>() {
-                                @Override
-                                public Unit invoke(DevicePoint devicePoint) {
-                                    mBoardView.onPointReceived(devicePoint);
+                        public Unit invoke(DevicePoint devicePoint) {
+                            mBoardView.onPointReceived(devicePoint);
 
-                                    parseDevicePoint(devicePoint);
-                                    return Unit.INSTANCE;
-                                }
-                            });
-
+                            parseDevicePoint(devicePoint);
+                            return Unit.INSTANCE;
                         }
                     });
                 } else {

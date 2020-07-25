@@ -146,8 +146,8 @@ public class BoardOnlineFragment extends BaseFragment {
         mBeans = new ArrayList<>();
         if (null != mCw) {
             WorkBriefBean bean0 = new WorkBriefBean(getString(R.string.author), mCw.getAuthor());
-            WorkBriefBean bean1 = new WorkBriefBean(getString(R.string.create_time), TimeUtils.msToDateFormat(1000 * mCw.getTime(), TimeUtils.FORMAT_CHINESE_ONE));
-            WorkBriefBean bean2 = new WorkBriefBean(getString(R.string.edit_time), TimeUtils.msToDateFormat(1000 * mCw.getEditTime(), TimeUtils.FORMAT_CHINESE_ONE));
+            WorkBriefBean bean1 = new WorkBriefBean(getString(R.string.create_time), TimeUtils.msToDateFormat(mCw.getTime(), TimeUtils.FORMAT_CHINESE_ONE));
+            WorkBriefBean bean2 = new WorkBriefBean(getString(R.string.edit_time), TimeUtils.msToDateFormat(mCw.getEditTime(), TimeUtils.FORMAT_CHINESE_ONE));
             mBeans.add(bean0);
             mBeans.add(bean1);
             mBeans.add(bean2);

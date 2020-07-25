@@ -22,7 +22,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class WorkListAdapter<T> extends BaseRecyclerAdapter<T, WorkListAdapter.ViewHolder> {
     private Context mContext;
-    private WorkListGridViewAdapter mGridViewAdapter;
     private WorkListGridViewAdapter.OnClickListener mClickListener;
 
     public static final int VIEW_TYPE_DATE = 0;

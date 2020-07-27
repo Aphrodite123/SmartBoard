@@ -10,8 +10,8 @@ import com.aphrodite.smartboard.R;
 import com.aphrodite.smartboard.config.IntentAction;
 import com.aphrodite.smartboard.model.event.ActionEvent;
 import com.aphrodite.smartboard.view.activity.base.BaseActivity;
+import com.aphrodite.smartboard.view.fragment.BoardDetailFragment;
 import com.aphrodite.smartboard.view.fragment.BoardEditorFragment;
-import com.aphrodite.smartboard.view.fragment.BoardOnlineFragment;
 import com.aphrodite.smartboard.view.fragment.BoardPlayFragment;
 import com.aphrodite.smartboard.view.fragment.base.BaseFragment;
 import com.aphrodite.smartboard.view.inter.BoardStatusListener;
@@ -59,7 +59,7 @@ public class CanvasActivity extends BaseActivity {
         }
 
         mFragments = new ArrayList<>();
-        BoardOnlineFragment onlineFragment = new BoardOnlineFragment(mStatusListener);
+        BoardDetailFragment onlineFragment = new BoardDetailFragment(mStatusListener);
         BoardPlayFragment playFragment = new BoardPlayFragment(mStatusListener);
         BoardEditorFragment editorFragment = new BoardEditorFragment(mStatusListener);
 

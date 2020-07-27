@@ -253,28 +253,6 @@ public class MainActivity extends BaseDeviceActivity {
         ActivityCompat.requestPermissions(this, permissions, AppConfig.PermissionType.STORAGE_PERMISSION);
     }
 
-    @TargetApi(23)
-    private boolean hasPermission() {
-        return Build.VERSION.SDK_INT < 23
-                || ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
-                && ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
-                && ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
-    }
-
-    @TargetApi(23)
-    private void requestPermission() {
-        if (Build.VERSION.SDK_INT < 23) {
-            return;
-        }
-
-        String[] permissions = new String[]{
-                Manifest.permission.RECORD_AUDIO,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                Manifest.permission.READ_EXTERNAL_STORAGE
-        };
-        ActivityCompat.requestPermissions(this, permissions, AppConfig.PermissionType.RECORD_PERMISSION);
-    }
-
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {
@@ -365,24 +343,7 @@ public class MainActivity extends BaseDeviceActivity {
 //        }
     }
 
-    /**
-     * 图片合成视频
-     */
-    private void handlePhoto() {
-        // 图片所在路径，图片命名格式img+number.jpg
-        // 这里指定目录为根目录下img文件夹
 
-        if (!FileUtils.isExist(AppConfig.FFMPEG_PATH)) {
-            return;
-        }
-
-        String combineVideo = AppConfig.FFMPEG_PATH + "video.mp4";
-        int frameRate = 10;// 合成视频帧率建议:1-10  普通视频帧率一般为25
-        String[] commandLine = FFmpegUtils.pictureToVideo(AppConfig.FFMPEG_PATH, frameRate, combineVideo);
-        if (mFfmpegHandler != null) {
-            mFfmpegHandler.executeFFmpegCmd(commandLine);
-        }
-    }
 
     private void pictureToGif() {
         if (!FileUtils.isExist(AppConfig.FFMPEG_PATH)) {

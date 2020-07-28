@@ -57,15 +57,10 @@ public class BoardEditorFragment extends BaseFragment {
     @BindView(R.id.switch_color)
     TextView mSwitchColorBtn;
 
+    private String mRootPath;
     private String mCurrentDataPath;
-    private String mCurrentAudioPath;
-    private String mCurrentImagePath;
-
-    private List<ScreenRecordEntity> mEntities;
     private CW mCw;
-
     private BoardStatusListener mStatusListener;
-
     private List<ScreenRecordEntity> mRecordEntities = new ArrayList<>();
 
     private PaletePopupWindow mPaletePopupWindow;
@@ -124,9 +119,10 @@ public class BoardEditorFragment extends BaseFragment {
     protected void initData() {
         Bundle bundle = getArguments();
         if (null != bundle) {
-            mCurrentDataPath = bundle.getString(IntentAction.CanvasAction.PATH_TRACK_FILE);
-            mCurrentAudioPath = bundle.getString(IntentAction.CanvasAction.PATH_AUDIO_FILE);
-            mCurrentImagePath = bundle.getString(IntentAction.CanvasAction.PATH_COVER_IMAGE);
+            mRootPath = bundle.getString(IntentAction.CanvasAction.PATH_ROOT);
+        }
+        if (!TextUtils.isEmpty(mRootPath)) {
+            mCurrentDataPath = mRootPath + AppConfig.DATA_FILE_NAME;
         }
 
         onBottomTab(0);

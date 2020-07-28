@@ -4,38 +4,15 @@ import com.aphrodite.framework.config.base.BaseConfig;
 import com.aphrodite.smartboard.application.MainApplication;
 
 import java.io.File;
-import java.util.regex.Pattern;
 
 /**
  * Created by Aphrodite on 2019/5/28.
  */
 public class AppConfig extends BaseConfig {
-    public static final String ROOT_PATH = SDCARD_PATH + "com.aphrodite.smartboard/";
-
     /**
      * 智能手写板数据文件存储路径，默认指定到data
      */
     public static final String DATA_PATH = MainApplication.getApplication().getExternalFilesDir("data").getAbsolutePath() + File.separator;
-
-    /**
-     * User缓存目录
-     */
-    public static final String CACHE_PATH = MainApplication.getApplication().getCacheDir().getAbsolutePath();
-
-    /**
-     * 在线模式板子数据保存路径
-     */
-    public static final String BOARD_ONLINE_PATH = CACHE_PATH + File.separator + "Notes/";
-
-    /**
-     * 正则*从文件名中匹配出timestamp
-     */
-    public static final Pattern BOARD_ONLINE_FILE_PATTERN = Pattern.compile("Note-(\\d{13})\\.note");
-
-    /**
-     * 智能手写板ffmpeg文件存储路径，默认指定到ffmpeg
-     */
-    public static final String FFMPEG_PATH = MainApplication.getApplication().getExternalFilesDir("ffmpeg").getAbsolutePath() + File.separator;
 
     /**
      * assets 数据路径
@@ -46,9 +23,7 @@ public class AppConfig extends BaseConfig {
 
     public static final String AUDIO_FILE_NAME = "audio.mp3";
 
-    /**
-     * 封面图片名称
-     */
+    //封面图片名称
     public static final String COVER_IMAGE_NAME = "cover_image.jpg";
 
     /**

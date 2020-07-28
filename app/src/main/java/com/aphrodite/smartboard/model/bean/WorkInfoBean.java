@@ -7,6 +7,7 @@ public class WorkInfoBean implements Parcelable {
     private String name;
     private String time;
     private String author;
+    private String path;
     private String picture;
     private String dataPath;
     private String audioPath;
@@ -20,6 +21,7 @@ public class WorkInfoBean implements Parcelable {
         name = in.readString();
         time = in.readString();
         author = in.readString();
+        path = in.readString();
         picture = in.readString();
         dataPath = in.readString();
         audioPath = in.readString();
@@ -32,6 +34,7 @@ public class WorkInfoBean implements Parcelable {
         dest.writeString(name);
         dest.writeString(time);
         dest.writeString(author);
+        dest.writeString(path);
         dest.writeString(picture);
         dest.writeString(dataPath);
         dest.writeString(audioPath);
@@ -78,6 +81,14 @@ public class WorkInfoBean implements Parcelable {
 
     public void setAuthor(String author) {
         this.author = author;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
     }
 
     public String getPicture() {

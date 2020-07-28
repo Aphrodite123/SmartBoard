@@ -5,7 +5,6 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Path;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -19,6 +18,8 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.apeman.sdk.bean.BoardType;
+import com.aphrodite.framework.utils.ObjectUtils;
+import com.aphrodite.framework.utils.ToastUtils;
 import com.aphrodite.framework.utils.UIUtils;
 import com.aphrodite.smartboard.R;
 import com.aphrodite.smartboard.config.AppConfig;
@@ -26,10 +27,11 @@ import com.aphrodite.smartboard.config.IntentAction;
 import com.aphrodite.smartboard.model.bean.CW;
 import com.aphrodite.smartboard.model.bean.CWACT;
 import com.aphrodite.smartboard.model.bean.CWLine;
-import com.aphrodite.smartboard.model.bean.ScreenRecordEntity;
 import com.aphrodite.smartboard.model.bean.WorkBriefBean;
 import com.aphrodite.smartboard.model.event.ActionEvent;
+import com.aphrodite.smartboard.model.event.SyncEvent;
 import com.aphrodite.smartboard.model.ffmpeg.FFmpegHandler;
+import com.aphrodite.smartboard.utils.BitmapUtils;
 import com.aphrodite.smartboard.utils.CWFileUtils;
 import com.aphrodite.smartboard.utils.FFmpegUtils;
 import com.aphrodite.smartboard.utils.FileUtils;
@@ -68,32 +70,32 @@ public class BoardDetailFragment extends BaseFragment {
     @BindView(R.id.palette_online_canvas)
     SimpleDoodleView mPaletteOnlineCanvas;
 
+    private String mRootPath;
     private String mCurrentDataPath;
-    private String mCurrentAudioPath;
     private String mCurrentImagePath;
-
-    private List<ScreenRecordEntity> mEntities;
-    private CW mCw;
 
     private BoardStatusListener mStatusListener;
     private ShareDialog mShareDialog;
+    private DeleteDialog mDeleteDialog;
     private ListPopupWindow mListPopupWindow;
     private List<WorkBriefBean> mBeans;
-
-    private DeleteDialog mDeleteDialog;
 
     //按照设备比例缩放后的画布宽度
     private int mCanvasWidth;
     //按照设备比例缩放后的画布高度
     private int mCanvasHeight;
-
     //将设备坐标点转换为画布坐标点的缩放比例
     private Double mXScale;
     private Double mYScale;
 
-    private FFmpegHandler mFfmpegHandler;
     private static int LINE_PARTS = 5;
+    private CW mCw;
+    private FFmpegHandler mFfmpegHandler;
     private Paint mPaint;
+    private float mLastX;
+    private float mLastY;
+    private int mImageNum;
+    private List<List<Integer>> mPoints;
 
     public BoardDetailFragment(BoardStatusListener statusListener) {
         this.mStatusListener = statusListener;
@@ -127,18 +129,20 @@ public class BoardDetailFragment extends BaseFragment {
     protected void initData() {
         getDeviceInfo();
         mFfmpegHandler = new FFmpegHandler(mHandler);
+        mPoints = new ArrayList<>();
 
         Bundle bundle = getArguments();
         if (null != bundle) {
-            mCurrentDataPath = bundle.getString(IntentAction.CanvasAction.PATH_TRACK_FILE);
-            mCurrentAudioPath = bundle.getString(IntentAction.CanvasAction.PATH_AUDIO_FILE);
-            mCurrentImagePath = bundle.getString(IntentAction.CanvasAction.PATH_COVER_IMAGE);
+            mRootPath = bundle.getString(IntentAction.CanvasAction.PATH_ROOT);
+        }
+        if (!TextUtils.isEmpty(mRootPath)) {
+            mCurrentDataPath = mRootPath + AppConfig.DATA_FILE_NAME;
+            mCurrentImagePath = mRootPath + AppConfig.COVER_IMAGE_NAME;
         }
 
         if (TextUtils.isEmpty(mCurrentDataPath)) {
             return;
         }
-
         File file = new File(mCurrentImagePath);
         Glide.with(getContext()).load(file).into(mPaletteOnlineBg);
 
@@ -147,7 +151,6 @@ public class BoardDetailFragment extends BaseFragment {
             String createTime = TimeUtils.msToDateFormat(mCw.getTime(), TimeUtils.FORMAT_SPECIAL_SYMBOL_ONE);
             setTitleText(createTime);
         }
-
     }
 
     @Override
@@ -162,6 +165,9 @@ public class BoardDetailFragment extends BaseFragment {
             mHandler.removeCallbacksAndMessages(null);
             mHandler = null;
         }
+
+        mPoints.clear();
+        mPoints = null;
     }
 
     private void getDeviceInfo() {
@@ -182,6 +188,18 @@ public class BoardDetailFragment extends BaseFragment {
 
         mXScale = mCanvasWidth / boardType.getMaxX();
         mYScale = mCanvasHeight / boardType.getMaxY();
+    }
+
+    private void initPaint(int color, float size) {
+        if (null == mPaint) {
+            mPaint = new Paint();
+        }
+
+        mPaint.setColor(color);
+        mPaint.setStyle(Paint.Style.STROKE);
+        mPaint.setStrokeWidth(size);
+        mPaint.setAntiAlias(true);
+        mPaint.setStrokeCap(Paint.Cap.ROUND);
     }
 
     private void setWindowBackground(Float alpha) {
@@ -207,7 +225,6 @@ public class BoardDetailFragment extends BaseFragment {
 
             splitLine(cwact.getLine());
         }
-
         handlePhoto();
     }
 
@@ -251,62 +268,52 @@ public class BoardDetailFragment extends BaseFragment {
             return;
         }
 
+        mPoints.addAll(points);
+
         Bitmap bitmap = Bitmap.createBitmap(mCanvasWidth, mCanvasHeight, Bitmap.Config.ARGB_8888);
         bitmap.setHasAlpha(true);
         Canvas canvas = new Canvas(bitmap);
         canvas.drawColor(Color.WHITE);
-
         initPaint(color, width);
 
-        Path path = new Path();
-        for (int i = 0; i < points.size(); i++) {
-            List<Integer> xyPoints = points.get(i);
-            if (null == xyPoints || xyPoints.size() < 2) {
+        List<Integer> xyPoints;
+        for (int i = 0; i < mPoints.size(); i++) {
+            xyPoints = mPoints.get(i);
+            if (ObjectUtils.isOutOfBounds(xyPoints, 2) || xyPoints.get(2) <= 0) {
                 continue;
             }
-
             if (0 == i) {
-                path.moveTo(xyPoints.get(0), xyPoints.get(1));
+                canvas.drawPoint((float) (xyPoints.get(0) * mXScale), (float) (xyPoints.get(1) * mYScale), mPaint);
             } else {
-                path.quadTo(mLastX,
-                        mLastY,
-                        (xyPoints.get(0) + mLastX) / 2,
-                        (xyPoints.get(1) + mLastY) / 2);
+                drawPath(canvas, mLastX, mLastY, (float) (xyPoints.get(0) * mXScale), (float) (xyPoints.get(1) * mYScale));
             }
-
-            mLastX = xyPoints.get(0);
-            mLastY = xyPoints.get(1);
-        }
-        mPathList.add(path);
-
-        for (int i = 0; i < mPathList.size(); i++) {
-            canvas.drawPath(mPathList.get(i), mPaint);
+            mLastX = (float) (xyPoints.get(0) * mXScale);
+            mLastY = (float) (xyPoints.get(1) * mYScale);
         }
 
         StringBuffer imageName = new StringBuffer();
         imageName.append("img").append(mImageNum).append(".jpg");
-
-        StringBuffer srcFile = new StringBuffer();
-        srcFile.append(AppConfig.videoPath).append("_").append(mCurrentTime).append(File.separator);
-
         try {
-            BitmapUtil.saveBitmap(bitmap, srcFile.toString(), imageName.toString());
+            BitmapUtils.saveBitmap(bitmap, mCurrentDataPath.substring(0, mCurrentDataPath.lastIndexOf("/")), imageName.toString(), Bitmap.CompressFormat.JPEG, 100);
         } catch (IOException e) {
             e.printStackTrace();
         }
         mImageNum++;
     }
 
-    private void initPaint(int color, float size) {
-        if (null == mPaint) {
-            mPaint = new Paint();
+    private void drawPath(Canvas canvas, float startX, float startY, float endX, float endY) {
+        float x = endX - startX;
+        float y = endY - startY;
+        //10倍插点
+        int insertCount = (int) (Math.max(Math.abs(x), Math.abs(y)) + 2);
+        //S.i("补点：$insertCount")
+        float dx = x / insertCount;
+        float dy = y / insertCount;
+        for (int i = 0; i < insertCount; i++) {
+            float insertX = startX + i * dx;
+            float insertY = startY + i * dy;
+            canvas.drawPoint(insertX, insertY, mPaint);
         }
-
-        mPaint.setColor(color);
-        mPaint.setStyle(Paint.Style.STROKE);
-        mPaint.setStrokeWidth(size);
-        mPaint.setAntiAlias(true);
-        mPaint.setStrokeCap(Paint.Cap.ROUND);
     }
 
     /**
@@ -315,14 +322,33 @@ public class BoardDetailFragment extends BaseFragment {
     private void handlePhoto() {
         // 图片所在路径，图片命名格式img+number.jpg
         // 这里指定目录为根目录下img文件夹
-
-        if (!FileUtils.isExist(AppConfig.FFMPEG_PATH)) {
+        if (!FileUtils.isExist(mRootPath)) {
             return;
         }
 
-        String combineVideo = AppConfig.FFMPEG_PATH + "video.mp4";
+        String combineVideo = mRootPath + "video.mp4";
         int frameRate = 10;// 合成视频帧率建议:1-10  普通视频帧率一般为25
-        String[] commandLine = FFmpegUtils.pictureToVideo(AppConfig.FFMPEG_PATH, frameRate, combineVideo);
+        String[] commandLine = FFmpegUtils.pictureToVideo(mRootPath, frameRate, combineVideo);
+        if (mFfmpegHandler != null) {
+            mFfmpegHandler.executeFFmpegCmd(commandLine);
+        }
+    }
+
+    /**
+     * 生成GIF文件
+     */
+    private void pictureToGif() {
+        if (!FileUtils.isExist(mRootPath)) {
+            return;
+        }
+
+        String srcFile = mRootPath + "video.mp4";
+        String Video2Gif = mRootPath + "pituretogif.gif";
+        int gifStart = 0;
+        int gifDuration = 5;
+        String resolution = "720x1280";//240x320、480x640、1080x1920
+        int frameRate = 10;
+        String[] commandLine = FFmpegUtils.generateGif(srcFile, gifStart, gifDuration, resolution, frameRate, Video2Gif);
         if (mFfmpegHandler != null) {
             mFfmpegHandler.executeFFmpegCmd(commandLine);
         }
@@ -344,8 +370,8 @@ public class BoardDetailFragment extends BaseFragment {
         mBeans = new ArrayList<>();
         if (null != mCw) {
             WorkBriefBean bean0 = new WorkBriefBean(getString(R.string.author), mCw.getAuthor());
-            WorkBriefBean bean1 = new WorkBriefBean(getString(R.string.create_time), TimeUtils.msToDateFormat(1000 * mCw.getTime(), TimeUtils.FORMAT_CHINESE_ONE));
-            WorkBriefBean bean2 = new WorkBriefBean(getString(R.string.edit_time), TimeUtils.msToDateFormat(1000 * mCw.getEditTime(), TimeUtils.FORMAT_CHINESE_ONE));
+            WorkBriefBean bean1 = new WorkBriefBean(getString(R.string.create_time), TimeUtils.msToDateFormat(mCw.getTime(), TimeUtils.FORMAT_CHINESE_ONE));
+            WorkBriefBean bean2 = new WorkBriefBean(getString(R.string.edit_time), TimeUtils.msToDateFormat(mCw.getEditTime(), TimeUtils.FORMAT_CHINESE_ONE));
             mBeans.add(bean0);
             mBeans.add(bean1);
             mBeans.add(bean2);
@@ -403,9 +429,14 @@ public class BoardDetailFragment extends BaseFragment {
             super.handleMessage(msg);
             switch (msg.what) {
                 case MSG_BEGIN:
+                    showLoadingDialog();
                     break;
                 case MSG_FINISH:
-                    Toast.makeText(getContext(), "保存成功，路径为：" + AppConfig.FFMPEG_PATH, Toast.LENGTH_LONG).show();
+                    dismissLoadingDialog();
+                    if (null != mPoints) {
+                        mPoints.clear();
+                    }
+                    ToastUtils.showMessage(String.format(getResources().getString(R.string.prompt_output_path), mRootPath));
                     break;
                 default:
                     break;
@@ -421,8 +452,8 @@ public class BoardDetailFragment extends BaseFragment {
 
         @Override
         public void onPositive() {
-            String dir = mCurrentDataPath.substring(0, mCurrentDataPath.lastIndexOf(AppConfig.SLASH));
-            FileUtils.deleteDir(new File(dir), true);
+            FileUtils.deleteDir(new File(mRootPath), true);
+            EventBus.getDefault().post(SyncEvent.REFRESH_WORK_LIST);
             getActivity().finish();
         }
     };
@@ -430,6 +461,7 @@ public class BoardDetailFragment extends BaseFragment {
     private ShareDialog.OnListener mShareListener = new ShareDialog.OnListener() {
         @Override
         public void onConfirm(int type, int id) {
+            pathsCut();
         }
     };
 

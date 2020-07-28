@@ -195,6 +195,7 @@ public class MainFragment extends BaseFragment {
                 WorkInfoBean infoBean = new WorkInfoBean();
                 infoBean.setAuthor(cw.getAuthor());
                 infoBean.setTime(TimeUtils.msToDateFormat(cw.getTime(), TimeUtils.FORMAT_CLOCK_ONE));
+                infoBean.setPath(AppConfig.DATA_PATH + cw.getTime() + File.separator);
                 infoBean.setPicture(AppConfig.DATA_PATH + cw.getTime() + File.separator + AppConfig.COVER_IMAGE_NAME);
                 infoBean.setDataPath(AppConfig.DATA_PATH + cw.getTime() + File.separator + AppConfig.DATA_FILE_NAME);
                 infoBean.setAudioPath(AppConfig.DATA_PATH + cw.getTime() + File.separator + AppConfig.AUDIO_FILE_NAME);
@@ -212,11 +213,9 @@ public class MainFragment extends BaseFragment {
 
     private WorkListGridViewAdapter.OnClickListener mClickListener = new WorkListGridViewAdapter.OnClickListener() {
         @Override
-        public void onClick(String dataPath, String audioPath, String imagePath) {
+        public void onClick(String path) {
             Intent intent = new Intent(IntentAction.CanvasAction.ACTION);
-            intent.putExtra(IntentAction.CanvasAction.PATH_TRACK_FILE, dataPath);
-            intent.putExtra(IntentAction.CanvasAction.PATH_AUDIO_FILE, audioPath);
-            intent.putExtra(IntentAction.CanvasAction.PATH_COVER_IMAGE, imagePath);
+            intent.putExtra(IntentAction.CanvasAction.PATH_ROOT, path);
             getActivity().startActivity(intent);
         }
     };

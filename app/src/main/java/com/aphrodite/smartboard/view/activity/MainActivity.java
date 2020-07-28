@@ -1,7 +1,6 @@
 package com.aphrodite.smartboard.view.activity;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -12,11 +11,8 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.os.AsyncTask;
 import android.os.Build;
-import android.os.Handler;
-import android.os.Message;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.apeman.sdk.bean.BoardType;
 import com.apeman.sdk.service.ConnectStatus;
@@ -38,9 +34,7 @@ import com.aphrodite.smartboard.model.ffmpeg.FFmpegHandler;
 import com.aphrodite.smartboard.model.handler.UsbHandler;
 import com.aphrodite.smartboard.utils.BitmapUtils;
 import com.aphrodite.smartboard.utils.CWFileUtils;
-import com.aphrodite.smartboard.utils.FFmpegUtils;
 import com.aphrodite.smartboard.utils.FileUtils;
-import com.aphrodite.smartboard.utils.ParseUtils;
 import com.aphrodite.smartboard.view.activity.base.BaseDeviceActivity;
 import com.aphrodite.smartboard.view.adapter.HomeViewPagerAdapter;
 import com.aphrodite.smartboard.view.fragment.MainFragment;
@@ -64,9 +58,6 @@ import androidx.lifecycle.Observer;
 import butterknife.BindView;
 import butterknife.BindViews;
 import butterknife.OnClick;
-
-import static com.aphrodite.smartboard.model.ffmpeg.FFmpegHandler.MSG_BEGIN;
-import static com.aphrodite.smartboard.model.ffmpeg.FFmpegHandler.MSG_FINISH;
 
 public class MainActivity extends BaseDeviceActivity {
     @BindViews({R.id.tab_home_ic, R.id.tab_mine_ic})
@@ -185,23 +176,14 @@ public class MainActivity extends BaseDeviceActivity {
         mPagerAdapter = new HomeViewPagerAdapter(getSupportFragmentManager());
         mViewPager.setAdapter(mPagerAdapter);
         mPagerAdapter.setFragments(mFragments);
-
-        mFfmpegHandler = new FFmpegHandler(mHandler);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
         EventBus.getDefault().unregister(mEventListener);
         UsbHandler.getInstance().close();
         PenService.Companion.disconnectUsbService(this, this);
-
-        //移除Handler
-        if (null != mHandler) {
-            mHandler.removeCallbacksAndMessages(null);
-            mHandler = null;
-        }
 
         if (null != mUsbPenService) {
             mUsbPenService.observeDevicePoint(null);
@@ -218,7 +200,6 @@ public class MainActivity extends BaseDeviceActivity {
             mLoadSDcardTask.cancel(true);
             mLoadSDcardTask = null;
         }
-
     }
 
     @Override
@@ -332,36 +313,6 @@ public class MainActivity extends BaseDeviceActivity {
         startActivity(intent);
     }
 
-    //    @OnClick(R.id.create_video_btn)
-    public void onCreateVideoClick() {
-        ParseUtils.getAssetsJson(this, "phone_region_code.json");
-
-//        if (hasPermission()) {
-//            pictureToGif();
-//        } else {
-//            requestPermission();
-//        }
-    }
-
-
-
-    private void pictureToGif() {
-        if (!FileUtils.isExist(AppConfig.FFMPEG_PATH)) {
-            return;
-        }
-
-        String srcFile = AppConfig.FFMPEG_PATH + "video.mp4";
-        String Video2Gif = AppConfig.FFMPEG_PATH + "pituretogif.gif";
-        int gifStart = 0;
-        int gifDuration = 5;
-        String resolution = "720x1280";//240x320、480x640、1080x1920
-        int frameRate = 10;
-        String[] commandLine = FFmpegUtils.generateGif(srcFile, gifStart, gifDuration, resolution, frameRate, Video2Gif);
-        if (mFfmpegHandler != null) {
-            mFfmpegHandler.executeFFmpegCmd(commandLine);
-        }
-    }
-
     private void switchTab(int position) {
         if (!ObjectUtils.isOutOfBounds(mTabIcons, position)) {
             mTabIcons.get(position).setSelected(true);
@@ -421,7 +372,7 @@ public class MainActivity extends BaseDeviceActivity {
             return;
         }
 
-        createBitmapForFile(mCanvasWidth, mCanvasHeight, fileDir, Bitmap.CompressFormat.JPEG, 100);
+        createBitmapForFile(mCanvasWidth, mCanvasHeight, Bitmap.CompressFormat.JPEG, 100);
 
         CW cw = CWFileUtils.read(path);
         if (null == cw) {
@@ -448,7 +399,7 @@ public class MainActivity extends BaseDeviceActivity {
 
     }
 
-    private void createBitmapForFile(int width, int height, String fileDir, Bitmap.CompressFormat format, int quality) {
+    private void createBitmapForFile(int width, int height, Bitmap.CompressFormat format, int quality) {
         mBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         mBitmap.setHasAlpha(true);
         mCanvas = new Canvas(mBitmap);
@@ -561,23 +512,6 @@ public class MainActivity extends BaseDeviceActivity {
         mPaint.setAntiAlias(true);
         mPaint.setStrokeCap(Paint.Cap.ROUND);
     }
-
-    @SuppressLint("HandlerLeak")
-    private Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            switch (msg.what) {
-                case MSG_BEGIN:
-                    break;
-                case MSG_FINISH:
-                    Toast.makeText(MainActivity.this, "保存成功，路径为：" + AppConfig.FFMPEG_PATH, Toast.LENGTH_LONG).show();
-                    break;
-                default:
-                    break;
-            }
-        }
-    };
 
     private Object mEventListener = new Object() {
         @Subscribe(threadMode = ThreadMode.MAIN)

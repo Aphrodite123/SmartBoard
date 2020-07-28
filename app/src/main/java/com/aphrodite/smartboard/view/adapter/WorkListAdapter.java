@@ -67,7 +67,7 @@ public class WorkListAdapter<T> extends BaseRecyclerAdapter<T, WorkListAdapter.V
                     @Override
                     public void onClick(View v) {
                         if (null != mClickListener) {
-                            mClickListener.onClick(bean.getDataPath(), bean.getAudioPath(), bean.getPicture());
+                            mClickListener.onClick(bean.getPath());
                         }
                     }
                 });

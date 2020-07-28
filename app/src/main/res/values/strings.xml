@@ -95,11 +95,12 @@
     <string name="play_rate">%sx</string>
     <string name="device_disconnected">设备已断开连接</string>
 
-    <!-- BoardOnlineFragment -->
+    <!-- BoardDetailFragment -->
     <string name="work_info">作品信息</string>
     <string name="author">作者</string>
     <string name="create_time">创建时间</string>
     <string name="edit_time">修改时间</string>
+    <string name="prompt_output_path">保存成功，路径为：%s</string>
 
     <!-- BoardEditorFragment -->
     <string name="toast_save_to_gallery_successed">已保存至相册</string>

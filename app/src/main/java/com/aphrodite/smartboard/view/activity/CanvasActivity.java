@@ -2,11 +2,15 @@ package com.aphrodite.smartboard.view.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
+
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+
 import com.aphrodite.framework.utils.ObjectUtils;
 import com.aphrodite.smartboard.R;
+import com.aphrodite.smartboard.config.AppConfig;
 import com.aphrodite.smartboard.config.IntentAction;
 import com.aphrodite.smartboard.model.event.ActionEvent;
 import com.aphrodite.smartboard.view.activity.base.BaseActivity;
@@ -18,6 +22,7 @@ import com.aphrodite.smartboard.view.inter.BoardStatusListener;
 
 import org.greenrobot.eventbus.EventBus;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,14 +31,11 @@ import java.util.List;
  * 画板
  */
 public class CanvasActivity extends BaseActivity {
-
     private List<BaseFragment> mFragments;
 
     //设备是否在线
     private boolean mDeviceOnline = true;
-    private String mCurrentDataPath;
-    private String mCurrentAudioPath;
-    private String mCurrentImagePath;
+    private String mRootPath;
 
     @Override
     protected int getViewId() {
@@ -53,9 +55,7 @@ public class CanvasActivity extends BaseActivity {
     protected void initData() {
         Intent intent = getIntent();
         if (null != intent) {
-            mCurrentDataPath = intent.getStringExtra(IntentAction.CanvasAction.PATH_TRACK_FILE);
-            mCurrentAudioPath = intent.getStringExtra(IntentAction.CanvasAction.PATH_AUDIO_FILE);
-            mCurrentImagePath = intent.getStringExtra(IntentAction.CanvasAction.PATH_COVER_IMAGE);
+            mRootPath = intent.getStringExtra(IntentAction.CanvasAction.PATH_ROOT);
         }
 
         mFragments = new ArrayList<>();
@@ -64,9 +64,7 @@ public class CanvasActivity extends BaseActivity {
         BoardEditorFragment editorFragment = new BoardEditorFragment(mStatusListener);
 
         Bundle bundle = new Bundle();
-        bundle.putString(IntentAction.CanvasAction.PATH_TRACK_FILE, mCurrentDataPath);
-        bundle.putString(IntentAction.CanvasAction.PATH_AUDIO_FILE, mCurrentAudioPath);
-        bundle.putString(IntentAction.CanvasAction.PATH_COVER_IMAGE, mCurrentImagePath);
+        bundle.putString(IntentAction.CanvasAction.PATH_ROOT, mRootPath);
         onlineFragment.setArguments(bundle);
         playFragment.setArguments(bundle);
         editorFragment.setArguments(bundle);

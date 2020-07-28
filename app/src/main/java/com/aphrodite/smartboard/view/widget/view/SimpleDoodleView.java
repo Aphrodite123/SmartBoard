@@ -42,6 +42,9 @@ public class SimpleDoodleView extends View {
     private static int LINE_PARTS = 5;
 
     private boolean mIsEraser;
+    //将设备坐标点转换为画布坐标点的缩放比例
+    private Double mXScale;
+    private Double mYScale;
 
     public void setCanDraw(boolean canDraw) {
         this.canDraw = canDraw;
@@ -228,7 +231,7 @@ public class SimpleDoodleView extends View {
         for (int i = 0; i < points.size(); i++) {
             List<Integer> xyPoints = points.get(i);
             if (i == 0) {
-                mCurrentPath.moveTo(xyPoints.get(0), xyPoints.get(1));
+                mCurrentPath.moveTo((float) (xyPoints.get(0) * mXScale), (float) (xyPoints.get(1) * mYScale));
             } else {
                 mCurrentPath.quadTo(
                         mLastX,
@@ -236,8 +239,8 @@ public class SimpleDoodleView extends View {
                         (xyPoints.get(0) + mLastX) / 2,
                         (xyPoints.get(1) + mLastY) / 2);
             }
-            mLastX = xyPoints.get(0);
-            mLastY = xyPoints.get(1);
+            mLastX = (float) (xyPoints.get(0) * mXScale);
+            mLastY = (float) (xyPoints.get(1) * mYScale);
         }
         DrawPath drawPath = new DrawPath();
         drawPath.setPaint(mPaint);
@@ -256,6 +259,14 @@ public class SimpleDoodleView extends View {
 
     public void setIsEraser(boolean isEraser) {
         this.mIsEraser = isEraser;
+    }
+
+    public void setXScale(Double xScale) {
+        this.mXScale = xScale;
+    }
+
+    public void setYScale(Double yScale) {
+        this.mYScale = yScale;
     }
 
     public void initPaint() {

@@ -11,8 +11,11 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.apeman.sdk.bean.BoardType;
 import com.aphrodite.framework.utils.ObjectUtils;
+import com.aphrodite.framework.utils.UIUtils;
 import com.aphrodite.smartboard.R;
+import com.aphrodite.smartboard.config.AppConfig;
 import com.aphrodite.smartboard.config.IntentAction;
 import com.aphrodite.smartboard.model.bean.CW;
 import com.aphrodite.smartboard.model.bean.CWACT;
@@ -46,11 +49,18 @@ public class BoardPlayFragment extends BaseFragment {
     @BindView(R.id.board_play_status)
     ImageView mPlayStatusBtn;
 
-    private BoardStatusListener mStatusListener;
+    //按照设备比例缩放后的画布宽度
+    private int mCanvasWidth;
+    //按照设备比例缩放后的画布高度
+    private int mCanvasHeight;
+    //将设备坐标点转换为画布坐标点的缩放比例
+    private Double mXScale;
+    private Double mYScale;
 
+    private BoardStatusListener mStatusListener;
+    private String mRootPath;
     private String mCurrentDataPath;
     private String mCurrentAudioPath;
-    private String mCurrentImagePath;
     private RecordPlayerService mRecordPlayerService;
     private ServiceConnection mServiceConnection;
 
@@ -93,10 +103,13 @@ public class BoardPlayFragment extends BaseFragment {
     protected void initData() {
         Bundle bundle = getArguments();
         if (null != bundle) {
-            mCurrentDataPath = bundle.getString(IntentAction.CanvasAction.PATH_TRACK_FILE);
-            mCurrentAudioPath = bundle.getString(IntentAction.CanvasAction.PATH_AUDIO_FILE);
-            mCurrentImagePath = bundle.getString(IntentAction.CanvasAction.PATH_COVER_IMAGE);
+            mRootPath = bundle.getString(IntentAction.CanvasAction.PATH_ROOT);
         }
+        if (!TextUtils.isEmpty(mRootPath)) {
+            mCurrentDataPath = mRootPath + AppConfig.DATA_FILE_NAME;
+            mCurrentAudioPath = mRootPath + AppConfig.AUDIO_FILE_NAME;
+        }
+        getDeviceInfo();
         getPaths();
         startAudioService();
     }
@@ -111,6 +124,26 @@ public class BoardPlayFragment extends BaseFragment {
             mEntities.clear();
             mEntities = null;
         }
+    }
+
+    private void getDeviceInfo() {
+        BoardType boardType = BoardType.NoteMaker;
+        float deviceScale = (float) (boardType.getMaxX() / boardType.getMaxY());
+        int viewWidth = UIUtils.getDisplayWidthPixels(getContext());
+        int viewHeight = UIUtils.getDisplayHeightPixels(getContext());
+        float screenScale = (float) (viewWidth) / (float) (viewHeight);
+        if (screenScale > deviceScale) {
+            //设备更宽，以View的高为基准进行缩放
+            mCanvasHeight = viewHeight;
+            mCanvasWidth = (int) (viewHeight * deviceScale);
+        } else {
+            //以View的宽为基准进行缩放
+            mCanvasWidth = viewWidth;
+            mCanvasHeight = (int) (viewWidth / deviceScale);
+        }
+
+        mXScale = mCanvasWidth / boardType.getMaxX();
+        mYScale = mCanvasHeight / boardType.getMaxY();
     }
 
     private void startAudioService() {
@@ -181,6 +214,8 @@ public class BoardPlayFragment extends BaseFragment {
                 continue;
             }
             if (null != mSimpleDoodleView) {
+                mSimpleDoodleView.setXScale(mXScale);
+                mSimpleDoodleView.setYScale(mYScale);
                 mSimpleDoodleView.splitLine(cwact.getLine());
             }
         }

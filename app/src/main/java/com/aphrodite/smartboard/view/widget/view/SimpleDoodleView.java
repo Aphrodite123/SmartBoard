@@ -231,7 +231,7 @@ public class SimpleDoodleView extends View {
         for (int i = 0; i < points.size(); i++) {
             List<Integer> xyPoints = points.get(i);
             if (i == 0) {
-                mCurrentPath.moveTo((float) (xyPoints.get(0) * mXScale), (float) (xyPoints.get(1) * mYScale));
+                mCurrentPath.moveTo((float) (xyPoints.get(0)), (float) (xyPoints.get(1)));
             } else {
                 mCurrentPath.quadTo(
                         mLastX,
@@ -239,8 +239,8 @@ public class SimpleDoodleView extends View {
                         (xyPoints.get(0) + mLastX) / 2,
                         (xyPoints.get(1) + mLastY) / 2);
             }
-            mLastX = (float) (xyPoints.get(0) * mXScale);
-            mLastY = (float) (xyPoints.get(1) * mYScale);
+            mLastX = (float) (xyPoints.get(0));
+            mLastY = (float) (xyPoints.get(1));
         }
         DrawPath drawPath = new DrawPath();
         drawPath.setPaint(mPaint);

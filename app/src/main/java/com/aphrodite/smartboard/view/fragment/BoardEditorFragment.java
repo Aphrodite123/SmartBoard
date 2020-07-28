@@ -14,8 +14,10 @@ import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.apeman.sdk.bean.BoardType;
 import com.aphrodite.framework.utils.ObjectUtils;
 import com.aphrodite.framework.utils.ToastUtils;
+import com.aphrodite.framework.utils.UIUtils;
 import com.aphrodite.smartboard.R;
 import com.aphrodite.smartboard.config.AppConfig;
 import com.aphrodite.smartboard.config.IntentAction;
@@ -56,6 +58,14 @@ public class BoardEditorFragment extends BaseFragment {
     LinearLayout mCanvasBottomTab;
     @BindView(R.id.switch_color)
     TextView mSwitchColorBtn;
+
+    //按照设备比例缩放后的画布宽度
+    private int mCanvasWidth;
+    //按照设备比例缩放后的画布高度
+    private int mCanvasHeight;
+    //将设备坐标点转换为画布坐标点的缩放比例
+    private Double mXScale;
+    private Double mYScale;
 
     private String mRootPath;
     private String mCurrentDataPath;
@@ -124,7 +134,7 @@ public class BoardEditorFragment extends BaseFragment {
         if (!TextUtils.isEmpty(mRootPath)) {
             mCurrentDataPath = mRootPath + AppConfig.DATA_FILE_NAME;
         }
-
+        getDeviceInfo();
         onBottomTab(0);
 
         getPaths();
@@ -168,6 +178,26 @@ public class BoardEditorFragment extends BaseFragment {
         getActivity().getWindow().setAttributes(layoutParams);
     }
 
+    private void getDeviceInfo() {
+        BoardType boardType = BoardType.NoteMaker;
+        float deviceScale = (float) (boardType.getMaxX() / boardType.getMaxY());
+        int viewWidth = UIUtils.getDisplayWidthPixels(getContext());
+        int viewHeight = UIUtils.getDisplayHeightPixels(getContext());
+        float screenScale = (float) (viewWidth) / (float) (viewHeight);
+        if (screenScale > deviceScale) {
+            //设备更宽，以View的高为基准进行缩放
+            mCanvasHeight = viewHeight;
+            mCanvasWidth = (int) (viewHeight * deviceScale);
+        } else {
+            //以View的宽为基准进行缩放
+            mCanvasWidth = viewWidth;
+            mCanvasHeight = (int) (viewWidth / deviceScale);
+        }
+
+        mXScale = mCanvasWidth / boardType.getMaxX();
+        mYScale = mCanvasHeight / boardType.getMaxY();
+    }
+
     private void getPaths() {
         if (TextUtils.isEmpty(mCurrentDataPath)) {
             return;
@@ -191,6 +221,8 @@ public class BoardEditorFragment extends BaseFragment {
                 continue;
             }
             if (null != mCanvas) {
+                mCanvas.setXScale(mXScale);
+                mCanvas.setYScale(mYScale);
                 mCanvas.splitLine(cwact.getLine());
             }
         }

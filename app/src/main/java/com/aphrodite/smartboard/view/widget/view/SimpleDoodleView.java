@@ -6,13 +6,12 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Point;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
+import com.aphrodite.framework.utils.ObjectUtils;
 import com.aphrodite.smartboard.model.bean.CWLine;
 import com.aphrodite.smartboard.model.ffmpeg.TouchGestureDetector;
 import com.aphrodite.smartboard.utils.CWFileUtils;
@@ -45,6 +44,8 @@ public class SimpleDoodleView extends View {
     //将设备坐标点转换为画布坐标点的缩放比例
     private Double mXScale;
     private Double mYScale;
+
+    private List<List<Integer>> mPoints = new ArrayList<>();
 
     public void setCanDraw(boolean canDraw) {
         this.canDraw = canDraw;
@@ -131,53 +132,58 @@ public class SimpleDoodleView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        for (DrawPath drawPath : drawPaths) {
-            for (int i = 0; i < drawPath.getPathList().size(); i++) {
-                canvas.drawPath(drawPath.getPathList().get(i), drawPath.getPaint());
+        if (ObjectUtils.isEmpty(mPoints)) {
+            for (DrawPath drawPath : drawPaths) {
+                for (int i = 0; i < drawPath.getPathList().size(); i++) {
+                    canvas.drawPath(drawPath.getPathList().get(i), drawPath.getPaint());
+                }
             }
+            return;
         }
-    }
-
-    public void clear() {
-        if (drawPaths != null) {
-            drawPaths.clear();
-        }
-        if (points != null) {
-            points.clear();
-        }
-        if (mPathList != null) {
-            mPathList.clear();
-        }
-        invalidate();
-    }
-
-    public void setDrawPath(CWLine line) {
-        setStrokeWidth(line.getWidth());
-        String[] split = line.getColor().split("\\,");
-        setDrawColor(Color.rgb(Integer.valueOf(split[0]), Integer.valueOf(split[1]), Integer.valueOf(split[2])));
-        initPaint();
-        List<List<Integer>> points = line.getPoints();
-        mCurrentPath = new Path(); // 新的涂鸦
-        mPathList = new ArrayList<>();
-        mPathList.add(mCurrentPath); // 添加的集合中
-        for (int i = 0; i < points.size(); i++) {
-            List<Integer> xyPoints = points.get(i);
-            if (i == 0) {
-                mCurrentPath.moveTo(xyPoints.get(0), xyPoints.get(1));
+        List<Integer> xyPoints = null;
+        for (int i = 0; i < mPoints.size(); i++) {
+            xyPoints = mPoints.get(i);
+            if (ObjectUtils.isOutOfBounds(xyPoints, 2) || xyPoints.get(2) <= 0) {
+                continue;
+            }
+            if (0 == i) {
+                canvas.drawPoint((float) (xyPoints.get(0) * mXScale), (float) (xyPoints.get(1) * mYScale), mPaint);
             } else {
-                mCurrentPath.quadTo(
-                        mLastX,
-                        mLastY,
-                        (xyPoints.get(0) + mLastX) / 2,
-                        (xyPoints.get(1) + mLastY) / 2);
+                drawPath(canvas, mLastX, mLastY, (float) (xyPoints.get(0) * mXScale), (float) (xyPoints.get(1) * mYScale));
             }
-            mLastX = xyPoints.get(0);
-            mLastY = xyPoints.get(1);
+            mLastX = (float) (xyPoints.get(0) * mXScale);
+            mLastY = (float) (xyPoints.get(1) * mYScale);
         }
-        DrawPath drawPath = new DrawPath();
-        drawPath.setPaint(mPaint);
-        drawPath.setPathList(mPathList);
-        drawPaths.add(drawPath);
+    }
+
+    private void drawPath(Canvas canvas, float startX, float startY, float endX, float endY) {
+        float x = endX - startX;
+        float y = endY - startY;
+        //10倍插点
+        int insertCount = (int) (Math.max(Math.abs(x), Math.abs(y)) + 2);
+        //S.i("补点：$insertCount")
+        float dx = x / insertCount;
+        float dy = y / insertCount;
+        for (int i = 0; i < insertCount; i++) {
+            float insertX = startX + i * dx;
+            float insertY = startY + i * dy;
+            canvas.drawPoint(insertX, insertY, mPaint);
+        }
+    }
+
+    public void createPaths(CWLine line) {
+        if (null == line) {
+            return;
+        }
+
+        mPoints.addAll(line.getPoints());
+        if (ObjectUtils.isEmpty(mPoints)) {
+            return;
+        }
+        String[] split = line.getColor().split("\\,");
+        int color = Color.rgb(Integer.valueOf(split[0]), Integer.valueOf(split[1]), Integer.valueOf(split[2]));
+        int width = line.getWidth();
+        initPaint(color, width);
         invalidate();
     }
 
@@ -284,6 +290,31 @@ public class SimpleDoodleView extends View {
             mPaint.setStrokeWidth(strokeWidth);
             mPaint.setColor(drawColor);
         }
+    }
+
+    private void initPaint(int color, float size) {
+        if (null == mPaint) {
+            mPaint = new Paint();
+        }
+
+        mPaint.setColor(color);
+        mPaint.setStyle(Paint.Style.STROKE);
+        mPaint.setStrokeWidth(size);
+        mPaint.setAntiAlias(true);
+        mPaint.setStrokeCap(Paint.Cap.ROUND);
+    }
+
+    public void clear() {
+        if (drawPaths != null) {
+            drawPaths.clear();
+        }
+        if (points != null) {
+            points.clear();
+        }
+        if (mPathList != null) {
+            mPathList.clear();
+        }
+        invalidate();
     }
 
     class DrawPath {

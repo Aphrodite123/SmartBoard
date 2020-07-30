@@ -209,14 +209,14 @@ public class BoardPlayFragment extends BaseFragment {
             if (null == cwact) {
                 continue;
             }
-            int time = cwact.getTime();
-            if (isSeek ? time > seconds : time != seconds) {
-                continue;
-            }
+//            int time = cwact.getTime();
+//            if (isSeek ? time > seconds : time != seconds) {
+//                continue;
+//            }
             if (null != mSimpleDoodleView) {
                 mSimpleDoodleView.setXScale(mXScale);
                 mSimpleDoodleView.setYScale(mYScale);
-                mSimpleDoodleView.splitLine(cwact.getLine());
+                mSimpleDoodleView.createPaths(cwact.getLine());
             }
         }
     }

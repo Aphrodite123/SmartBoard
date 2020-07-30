@@ -15,7 +15,6 @@ import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
 
 import com.apeman.sdk.bean.BoardType;
 import com.aphrodite.framework.utils.ObjectUtils;
@@ -41,7 +40,6 @@ import com.aphrodite.smartboard.view.inter.BoardStatusListener;
 import com.aphrodite.smartboard.view.widget.dialog.DeleteDialog;
 import com.aphrodite.smartboard.view.widget.dialog.ShareDialog;
 import com.aphrodite.smartboard.view.widget.popupwindow.ListPopupWindow;
-import com.aphrodite.smartboard.view.widget.view.SimpleDoodleView;
 import com.bumptech.glide.Glide;
 
 import org.greenrobot.eventbus.EventBus;
@@ -67,8 +65,6 @@ public class BoardDetailFragment extends BaseFragment {
     RelativeLayout mPaletteOnlineRoot;
     @BindView(R.id.palette_online_bg)
     ImageView mPaletteOnlineBg;
-    @BindView(R.id.palette_online_canvas)
-    SimpleDoodleView mPaletteOnlineCanvas;
 
     private String mRootPath;
     private String mCurrentDataPath;

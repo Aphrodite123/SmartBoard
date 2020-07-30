@@ -2,6 +2,8 @@ package com.aphrodite.smartboard.view.widget.view;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -9,6 +11,7 @@ import android.view.View;
 import com.apeman.sdk.bean.DevicePoint;
 import com.aphrodite.smartboard.model.ffmpeg.TouchGestureDetector;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import androidx.annotation.Nullable;
@@ -26,6 +29,19 @@ public class CustomDrawView extends View {
     private List<List<DevicePoint>> mLines;
     private List<DevicePoint> mPoints;
 
+    private int mLastX;
+    private int mLastY;
+    private int mPressure;
+
+    private static int POINT_COUNT = 5;
+    private int mLineWidth;
+    private int mLineColor;
+    private int mEraserWidth;
+    private int mEraserColor;
+    private Paint mPaint;
+    private boolean mIsEraser;
+
+
     public CustomDrawView(Context context) {
         super(context);
     }
@@ -33,6 +49,12 @@ public class CustomDrawView extends View {
     public CustomDrawView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         this.mContext = context;
+        this.mLines = new ArrayList<>();
+        this.mPressure = 1023;
+        this.mLineWidth = 10;
+        this.mLineColor = Color.BLACK;
+        this.mEraserWidth = 20;
+        this.mEraserColor = Color.WHITE;
     }
 
     @Override
@@ -52,20 +74,62 @@ public class CustomDrawView extends View {
         return true;
     }
 
+    private void initPaint() {
+        if (null == mPaint) {
+            mPaint = new Paint();
+        }
+
+        mPaint.setColor(mLineColor);
+        mPaint.setStyle(Paint.Style.STROKE);
+        mPaint.setStrokeWidth(mLineWidth);
+        mPaint.setAntiAlias(true);
+        mPaint.setStrokeCap(Paint.Cap.ROUND);
+
+        if (mIsEraser) {
+            mPaint.setStrokeWidth(mEraserWidth);
+            mPaint.setColor(mEraserColor);
+        } else {
+            mPaint.setXfermode(null);
+            mPaint.setStrokeWidth(mLineWidth);
+            mPaint.setColor(mLineColor);
+        }
+    }
+
+    private void addPoint(int x, int y, int p) {
+        DevicePoint point = new DevicePoint();
+        point.setX(x);
+        point.setY(y);
+        point.setPressure(p);
+        mPoints.add(point);
+    }
+
+
     private TouchGestureDetector mTouchGestureDetector = new TouchGestureDetector(mContext, new TouchGestureDetector.OnTouchGestureListener() {
         @Override
         public void onScrollBegin(MotionEvent e) {
-            super.onScrollBegin(e);
+            initPaint();
+            mPoints = new ArrayList<>();
+            mLastX = (int) e.getX();
+            mLastY = (int) e.getY();
+            addPoint(mLastX, mLastY, mPressure);
+            invalidate();
         }
 
         @Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-            return super.onScroll(e1, e2, distanceX, distanceY);
+            mLastX = (int) e2.getX();
+            mLastY = (int) e2.getY();
+            addPoint(mLastX, mLastY, mPressure);
+            invalidate();
+            return true;
         }
 
         @Override
         public void onScrollEnd(MotionEvent e) {
-            super.onScrollEnd(e);
+            mLastX = (int) e.getX();
+            mLastY = (int) e.getY();
+            addPoint(mLastX, mLastY, mPressure);
+            invalidate();
         }
     });
 

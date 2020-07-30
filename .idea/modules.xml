@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/Application-SmartBoard-app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/Application-SmartBoard-app.iml" group="SmartBoard/app" />
       <module fileurl="file://$PROJECT_DIR$/SmartBoard.iml" filepath="$PROJECT_DIR$/SmartBoard.iml" group="SmartBoard" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/SmartBoard-app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/SmartBoard-app.iml" group="SmartBoard/app" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" group="SmartBoard/app" />

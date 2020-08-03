@@ -32,7 +32,7 @@ import com.aphrodite.smartboard.view.inter.BoardStatusListener;
 import com.aphrodite.smartboard.view.widget.dialog.DeleteDialog;
 import com.aphrodite.smartboard.view.widget.dialog.ShareDialog;
 import com.aphrodite.smartboard.view.widget.popupwindow.PaletePopupWindow;
-import com.aphrodite.smartboard.view.widget.view.SimpleDoodleView;
+import com.aphrodite.smartboard.view.widget.view.CustomDrawView;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -53,7 +53,7 @@ public class BoardEditorFragment extends BaseFragment {
     @BindView(R.id.board_editor_root)
     RelativeLayout mRoot;
     @BindView(R.id.custom_canvas)
-    SimpleDoodleView mCanvas;
+    CustomDrawView mCanvas;
     @BindView(R.id.canvas_bottom_tab)
     LinearLayout mCanvasBottomTab;
     @BindView(R.id.switch_color)
@@ -155,7 +155,7 @@ public class BoardEditorFragment extends BaseFragment {
         mColorIds.add(getResources().getColor(R.color.color_000000));
 
         //默认为红色
-        mCanvas.setDrawColor(getResources().getColor(R.color.color_7bff16));
+//        mCanvas.setDrawColor(getResources().getColor(R.color.color_7bff16));
         ScreenRecordEntity recordEntity = new ScreenRecordEntity();
         recordEntity.setType("data/0");
         mRecordEntities.add(recordEntity);
@@ -221,9 +221,9 @@ public class BoardEditorFragment extends BaseFragment {
                 continue;
             }
             if (null != mCanvas) {
-                mCanvas.setXScale(mXScale);
-                mCanvas.setYScale(mYScale);
-                mCanvas.splitLine(cwact.getLine());
+//                mCanvas.setXScale(mXScale);
+//                mCanvas.setYScale(mYScale);
+//                mCanvas.splitLine(cwact.getLine());
             }
         }
     }
@@ -266,11 +266,11 @@ public class BoardEditorFragment extends BaseFragment {
                 if (null != mCanvas) {
                     mCanvas.setCanDraw(true);
                 }
-                mCanvas.setIsEraser(false);
+                mCanvas.setMode(CustomDrawView.Mode.DRAW);
                 break;
             //橡皮
             case 1:
-                mCanvas.setIsEraser(true);
+                mCanvas.setMode(CustomDrawView.Mode.ERASER);
                 break;
             //色板
             case 2:
@@ -287,12 +287,12 @@ public class BoardEditorFragment extends BaseFragment {
                     mPaletePopupWindow.showAtLocation(mRoot, Gravity.BOTTOM, 0, 0);
                     setWindowBackground(0.8f);
                 }
-                mCanvas.setIsEraser(false);
+                mCanvas.setMode(CustomDrawView.Mode.DRAW);
                 break;
             //清空
             case 3:
                 mCanvas.clear();
-                mCanvas.setIsEraser(false);
+                mCanvas.setMode(CustomDrawView.Mode.DRAW);
                 break;
         }
     }

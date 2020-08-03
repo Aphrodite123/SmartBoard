@@ -17,7 +17,7 @@
         android:layout_below="@id/toolbar"
         android:orientation="vertical">
 
-        <com.aphrodite.smartboard.view.widget.view.SimpleDoodleView
+        <com.aphrodite.smartboard.view.widget.view.CustomDrawView
             android:id="@+id/custom_canvas"
             android:layout_width="match_parent"
             android:layout_height="@dimen/dip0"

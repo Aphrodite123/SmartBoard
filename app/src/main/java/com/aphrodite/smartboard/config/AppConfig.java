@@ -26,10 +26,11 @@ public class AppConfig extends BaseConfig {
     //封面图片名称
     public static final String COVER_IMAGE_NAME = "cover_image.jpg";
 
-    /**
-     * 微信APP ID
-     */
-    public static final String WX_APP_ID = "wx87889e866c6936fe";
+    //微信APP ID
+    public static final String WX_APP_ID = "wxec7f76bcab4613b2";
+
+    //微信APP KEY
+    public static final String WX_APP_KEY = "d6448bffb5bb516121efc9573a3d035c";
 
     public interface SharePreferenceKey {
         //用户手机号

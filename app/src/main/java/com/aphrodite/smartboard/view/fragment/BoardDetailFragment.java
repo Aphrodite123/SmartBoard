@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -26,6 +27,7 @@ import com.aphrodite.smartboard.config.IntentAction;
 import com.aphrodite.smartboard.model.bean.CW;
 import com.aphrodite.smartboard.model.bean.CWACT;
 import com.aphrodite.smartboard.model.bean.CWLine;
+import com.aphrodite.smartboard.model.bean.ShareContentType;
 import com.aphrodite.smartboard.model.bean.WorkBriefBean;
 import com.aphrodite.smartboard.model.event.ActionEvent;
 import com.aphrodite.smartboard.model.event.SyncEvent;
@@ -33,7 +35,9 @@ import com.aphrodite.smartboard.model.ffmpeg.FFmpegHandler;
 import com.aphrodite.smartboard.utils.BitmapUtils;
 import com.aphrodite.smartboard.utils.CWFileUtils;
 import com.aphrodite.smartboard.utils.FFmpegUtils;
+import com.aphrodite.smartboard.utils.FileUtil;
 import com.aphrodite.smartboard.utils.FileUtils;
+import com.aphrodite.smartboard.utils.Share2;
 import com.aphrodite.smartboard.utils.TimeUtils;
 import com.aphrodite.smartboard.view.fragment.base.BaseFragment;
 import com.aphrodite.smartboard.view.inter.BoardStatusListener;
@@ -409,13 +413,25 @@ public class BoardDetailFragment extends BaseFragment {
 
     @OnClick(R.id.iv_right_btn)
     public void onToolbarRightBtn() {
-        if (null == mShareDialog) {
-            mShareDialog = new ShareDialog(getContext(), mShareListener);
-        }
+//        if (null == mShareDialog) {
+//            mShareDialog = new ShareDialog(getContext(), mShareListener);
+//        }
+//
+//        if (!mShareDialog.isShowing()) {
+//            mShareDialog.show();
+//        }
 
-        if (!mShareDialog.isShowing()) {
-            mShareDialog.show();
+        String combineVideo = mRootPath + "video.mp4";
+        Uri shareFileUrl = FileUtil.getFileUri(getContext(), ShareContentType.VIDEO, new File(combineVideo));
+        if (null == shareFileUrl) {
+            return;
         }
+        new Share2.Builder(getActivity())
+                .setContentType(ShareContentType.VIDEO)
+                .setShareFileUri(shareFileUrl)
+                .setTitle(getString(R.string.app_name))
+                .build()
+                .shareBySystem();
     }
 
     @SuppressLint("HandlerLeak")

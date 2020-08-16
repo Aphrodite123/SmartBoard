@@ -628,6 +628,29 @@ public class UsbHandler {
             CWFileUtils.write(mData, AppConfig.DATA_PATH + mTimestamp + File.separator, mCanvasWidth, mCanvasHeight, mTimestamp);
         }
 
+        private void handleCoordinate(byte[] buffer) {
+            if (ObjectUtils.isEmpty(buffer)) {
+                return;
+            }
+
+            int pressure = ByteUtils.byteToInteger(new byte[]{buffer[10], buffer[9]});
+            if (pressure <= 0) {
+                int red = (mPaint.getColor() & 0xff0000) >> 16;
+                int green = (mPaint.getColor() & 0x00ff00) >> 8;
+                int blue = (mPaint.getColor() & 0x0000ff);
+                CWFileUtils.writeLine(mDevicePoints, (int) mPaint.getStrokeWidth(), red + "," + green + "," + blue + ",1");
+
+                //保存完后将mDevicePoints置为空
+                mDevicePoints.clear();
+            } else {
+                DevicePoint devicePoint = new DevicePoint();
+                devicePoint.setX(ByteUtils.byteToInteger(new byte[]{buffer[6], buffer[5]}));
+                devicePoint.setY(ByteUtils.byteToInteger(new byte[]{buffer[8], buffer[7]}));
+                devicePoint.setPressure(pressure);
+                mDevicePoints.add(devicePoint);
+            }
+        }
+
         @Override
         public void handleMessage(@NonNull Message msg) {
             Bundle bundle = msg.getData();
@@ -678,15 +701,14 @@ public class UsbHandler {
 
                         mCoordinateCount = ByteUtils.byteToInteger(new byte[]{buffer[4], buffer[5]});
                         int[] positionCount;
-                        for (int i = 0; i < mCoordinateCount; i++) {
-                            positionCount = ByteUtils.integerToArray(i);
-                            if (ObjectUtils.isOutOfBounds(positionCount, 2)) {
-                                continue;
-                            }
-                            buffer[4] = (byte) positionCount[1];
-                            buffer[5] = (byte) positionCount[0];
-                            queryCoordinates(buffer);
+                        //坐标传输，默认从第1个开始
+                        positionCount = ByteUtils.integerToArray(0);
+                        if (ObjectUtils.isOutOfBounds(positionCount, 2)) {
+                            return;
                         }
+                        buffer[4] = (byte) positionCount[1];
+                        buffer[5] = (byte) positionCount[0];
+                        queryCoordinates(buffer);
                     }
                     break;
                 //坐标传输
@@ -705,25 +727,12 @@ public class UsbHandler {
                             EventBus.getDefault().post(SyncEvent.END_SYNC_OFFLINE);
                             break;
                         }
-                        mCoordinateCount--;
 
-                        int pressure = ByteUtils.byteToInteger(new byte[]{buffer[10], buffer[9]});
-                        if (pressure <= 0) {
-                            int red = (mPaint.getColor() & 0xff0000) >> 16;
-                            int green = (mPaint.getColor() & 0x00ff00) >> 8;
-                            int blue = (mPaint.getColor() & 0x0000ff);
-                            CWFileUtils.writeLine(mDevicePoints, (int) mPaint.getStrokeWidth(), red + "," + green + "," + blue + ",1");
-
-                            //保存完后将mDevicePoints置为空
-                            mDevicePoints.clear();
-                        } else {
-                            DevicePoint devicePoint = new DevicePoint();
-                            devicePoint.setX(ByteUtils.byteToInteger(new byte[]{buffer[6], buffer[5]}));
-                            devicePoint.setY(ByteUtils.byteToInteger(new byte[]{buffer[8], buffer[7]}));
-                            devicePoint.setPressure(pressure);
-                            mDevicePoints.add(devicePoint);
+                        int curIndex = ByteUtils.byteToInteger(new byte[]{buffer[4], buffer[3]});
+                        if (curIndex > 0) {
+                            handleCoordinate(buffer);
                         }
-
+                        mCoordinateCount--;
                         if (mCoordinateCount <= 0) {
                             //页坐标传输完成后将数据写入文件
                             saveData();
@@ -739,6 +748,14 @@ public class UsbHandler {
                                 EventBus.getDefault().post(SyncEvent.END_SYNC_OFFLINE);
                             }
                         }
+
+                        int[] positions = ByteUtils.integerToArray(mCoordinateCount);
+                        if (ObjectUtils.isOutOfBounds(positions, 2)) {
+                            return;
+                        }
+                        buffer[4] = (byte) positions[1];
+                        buffer[5] = (byte) positions[0];
+                        queryCoordinates(buffer);
                     }
                     break;
                 //页面删除回调

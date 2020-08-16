@@ -5,6 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/Application-SmartBoard-app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/Application-SmartBoard-app.iml" group="SmartBoard/app" />
       <module fileurl="file://$PROJECT_DIR$/SmartBoard.iml" filepath="$PROJECT_DIR$/SmartBoard.iml" group="SmartBoard" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/SmartBoard-app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/SmartBoard-app.iml" group="SmartBoard/app" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/share2/SmartBoard-share2.iml" filepath="$PROJECT_DIR$/.idea/modules/share2/SmartBoard-share2.iml" group="SmartBoard/share2" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" group="SmartBoard/app" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/share2/share2.iml" filepath="$PROJECT_DIR$/.idea/modules/share2/share2.iml" group="SmartBoard/share2" />
     </modules>

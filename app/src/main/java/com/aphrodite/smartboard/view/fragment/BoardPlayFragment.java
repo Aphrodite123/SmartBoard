@@ -25,6 +25,7 @@ import com.aphrodite.smartboard.model.service.RecordPlayerService;
 import com.aphrodite.smartboard.utils.CWFileUtils;
 import com.aphrodite.smartboard.view.fragment.base.BaseFragment;
 import com.aphrodite.smartboard.view.inter.BoardStatusListener;
+import com.aphrodite.smartboard.view.widget.view.CustomDrawView;
 import com.aphrodite.smartboard.view.widget.view.SimpleDoodleView;
 
 import java.text.DecimalFormat;
@@ -41,7 +42,7 @@ import static android.content.Context.BIND_AUTO_CREATE;
  */
 public class BoardPlayFragment extends BaseFragment {
     @BindView(R.id.board_play_canvas)
-    SimpleDoodleView mSimpleDoodleView;
+    CustomDrawView mCustomDrawView;
     @BindView(R.id.board_play_seekbar)
     SeekBar mSeekBar;
     @BindView(R.id.play_speed)
@@ -111,7 +112,13 @@ public class BoardPlayFragment extends BaseFragment {
         }
         getDeviceInfo();
         getPaths();
-        startAudioService();
+
+        mCustomDrawView.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mCustomDrawView.replay(mCw, 100, mXScale, mYScale);
+            }
+        }, 200);
     }
 
     @Override
@@ -209,14 +216,7 @@ public class BoardPlayFragment extends BaseFragment {
             if (null == cwact) {
                 continue;
             }
-//            int time = cwact.getTime();
-//            if (isSeek ? time > seconds : time != seconds) {
-//                continue;
-//            }
-            if (null != mSimpleDoodleView) {
-                mSimpleDoodleView.setXScale(mXScale);
-                mSimpleDoodleView.setYScale(mYScale);
-                mSimpleDoodleView.createPaths(cwact.getLine());
+            if (null != mCustomDrawView) {
             }
         }
     }

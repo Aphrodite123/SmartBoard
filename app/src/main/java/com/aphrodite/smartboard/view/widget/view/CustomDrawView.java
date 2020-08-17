@@ -6,17 +6,25 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
 import com.apeman.sdk.bean.DevicePoint;
 import com.aphrodite.framework.utils.ObjectUtils;
+import com.aphrodite.smartboard.model.bean.CW;
+import com.aphrodite.smartboard.model.bean.CWACT;
+import com.aphrodite.smartboard.model.bean.CWLine;
 import com.aphrodite.smartboard.utils.CWFileUtils;
+import com.aphrodite.smartboard.utils.LogUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 /**
@@ -36,7 +44,6 @@ public class CustomDrawView extends View {
     private int mLineColor;
     private int mEraserWidth;
     private int mEraserColor;
-
 
     //是否开启涂鸦
     private boolean mCanDraw;
@@ -101,7 +108,6 @@ public class CustomDrawView extends View {
                 addPoint(mLastX, mLastY, mPressure);
                 break;
             case MotionEvent.ACTION_MOVE:
-
                 mPath.quadTo(mLastX, mLastY, (mLastX + x) / 2, (mLastY + y) / 2);
                 if (null == mBufferBitmap) {
                     initBuffer();
@@ -257,6 +263,82 @@ public class CustomDrawView extends View {
             mRemovePaths.clear();
             mRemovePaths = null;
         }
+
+        if (null != mHandler) {
+            mHandler.removeCallbacksAndMessages(null);
+            mHandler = null;
+        }
+
+    }
+
+    //回放
+    public void replay(CW cw, int delay, double xScale, double yScale) {
+        if (null == cw) {
+            return;
+        }
+        List<CWACT> cwacts = cw.getACT();
+        if (ObjectUtils.isEmpty(cwacts)) {
+            return;
+        }
+
+        for (CWACT cwact : cwacts) {
+            if (null == cwact) {
+                continue;
+            }
+            createPaths(cwact.getLine(), delay, xScale, yScale);
+        }
+    }
+
+    private void createPaths(CWLine line, int delay, double xScale, double yScale) {
+        if (null == line) {
+            return;
+        }
+        if (null == mBufferBitmap) {
+            initBuffer();
+        }
+        List<List<Integer>> points = line.getPoints();
+        if (ObjectUtils.isEmpty(points)) {
+            return;
+        }
+        LogUtils.d("Enter to createPaths. " + points.size());
+        String[] split = line.getColor().split("\\,");
+        int color = Color.rgb(Integer.valueOf(split[0]), Integer.valueOf(split[1]), Integer.valueOf(split[2]));
+        int width = line.getWidth();
+        setLineColor(color);
+        setLineWidth(width);
+        initPaint();
+
+        List<Integer> xyPoints;
+        for (int i = 0; i < points.size(); i++) {
+            xyPoints = points.get(i);
+            if (ObjectUtils.isOutOfBounds(xyPoints, 2) || xyPoints.get(2) <= 0) {
+                continue;
+            }
+            if (0 == i) {
+                mBufferCanvas.drawPoint((float) (xyPoints.get(0) * xScale), (float) (xyPoints.get(1) * yScale), mPaint);
+                invalidate();
+            } else {
+                drawPath(mLastX, mLastY, (float) (xyPoints.get(0) * xScale), (float) (xyPoints.get(1) * yScale));
+            }
+            mLastX = (float) (xyPoints.get(0) * xScale);
+            mLastY = (float) (xyPoints.get(1) * yScale);
+        }
+    }
+
+    private void drawPath(float startX, float startY, float endX, float endY) {
+        float x = endX - startX;
+        float y = endY - startY;
+        //10倍插点
+        int insertCount = (int) (Math.max(Math.abs(x), Math.abs(y)) + 2);
+        //S.i("补点：$insertCount")
+        float dx = x / insertCount;
+        float dy = y / insertCount;
+        for (int i = 0; i < insertCount; i++) {
+            float insertX = startX + i * dx;
+            float insertY = startY + i * dy;
+            mBufferCanvas.drawPoint(insertX, insertY, mPaint);
+            invalidate();
+        }
     }
 
     public void setMode(int mode) {
@@ -298,6 +380,12 @@ public class CustomDrawView extends View {
         int ERASER = BASE + 2;
     }
 
+    private interface WhatType {
+        int BASE = 0x00;
+        int WHAT_01 = BASE + 1;
+        int WHAT_02 = BASE + 1;
+    }
+
     private static class PathDraw {
         public Paint paint;
         public Path path;
@@ -308,4 +396,21 @@ public class CustomDrawView extends View {
             }
         }
     }
+
+    private Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            Bundle bundle = msg.getData();
+            if (null == bundle) {
+                return;
+            }
+            float x = bundle.getFloat(String.valueOf(WhatType.WHAT_01));
+            float y = bundle.getFloat(String.valueOf(WhatType.WHAT_02));
+            LogUtils.d("Enter to handleMessage. (" + x + " , " + y + ")");
+            if (null != mBufferCanvas) {
+                mBufferCanvas.drawPoint(x, y, mPaint);
+                invalidate();
+            }
+        }
+    };
 }

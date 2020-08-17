@@ -9,7 +9,7 @@
         android:id="@+id/toolbar"
         layout="@layout/toolbar_general" />
 
-    <com.aphrodite.smartboard.view.widget.view.SimpleDoodleView
+    <com.aphrodite.smartboard.view.widget.view.CustomDrawView
         android:id="@+id/board_play_canvas"
         android:layout_width="match_parent"
         android:layout_height="@dimen/dip0"

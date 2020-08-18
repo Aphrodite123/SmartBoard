@@ -19,6 +19,9 @@ public class AppConfig extends BaseConfig {
      */
     public static final String ASSETS_FILE_PATH = "data";
 
+    //在线数据保存路径
+    public static final String PATH_ONLINE_DATA = "online/";
+
     public static final String DATA_FILE_NAME = "data.cw";
 
     public static final String AUDIO_FILE_NAME = "audio.mp3";

@@ -88,7 +88,6 @@ public class DeviceOnLineActivity extends BaseDeviceActivity {
 
     @Override
     protected void initData() {
-        mTimestamp = System.currentTimeMillis();
     }
 
     @Override
@@ -235,7 +234,8 @@ public class DeviceOnLineActivity extends BaseDeviceActivity {
         screenRecordEntity.setType("data/0");
         data.add(screenRecordEntity);
 
-        CWFileUtils.write(data, AppConfig.DATA_PATH + mTimestamp + File.separator, mCanvasWidth, mCanvasHeight, mTimestamp);
+        mTimestamp = System.currentTimeMillis();
+        CWFileUtils.write(data, AppConfig.DATA_PATH + AppConfig.PATH_ONLINE_DATA + mTimestamp + File.separator, mCanvasWidth, mCanvasHeight, mTimestamp);
     }
 
     private void cleanBoardView() {
@@ -297,8 +297,7 @@ public class DeviceOnLineActivity extends BaseDeviceActivity {
 
     @OnClick(R.id.iv_right_btn)
     public void onToolbarRightBtn() {
-//        saveData();
-        showDialog();
+        saveData();
     }
 
     private DeleteDialog.OnClickListener mClickListener = new DeleteDialog.OnClickListener() {

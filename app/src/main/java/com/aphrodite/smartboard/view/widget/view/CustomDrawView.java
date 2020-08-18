@@ -33,7 +33,6 @@ import io.reactivex.schedulers.Schedulers;
 public class CustomDrawView extends View {
     private Context mContext;
 
-    private static int POINT_COUNT = 5;
     private List<PathDraw> mCachePaths;
     private List<PathDraw> mRemovePaths;
     private Paint mPaint;

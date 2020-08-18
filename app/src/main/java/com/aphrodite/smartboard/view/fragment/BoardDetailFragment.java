@@ -413,14 +413,6 @@ public class BoardDetailFragment extends BaseFragment {
 
     @OnClick(R.id.iv_right_btn)
     public void onToolbarRightBtn() {
-//        if (null == mShareDialog) {
-//            mShareDialog = new ShareDialog(getContext(), mShareListener);
-//        }
-//
-//        if (!mShareDialog.isShowing()) {
-//            mShareDialog.show();
-//        }
-
         String combineVideo = mRootPath + "video.mp4";
         Uri shareFileUrl = FileUtil.getFileUri(getContext(), ShareContentType.VIDEO, new File(combineVideo));
         if (null == shareFileUrl) {

@@ -6,9 +6,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -19,13 +16,15 @@ import com.aphrodite.smartboard.model.bean.CW;
 import com.aphrodite.smartboard.model.bean.CWACT;
 import com.aphrodite.smartboard.model.bean.CWLine;
 import com.aphrodite.smartboard.utils.CWFileUtils;
-import com.aphrodite.smartboard.utils.LogUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import io.reactivex.Observable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * Created by Aphrodite on 2020/7/30.
@@ -51,8 +50,7 @@ public class CustomDrawView extends View {
     private Bitmap mBufferBitmap;
     private Canvas mBufferCanvas;
 
-    private List<List<DevicePoint>> mLines;
-    private List<DevicePoint> mPoints;
+    private List<DevicePoint> mDevicePoints;
     private float mLastX;
     private float mLastY;
     private float mPressure;
@@ -64,7 +62,6 @@ public class CustomDrawView extends View {
     public CustomDrawView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         this.mContext = context;
-        this.mLines = new ArrayList<>();
         this.mPressure = 1023;
         this.mLineWidth = 10;
         this.mLineColor = Color.BLACK;
@@ -100,10 +97,10 @@ public class CustomDrawView extends View {
                 }
                 mPath.moveTo(mLastX, mLastY);
 
-                if (null == mPoints) {
-                    mPoints = new ArrayList<>();
+                if (null == mDevicePoints) {
+                    mDevicePoints = new ArrayList<>();
                 } else {
-                    mPoints.clear();
+                    mDevicePoints.clear();
                 }
                 addPoint(mLastX, mLastY, mPressure);
                 break;
@@ -171,17 +168,17 @@ public class CustomDrawView extends View {
         point.setX((int) x);
         point.setY((int) y);
         point.setPressure((int) p);
-        mPoints.add(point);
+        mDevicePoints.add(point);
     }
 
     private void savePath() {
-        if (ObjectUtils.isEmpty(mPoints)) {
+        if (ObjectUtils.isEmpty(mDevicePoints)) {
             return;
         }
         int red = (mPaint.getColor() & 0xff0000) >> 16;
         int green = (mPaint.getColor() & 0x00ff00) >> 8;
         int blue = (mPaint.getColor() & 0x0000ff);
-        CWFileUtils.writeLine(mPoints, (int) mPaint.getStrokeWidth(), red + "," + green + "," + blue + ",1");
+        CWFileUtils.writeLine(mDevicePoints, (int) mPaint.getStrokeWidth(), red + "," + green + "," + blue + ",1");
     }
 
     //重新绘制
@@ -264,11 +261,10 @@ public class CustomDrawView extends View {
             mRemovePaths = null;
         }
 
-        if (null != mHandler) {
-            mHandler.removeCallbacksAndMessages(null);
-            mHandler = null;
+        if (null != mDevicePoints) {
+            mDevicePoints.clear();
+            mDevicePoints = null;
         }
-
     }
 
     //回放
@@ -287,6 +283,20 @@ public class CustomDrawView extends View {
             }
             createPaths(cwact.getLine(), delay, xScale, yScale);
         }
+
+        Observable.intervalRange(0, mDevicePoints.size(), 0, delay, TimeUnit.MILLISECONDS)
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Consumer<Long>() {
+                    @Override
+                    public void accept(Long aLong) throws Exception {
+                        DevicePoint point = mDevicePoints.get(Integer.parseInt(aLong.toString()));
+                        if (null == point) {
+                            return;
+                        }
+                        mBufferCanvas.drawPoint(point.getX(), point.getY(), mPaint);
+                        invalidate();
+                    }
+                });
     }
 
     private void createPaths(CWLine line, int delay, double xScale, double yScale) {
@@ -300,7 +310,6 @@ public class CustomDrawView extends View {
         if (ObjectUtils.isEmpty(points)) {
             return;
         }
-        LogUtils.d("Enter to createPaths. " + points.size());
         String[] split = line.getColor().split("\\,");
         int color = Color.rgb(Integer.valueOf(split[0]), Integer.valueOf(split[1]), Integer.valueOf(split[2]));
         int width = line.getWidth();
@@ -315,8 +324,13 @@ public class CustomDrawView extends View {
                 continue;
             }
             if (0 == i) {
-                mBufferCanvas.drawPoint((float) (xyPoints.get(0) * xScale), (float) (xyPoints.get(1) * yScale), mPaint);
-                invalidate();
+                if (null == mDevicePoints) {
+                    mDevicePoints = new ArrayList<>();
+                }
+                DevicePoint point = new DevicePoint();
+                point.setX((int) (xyPoints.get(0) * xScale));
+                point.setY((int) (xyPoints.get(1) * yScale));
+                mDevicePoints.add(point);
             } else {
                 drawPath(mLastX, mLastY, (float) (xyPoints.get(0) * xScale), (float) (xyPoints.get(1) * yScale));
             }
@@ -336,8 +350,13 @@ public class CustomDrawView extends View {
         for (int i = 0; i < insertCount; i++) {
             float insertX = startX + i * dx;
             float insertY = startY + i * dy;
-            mBufferCanvas.drawPoint(insertX, insertY, mPaint);
-            invalidate();
+            if (null == mDevicePoints) {
+                mDevicePoints = new ArrayList<>();
+            }
+            DevicePoint point = new DevicePoint();
+            point.setX((int) insertX);
+            point.setY((int) insertY);
+            mDevicePoints.add(point);
         }
     }
 
@@ -380,12 +399,6 @@ public class CustomDrawView extends View {
         int ERASER = BASE + 2;
     }
 
-    private interface WhatType {
-        int BASE = 0x00;
-        int WHAT_01 = BASE + 1;
-        int WHAT_02 = BASE + 1;
-    }
-
     private static class PathDraw {
         public Paint paint;
         public Path path;
@@ -397,20 +410,4 @@ public class CustomDrawView extends View {
         }
     }
 
-    private Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(@NonNull Message msg) {
-            Bundle bundle = msg.getData();
-            if (null == bundle) {
-                return;
-            }
-            float x = bundle.getFloat(String.valueOf(WhatType.WHAT_01));
-            float y = bundle.getFloat(String.valueOf(WhatType.WHAT_02));
-            LogUtils.d("Enter to handleMessage. (" + x + " , " + y + ")");
-            if (null != mBufferCanvas) {
-                mBufferCanvas.drawPoint(x, y, mPaint);
-                invalidate();
-            }
-        }
-    };
 }

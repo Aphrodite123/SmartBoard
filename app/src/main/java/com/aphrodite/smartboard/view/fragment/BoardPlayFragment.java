@@ -116,9 +116,9 @@ public class BoardPlayFragment extends BaseFragment {
         mCustomDrawView.postDelayed(new Runnable() {
             @Override
             public void run() {
-                mCustomDrawView.replay(mCw, 100, mXScale, mYScale);
+                mCustomDrawView.replay(mCw, 50, mXScale, mYScale);
             }
-        }, 200);
+        }, 100);
     }
 
     @Override
@@ -130,6 +130,10 @@ public class BoardPlayFragment extends BaseFragment {
         if (null != mEntities) {
             mEntities.clear();
             mEntities = null;
+        }
+        if (null != mCustomDrawView) {
+            mCustomDrawView.destory();
+            mCustomDrawView = null;
         }
     }
 

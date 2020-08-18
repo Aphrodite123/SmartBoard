@@ -281,7 +281,7 @@ public class CustomDrawView extends View {
             if (null == cwact) {
                 continue;
             }
-            createPaths(cwact.getLine(), delay, xScale, yScale);
+            createPaths(cwact.getLine(), xScale, yScale);
         }
 
         Observable.intervalRange(0, mDevicePoints.size(), 0, delay, TimeUnit.MILLISECONDS)
@@ -299,7 +299,7 @@ public class CustomDrawView extends View {
                 });
     }
 
-    private void createPaths(CWLine line, int delay, double xScale, double yScale) {
+    private void createPaths(CWLine line, double xScale, double yScale) {
         if (null == line) {
             return;
         }

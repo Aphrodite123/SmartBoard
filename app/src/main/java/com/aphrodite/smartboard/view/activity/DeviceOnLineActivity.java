@@ -8,6 +8,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
@@ -247,8 +248,11 @@ public class DeviceOnLineActivity extends BaseDeviceActivity {
                 }
                 break;
             case (byte) 0x11:
+                if (null == mDevicePoints) {
+                    mDevicePoints = new ArrayList<>();
+                }
                 //压下
-                if (null != mDevicePoints) {
+                if (devicePoint.getX() > 0 && devicePoint.getY() > 0 && devicePoint.getPressure() > 0) {
                     mDevicePoints.add(devicePoint);
                 }
                 break;
@@ -298,7 +302,6 @@ public class DeviceOnLineActivity extends BaseDeviceActivity {
         if (null == points || points.size() <= 0) {
             return;
         }
-
         //将线条进行分割
         int consult = points.size() / LINE_PARTS;
         if (consult > 1) {
@@ -450,8 +453,8 @@ public class DeviceOnLineActivity extends BaseDeviceActivity {
 
     @OnClick(R.id.iv_right_btn)
     public void onToolbarRightBtn() {
-        saveData();
-        pathsCut();
+        LoadSDcardTask loadSDcardTask = new LoadSDcardTask();
+        loadSDcardTask.execute();
     }
 
     private DeleteDialog.OnClickListener mClickListener = new DeleteDialog.OnClickListener() {
@@ -499,5 +502,33 @@ public class DeviceOnLineActivity extends BaseDeviceActivity {
             }
         }
     };
+
+    private class LoadSDcardTask extends AsyncTask<Object, Object, Object> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            showLoadingDialog();
+
+            String path = AppConfig.DATA_PATH + AppConfig.PATH_ONLINE_DATA;
+            File file = new File(path);
+            if (file.exists()) {
+                FileUtils.deleteDir(file, false);
+            }
+        }
+
+        @Override
+        protected Object doInBackground(Object... objects) {
+            saveData();
+            return true;
+        }
+
+        @Override
+        protected void onPostExecute(Object o) {
+            super.onPostExecute(o);
+            dismissLoadingDialog();
+
+            pathsCut();
+        }
+    }
 
 }

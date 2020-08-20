@@ -235,24 +235,25 @@ public class DeviceOnLineActivity extends BaseDeviceActivity {
                 mDevicePoints = null;
                 break;
             case (byte) 0x10:
-                initPaint();
                 //悬空
-                if (null == mDevicePoints) {
-                    mDevicePoints = new ArrayList<>();
-                } else {
-                    int red = (mPaint.getColor() & 0xff0000) >> 16;
-                    int green = (mPaint.getColor() & 0x00ff00) >> 8;
-                    int blue = (mPaint.getColor() & 0x0000ff);
-                    CWFileUtils.writeLine(mDevicePoints, (int) mPaint.getStrokeWidth(), red + "," + green + "," + blue + ",1");
-                    mDevicePoints.clear();
+                if (ObjectUtils.isEmpty(mDevicePoints)) {
+                    break;
                 }
+
+                initPaint();
+                int red = (mPaint.getColor() & 0xff0000) >> 16;
+                int green = (mPaint.getColor() & 0x00ff00) >> 8;
+                int blue = (mPaint.getColor() & 0x0000ff);
+                CWFileUtils.writeLine(mDevicePoints, (int) mPaint.getStrokeWidth(), red + "," + green + "," + blue + ",1");
+                mDevicePoints.clear();
                 break;
             case (byte) 0x11:
+                //压下
                 if (null == mDevicePoints) {
                     mDevicePoints = new ArrayList<>();
                 }
-                //压下
-                if (devicePoint.getX() > 0 && devicePoint.getY() > 0 && devicePoint.getPressure() > 0) {
+
+                if (devicePoint.getPressure() > 0) {
                     mDevicePoints.add(devicePoint);
                 }
                 break;

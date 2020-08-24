@@ -135,8 +135,14 @@ public class CWFileUtils {
         actStringBuilder.append("#ACT:" + timeTip + ",line");
         actStringBuilder.append("\n");
         actStringBuilder.append("{\"width\":" + width + ",\"color\":\"" + color + "\",\"points\":[");
+        int x;
+        int y;
+        int pressure;
         for (int i = 0; i < len; i++) {
-            actStringBuilder.append((i == 0 ? "[" : ",[") + points.get(i).getX() + "," + points.get(i).getY() + "," + points.get(i).getPressure() + "]");
+            x = points.get(i).getX();
+            y = points.get(i).getY();
+            pressure = points.get(i).getPressure();
+            actStringBuilder.append((i == 0 ? "[" : ",[") + x + "," + y + "," + pressure + "]");
         }
         actStringBuilder.append("]}");
         actStringBuilder.append("\n");

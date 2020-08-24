@@ -37,6 +37,7 @@ import com.aphrodite.smartboard.utils.CWFileUtils;
 import com.aphrodite.smartboard.utils.FFmpegUtils;
 import com.aphrodite.smartboard.utils.FileUtil;
 import com.aphrodite.smartboard.utils.FileUtils;
+import com.aphrodite.smartboard.utils.LogUtils;
 import com.aphrodite.smartboard.utils.Share2;
 import com.aphrodite.smartboard.view.activity.base.BaseDeviceActivity;
 import com.aphrodite.smartboard.view.widget.dialog.DeleteDialog;
@@ -231,10 +232,12 @@ public class DeviceOnLineActivity extends BaseDeviceActivity {
 
         switch (devicePoint.getState()) {
             case (byte) 0x00:
+                LogUtils.d("Enter to parseDevicePoint. 离开");
                 //离开
                 mDevicePoints = null;
                 break;
             case (byte) 0x10:
+                LogUtils.d("Enter to parseDevicePoint. 悬空");
                 //悬空
                 if (ObjectUtils.isEmpty(mDevicePoints)) {
                     break;
@@ -248,6 +251,7 @@ public class DeviceOnLineActivity extends BaseDeviceActivity {
                 mDevicePoints.clear();
                 break;
             case (byte) 0x11:
+                LogUtils.d("Enter to parseDevicePoint. 压下");
                 //压下
                 if (null == mDevicePoints) {
                     mDevicePoints = new ArrayList<>();
@@ -309,7 +313,6 @@ public class DeviceOnLineActivity extends BaseDeviceActivity {
             List<List<Integer>> splitPoints = new ArrayList<>();
             for (int i = 1; i < consult + 1; i++) {
                 splitPoints.clear();
-
                 if (1 == i) {
                     splitPoints.addAll(points.subList(0, LINE_PARTS));
                 } else if (consult == i) {

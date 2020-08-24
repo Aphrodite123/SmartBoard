@@ -1,19 +1,19 @@
 {
   "buildFiles": [
-    "D:\\SoftWare\\Android\\SDK\\ndk\\21.3.6528147\\build\\cmake\\platforms.cmake",
-    "D:\\SoftWare\\Android\\SDK\\ndk\\21.3.6528147\\build\\cmake\\android.toolchain.cmake",
-    "D:\\Application\\Aphrodite\\SmartBoard\\app\\CMakeLists.txt"
+    "E:\\Software\\Android\\Sdk\\ndk\\21.3.6528147\\build\\cmake\\platforms.cmake",
+    "E:\\Software\\Android\\Sdk\\ndk\\21.3.6528147\\build\\cmake\\android.toolchain.cmake",
+    "D:\\Application\\SmartBoard\\app\\CMakeLists.txt"
   ],
   "cleanCommands": [
-    "D:\\SoftWare\\Android\\sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"D:\\Application\\Aphrodite\\SmartBoard\\app\\.cxx\\cmake\\debug\\arm64-v8a\" clean"
+    "E:\\Software\\Android\\Sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"D:\\Application\\SmartBoard\\app\\.cxx\\cmake\\debug\\arm64-v8a\" clean"
   ],
-  "buildTargetsCommand": "D:\\SoftWare\\Android\\sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe  -C \"D:\\Application\\Aphrodite\\SmartBoard\\app\\.cxx\\cmake\\debug\\arm64-v8a\" {LIST_OF_TARGETS_TO_BUILD}",
+  "buildTargetsCommand": "E:\\Software\\Android\\Sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe  -C \"D:\\Application\\SmartBoard\\app\\.cxx\\cmake\\debug\\arm64-v8a\" {LIST_OF_TARGETS_TO_BUILD}",
   "libraries": {
     "media-handle-Debug-arm64-v8a": {
       "artifactName": "media-handle",
-      "buildCommand": "D:\\SoftWare\\Android\\sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"D:\\Application\\Aphrodite\\SmartBoard\\app\\.cxx\\cmake\\debug\\arm64-v8a\" media-handle",
+      "buildCommand": "E:\\Software\\Android\\Sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"D:\\Application\\SmartBoard\\app\\.cxx\\cmake\\debug\\arm64-v8a\" media-handle",
       "abi": "arm64-v8a",
-      "output": "D:\\Application\\Aphrodite\\SmartBoard\\app\\build\\intermediates\\cmake\\debug\\obj\\arm64-v8a\\libmedia-handle.so",
+      "output": "D:\\Application\\SmartBoard\\app\\build\\intermediates\\cmake\\debug\\obj\\arm64-v8a\\libmedia-handle.so",
       "runtimeFiles": []
     }
   }

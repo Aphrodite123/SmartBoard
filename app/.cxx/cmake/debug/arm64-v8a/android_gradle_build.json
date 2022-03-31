@@ -1,116 +1,116 @@
 {
   "stringTable": {
-    "0": "D:/Application/SmartBoard/app/.cxx/cmake/debug/arm64-v8a",
-    "1": "--target=aarch64-none-linux-android21 --gcc-toolchain=E:/Software/Android/Sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=E:/Software/Android/Sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/windows-x86_64/sysroot -Dmedia_handle_EXPORTS -I../../../../src/main/cpp -I../../../../src/main/cpp/include -I../../../../src/main/cpp/include/arm64-v8a -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security -O0 -fno-limit-debug-info -fPIC",
-    "2": "--target=aarch64-none-linux-android21 --gcc-toolchain=E:/Software/Android/Sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=E:/Software/Android/Sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/windows-x86_64/sysroot -Dmedia_handle_EXPORTS -I../../../../src/main/cpp -I../../../../src/main/cpp/include -I../../../../src/main/cpp/include/arm64-v8a -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security -std=gnu++11 -O0 -fno-limit-debug-info -fPIC"
+    "0": "D:/Application/Aphrodite/SmartBoard/app/.cxx/cmake/debug/arm64-v8a",
+    "1": "--target=aarch64-none-linux-android21 --gcc-toolchain=D:/SoftWare/Android/SDK/ndk/21.3.6528147/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=D:/SoftWare/Android/SDK/ndk/21.3.6528147/toolchains/llvm/prebuilt/windows-x86_64/sysroot -Dmedia_handle_EXPORTS -I../../../../src/main/cpp -I../../../../src/main/cpp/include -I../../../../src/main/cpp/include/arm64-v8a -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security -O0 -fno-limit-debug-info -fPIC",
+    "2": "--target=aarch64-none-linux-android21 --gcc-toolchain=D:/SoftWare/Android/SDK/ndk/21.3.6528147/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=D:/SoftWare/Android/SDK/ndk/21.3.6528147/toolchains/llvm/prebuilt/windows-x86_64/sysroot -Dmedia_handle_EXPORTS -I../../../../src/main/cpp -I../../../../src/main/cpp/include -I../../../../src/main/cpp/include/arm64-v8a -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security -std=gnu++11 -O0 -fno-limit-debug-info -fPIC"
   },
   "buildFiles": [
-    "E:\\Software\\Android\\Sdk\\ndk\\21.3.6528147\\build\\cmake\\platforms.cmake",
-    "E:\\Software\\Android\\Sdk\\ndk\\21.3.6528147\\build\\cmake\\android.toolchain.cmake",
-    "D:\\Application\\SmartBoard\\app\\CMakeLists.txt"
+    "D:\\SoftWare\\Android\\SDK\\ndk\\21.3.6528147\\build\\cmake\\platforms.cmake",
+    "D:\\SoftWare\\Android\\SDK\\ndk\\21.3.6528147\\build\\cmake\\android.toolchain.cmake",
+    "D:\\Application\\Aphrodite\\SmartBoard\\app\\CMakeLists.txt"
   ],
   "cleanCommands": [
-    "E:\\Software\\Android\\Sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"D:\\Application\\SmartBoard\\app\\.cxx\\cmake\\debug\\arm64-v8a\" clean"
+    "D:\\SoftWare\\Android\\sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"D:\\Application\\Aphrodite\\SmartBoard\\app\\.cxx\\cmake\\debug\\arm64-v8a\" clean"
   ],
-  "buildTargetsCommand": "E:\\Software\\Android\\Sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe  -C \"D:\\Application\\SmartBoard\\app\\.cxx\\cmake\\debug\\arm64-v8a\" {LIST_OF_TARGETS_TO_BUILD}",
+  "buildTargetsCommand": "D:\\SoftWare\\Android\\sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe  -C \"D:\\Application\\Aphrodite\\SmartBoard\\app\\.cxx\\cmake\\debug\\arm64-v8a\" {LIST_OF_TARGETS_TO_BUILD}",
   "libraries": {
     "media-handle-Debug-arm64-v8a": {
-      "buildCommand": "E:\\Software\\Android\\Sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"D:\\Application\\SmartBoard\\app\\.cxx\\cmake\\debug\\arm64-v8a\" media-handle",
+      "buildCommand": "D:\\SoftWare\\Android\\sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"D:\\Application\\Aphrodite\\SmartBoard\\app\\.cxx\\cmake\\debug\\arm64-v8a\" media-handle",
       "buildType": "debug",
-      "toolchain": "2386398144",
+      "toolchain": "241491936",
       "abi": "arm64-v8a",
       "artifactName": "media-handle",
       "files": [
         {
-          "src": "D:\\Application\\SmartBoard\\app\\src\\main\\cpp\\ffmpeg\\cmdutils.c",
+          "src": "D:\\Application\\Aphrodite\\SmartBoard\\app\\src\\main\\cpp\\ffmpeg\\cmdutils.c",
           "flagsOrdinal": 1,
           "workingDirectoryOrdinal": 0
         },
         {
-          "src": "D:\\Application\\SmartBoard\\app\\src\\main\\cpp\\ffmpeg\\ffmpeg.c",
+          "src": "D:\\Application\\Aphrodite\\SmartBoard\\app\\src\\main\\cpp\\ffmpeg\\ffmpeg.c",
           "flagsOrdinal": 1,
           "workingDirectoryOrdinal": 0
         },
         {
-          "src": "D:\\Application\\SmartBoard\\app\\src\\main\\cpp\\ffmpeg\\ffmpeg_filter.c",
+          "src": "D:\\Application\\Aphrodite\\SmartBoard\\app\\src\\main\\cpp\\ffmpeg\\ffmpeg_filter.c",
           "flagsOrdinal": 1,
           "workingDirectoryOrdinal": 0
         },
         {
-          "src": "D:\\Application\\SmartBoard\\app\\src\\main\\cpp\\ffmpeg\\ffmpeg_opt.c",
+          "src": "D:\\Application\\Aphrodite\\SmartBoard\\app\\src\\main\\cpp\\ffmpeg\\ffmpeg_opt.c",
           "flagsOrdinal": 1,
           "workingDirectoryOrdinal": 0
         },
         {
-          "src": "D:\\Application\\SmartBoard\\app\\src\\main\\cpp\\ffmpeg_cmd.c",
+          "src": "D:\\Application\\Aphrodite\\SmartBoard\\app\\src\\main\\cpp\\ffmpeg_cmd.c",
           "flagsOrdinal": 1,
           "workingDirectoryOrdinal": 0
         },
         {
-          "src": "D:\\Application\\SmartBoard\\app\\src\\main\\cpp\\ffmpeg\\ffprobe.c",
+          "src": "D:\\Application\\Aphrodite\\SmartBoard\\app\\src\\main\\cpp\\ffmpeg\\ffprobe.c",
           "flagsOrdinal": 1,
           "workingDirectoryOrdinal": 0
         },
         {
-          "src": "D:\\Application\\SmartBoard\\app\\src\\main\\cpp\\audio_player.c",
+          "src": "D:\\Application\\Aphrodite\\SmartBoard\\app\\src\\main\\cpp\\audio_player.c",
           "flagsOrdinal": 1,
           "workingDirectoryOrdinal": 0
         },
         {
-          "src": "D:\\Application\\SmartBoard\\app\\src\\main\\cpp\\openSL_audio_player.c",
+          "src": "D:\\Application\\Aphrodite\\SmartBoard\\app\\src\\main\\cpp\\openSL_audio_player.c",
           "flagsOrdinal": 1,
           "workingDirectoryOrdinal": 0
         },
         {
-          "src": "D:\\Application\\SmartBoard\\app\\src\\main\\cpp\\video_player.c",
+          "src": "D:\\Application\\Aphrodite\\SmartBoard\\app\\src\\main\\cpp\\video_player.c",
           "flagsOrdinal": 1,
           "workingDirectoryOrdinal": 0
         },
         {
-          "src": "D:\\Application\\SmartBoard\\app\\src\\main\\cpp\\AVpacket_queue.c",
+          "src": "D:\\Application\\Aphrodite\\SmartBoard\\app\\src\\main\\cpp\\AVpacket_queue.c",
           "flagsOrdinal": 1,
           "workingDirectoryOrdinal": 0
         },
         {
-          "src": "D:\\Application\\SmartBoard\\app\\src\\main\\cpp\\media_player.c",
+          "src": "D:\\Application\\Aphrodite\\SmartBoard\\app\\src\\main\\cpp\\media_player.c",
           "flagsOrdinal": 1,
           "workingDirectoryOrdinal": 0
         },
         {
-          "src": "D:\\Application\\SmartBoard\\app\\src\\main\\cpp\\video_filter.c",
+          "src": "D:\\Application\\Aphrodite\\SmartBoard\\app\\src\\main\\cpp\\video_filter.c",
           "flagsOrdinal": 1,
           "workingDirectoryOrdinal": 0
         },
         {
-          "src": "D:\\Application\\SmartBoard\\app\\src\\main\\cpp\\audio_lame.c",
+          "src": "D:\\Application\\Aphrodite\\SmartBoard\\app\\src\\main\\cpp\\audio_lame.c",
           "flagsOrdinal": 1,
           "workingDirectoryOrdinal": 0
         },
         {
-          "src": "D:\\Application\\SmartBoard\\app\\src\\main\\cpp\\fast_start.c",
+          "src": "D:\\Application\\Aphrodite\\SmartBoard\\app\\src\\main\\cpp\\fast_start.c",
           "flagsOrdinal": 1,
           "workingDirectoryOrdinal": 0
         },
         {
-          "src": "D:\\Application\\SmartBoard\\app\\src\\main\\cpp\\ffprobe_cmd.c",
+          "src": "D:\\Application\\Aphrodite\\SmartBoard\\app\\src\\main\\cpp\\ffprobe_cmd.c",
           "flagsOrdinal": 1,
           "workingDirectoryOrdinal": 0
         },
         {
-          "src": "D:\\Application\\SmartBoard\\app\\src\\main\\cpp\\ffmpeg_pusher.cpp",
+          "src": "D:\\Application\\Aphrodite\\SmartBoard\\app\\src\\main\\cpp\\ffmpeg_pusher.cpp",
           "flagsOrdinal": 2,
           "workingDirectoryOrdinal": 0
         }
       ],
       "headers": [],
-      "output": "D:\\Application\\SmartBoard\\app\\build\\intermediates\\cmake\\debug\\obj\\arm64-v8a\\libmedia-handle.so",
+      "output": "D:\\Application\\Aphrodite\\SmartBoard\\app\\build\\intermediates\\cmake\\debug\\obj\\arm64-v8a\\libmedia-handle.so",
       "runtimeFiles": []
     }
   },
   "toolchains": {
-    "2386398144": {
-      "cCompilerExecutable": "E:\\Software\\Android\\Sdk\\ndk\\21.3.6528147\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang.exe",
-      "cppCompilerExecutable": "E:\\Software\\Android\\Sdk\\ndk\\21.3.6528147\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe"
+    "241491936": {
+      "cCompilerExecutable": "D:\\SoftWare\\Android\\SDK\\ndk\\21.3.6528147\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang.exe",
+      "cppCompilerExecutable": "D:\\SoftWare\\Android\\SDK\\ndk\\21.3.6528147\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe"
     }
   },
   "cFileExtensions": [

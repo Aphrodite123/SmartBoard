@@ -291,7 +291,7 @@ public class BoardEditorFragment extends BaseFragment {
                 break;
             //清空
             case 3:
-                mCanvas.clear();
+                mCanvas.undo();
                 mCanvas.setMode(CustomDrawView.Mode.DRAW);
                 break;
         }
